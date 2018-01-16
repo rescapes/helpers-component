@@ -14,7 +14,6 @@ import {
   propsForItem, propsForSansClass,
   renderChoicepoint, renderErrorDefault, renderLoadingDefault
 } from 'src/lib/componentHelpers';
-import mergeDeepWith from 'ramda/es/mergeDeepWith';
 import {concatFeatures, featureByType, geojsonByType} from 'src/lib/geojsonHelpers';
 import {calculateDistance} from 'src/lib/geospatialHelpers';
 import {copy, fromImmutable, toImmutable, toImmutableKeyedByProp, toJS} from 'src/lib/immutableHelpers';
@@ -46,7 +45,6 @@ export {
   renderChoicepoint,
   mergeActionsForViews,
   mergePropsForViews,
-  mergeDeepWith,
   keyWith,
   applyToIfFunction,
   applyIfFunction,
@@ -73,7 +71,6 @@ export {
   toImmutable,
   toJS,
   fromImmutable,
-  toImmutable,
   toImmutableKeyedByProp,
   copy,
   sankeyGenerator,
