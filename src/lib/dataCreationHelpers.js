@@ -12,9 +12,9 @@
 import * as R from 'ramda';
 import moment from 'moment';
 
-import {fromImmutable} from 'helpers/immutableHelpers';
-import {toTimeString} from 'helpers/timeHelpers';
-import {calculateDistance} from 'helpers/geospatialHelpers';
+import {fromImmutable} from './immutableHelpers';
+import {toTimeString} from './timeHelpers';
+import {calculateDistance} from './geospatialHelpers';
 const { capitalize, compact, compactJoin, emptyToNull, idOrIdFromObj, reduceWithNext } = require('rescape-ramda');
 
 // Direction ids for typical Trip pairs

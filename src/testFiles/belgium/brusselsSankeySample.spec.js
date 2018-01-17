@@ -8,25 +8,11 @@
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+import graph from './brusselsSankeySample'
 
-import {loadSpreadsheet} from './authHelpers';
-
-const publishedUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSoIoERtsGlNhJfKUlCpTRt1RUOVo66C5NrCXyDrlZw5zXbuy2JkkU2p6oQCvlT5GS4iGN3dUvjklO_/pubhtml'
-describe('authHelpers', () => {
-  test('loadSpreadsheet', () => {
-    loadSpreadsheet('1rnyHarvMFhSmC1bsmfvxQxF2X8DzmUwpU0Jsu0ZssF0').fork(
-      error => {
-        throw error
-
-      },
-      spreadsheet => {
-        spreadsheet.worksheets[0].cells(
-          {range: 'R1C1:R5C5'},
-          (err, cells) => {
-            // Cells will contain a 2 dimensional array with all cell data in the
-            // range requested.
-          });
-      }
-    );
-  });
-});
+describe('brusselsSankeySample', () => {
+  test('it', () => {
+    expect(graph.nodes.length).toBeGreaterThan(0)
+    expect(graph.links.length).toBeGreaterThan(0)
+  })
+})

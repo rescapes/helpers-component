@@ -10,7 +10,7 @@
  */
 
 
-import {sankeyGenerator, unprojectNode} from 'helpers/sankeyHelpers';
+import {sankeyGenerator, unprojectNode} from './sankeyHelpers';
 import sankeyData from 'data/sankey.sample';
 import * as R from 'ramda';
 import NamedTupleMap from 'namedtuplemap';

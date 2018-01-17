@@ -12,7 +12,7 @@
 import {
   resolveSvgReact, resolveSvgPoints, resolveFeatureFromExtent, nodeToFeature,
   translateNodeFeature
-} from 'helpers/svgHelpers';
+} from './svgHelpers';
 import * as R from 'ramda';
 
 describe('svgHelpers', () => {

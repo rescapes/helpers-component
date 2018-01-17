@@ -17,11 +17,11 @@ import Task from 'data.task';
 import * as R from 'ramda';
 import {makeMockStore} from './testHelpers';
 import {sampleConfig} from 'data/samples/sampleConfig';
-import {eMap} from 'helpers/componentHelpers';
+import {eMap} from './componentHelpers';
 const [div] = eMap(['div']);
 import React from 'react';
 import * as Either from 'data.either';
-import {eitherToPromise} from 'helpers/testHelpers';
+import {eitherToPromise} from './testHelpers';
 
 describe('jestHelpers', () => {
   test('expectTask', () => {

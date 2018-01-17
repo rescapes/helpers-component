@@ -13,14 +13,14 @@
 import {
   eitherToPromise, makeSampleInitialState, mockApolloClientWithSamples,
   propsFromSampleStateAndContainer, waitForChildComponentRender, wrapWithMockGraphqlAndStore
-} from 'helpers/testHelpers';
-import {getClass} from 'helpers/styleHelpers';
+} from './testHelpers';
+import {getClass} from './styleHelpers';
 import * as R from 'ramda';
 import * as Either from 'data.either';
-import {theme} from 'styles/styles';
 import {Provider as provider} from 'rebass';
-import {eMap} from 'helpers/componentHelpers';
+import {eMap} from './componentHelpers';
 const [Provider] = eMap([provider])
+const theme = {}
 
 /**
  * Runs tests on an apollo React container with the * given config.

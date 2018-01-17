@@ -24,7 +24,7 @@ import {InMemoryCache} from 'apollo-client-preset';
 import {SchemaLink} from 'apollo-link-schema';
 import PropTypes from 'prop-types';
 import {createWaitForElement} from 'enzyme-wait';
-import {getClass} from 'helpers/styleHelpers';
+import {getClass} from './styleHelpers';
 import {onError} from "apollo-link-error";
 import prettyFormat from 'pretty-format';
 const sampleConfig = getCurrentConfig()

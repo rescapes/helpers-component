@@ -16,7 +16,7 @@ import {
   nameLookup, propsFor,
   propsForSansClass, strPath, itemizeProps, applyToIfFunction, keyWith, propsForItem, applyIfFunction, composeViews,
   composeViewsFromStruct, whenProp
-} from 'helpers/componentHelpers';
+} from './componentHelpers';
 import {throwing, hasStrPath} from 'rescape-ramda';
 
 const {reqStrPath} = throwing;

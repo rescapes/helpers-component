@@ -1,12 +1,12 @@
 
-import places from './california/californiaPlaces';
+import places from 'testFiles/california/californiaPlaces';
 import helper from './dataCreationHelpers';
-import w from './california/californiaStops';
-import regions from './california/californiaRegions';
-import * as routeTypes from './default/routeTypes';
-import {DEFAULT_SERVICE} from './default/services';
+import w from 'testFiles/california/californiaStops';
+import regions from 'testFiles/california/californiaRegions';
+import * as routeTypes from 'testFiles/default/routeTypes';
+import {DEFAULT_SERVICE} from 'testFiles/default/services';
 import query from './dataQueryHelpers';
-import * as stopTypes from 'data/default/stopTypes';
+import * as stopTypes from 'testFiles/default/stopTypes';
 
 describe('Data Creation Helpers', () => {
     test('Creates a Stop id from a Place and Stop location', () => {

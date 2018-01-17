@@ -15,12 +15,12 @@ import {v} from 'rescape-validate';
 import PropTypes from 'prop-types';
 import {filterWithKeys, mapKeys, mergeDeep, throwing} from 'rescape-ramda';
 import * as Either from 'data.either';
-import {getClassAndStyle, getStyleObj} from 'helpers/styleHelpers';
+import {getClassAndStyle, getStyleObj} from './styleHelpers';
 import prettyFormat from 'pretty-format';
 import {graphql} from 'graphql';
-import {createSelectorResolvedSchema} from 'schema/selectorResolvers';
-import {getCurrentConfig} from 'data/current/currentConfig';
-import makeSchema from 'schema/schema';
+import {createSelectorResolvedSchema} from 'testFiles/schema/selectorResolvers';
+import {getCurrentConfig} from 'testFiles/current/currentConfig';
+import makeSchema from 'testFiles/schema/schema';
 import {createSelectorCreator, defaultMemoize} from 'reselect';
 import {compact} from 'enzyme-to-json';
 

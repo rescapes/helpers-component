@@ -47,6 +47,10 @@ import {
   TO_FROM_DIRECTION
 } from 'src/lib/dataCreationHelpers';
 import {routeResolver, tripResolver} from 'src/lib/dataQueryHelpers';
+import {
+  asUnaryMemoize, findOneValueByParams, makeInnerJoinByLensThenFilterSelector,
+  mergeStateAndProps
+} from 'lib/selectorHelpers';
 
 const dataCreationHelpers = {
   FROM_TO_DIRECTION,
@@ -145,6 +149,10 @@ export {
   applyRegionsToUsers,
   wrapLocationsWithFeatures,
   firstUserLens,
+  mergeStateAndProps,
+  makeInnerJoinByLensThenFilterSelector,
+  findOneValueByParams,
+  asUnaryMemoize,
   dataCreationHelpers,
   dataQueryHelpers
 };

@@ -11,10 +11,10 @@
 
 import * as R from 'ramda';
 import {sankey} from 'd3-sankey';
-import {asUnaryMemoize} from 'selectors/selectorHelpers';
+import {asUnaryMemoize} from './selectorHelpers';
 //import {BART_SAMPLE} from 'data/samples/oakland-sample/oaklandLocations.sample';
 import {mergeDeep, throwing} from 'rescape-ramda';
-import {resolveFeatureFromExtent, resolveSvgPoints} from 'helpers/svgHelpers';
+import {resolveFeatureFromExtent, resolveSvgPoints} from './svgHelpers';
 import bbox from '@turf/bbox';
 import bboxPolygon from '@turf/bbox-polygon';
 import center from '@turf/center';

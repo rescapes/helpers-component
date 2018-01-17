@@ -24,12 +24,23 @@
   "homepage": "https://github.com/udiliaInc/create-react-library#readme",
   "license": "MIT",
   "dependencies": {
+    "apollo-client-preset": "^1.0.6",
+    "d3-sankey": "^0.7.1",
+    "data.either": "^1.5.1",
+    "enzyme": "^3.3.0",
+    "enzyme-to-json": "^3.3.0",
+    "graphql": "^0.12.3",
+    "graphql-geojson": "^1.0.0",
+    "graphql-tools": "^2.18.0",
     "immutable": "^3.8.2",
+    "memoize-immutable": "^3.0.0",
     "moment": "^2.20.1",
     "moment-duration-format": "^2.2.0",
     "ramda": "^0.25.0",
+    "rebass": "^1.0.4",
     "rescape-ramda": "^1.2.10",
-    "rescape-validate": "^1.2.3"
+    "rescape-validate": "^1.2.3",
+    "reselect": "^3.0.1"
   },
   "devDependencies": {
     "autoprefixer": "7.1.6",
@@ -77,6 +88,9 @@
     "react-dom": ">=0.14"
   },
   "jest": {
+    "modulePaths": [
+      "<rootDir>/src"
+    ],
     "collectCoverageFrom": [
       "src/**/*.{js,jsx,mjs}"
     ],
