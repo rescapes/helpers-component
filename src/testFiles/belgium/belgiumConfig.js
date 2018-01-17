@@ -12,8 +12,8 @@
 import regions from './belgiumRegions';
 import users from './belgiumUsers';
 import * as R from 'ramda';
-import {defaultConfig} from 'data/default/defaultConfig';
-import {applyRegionsToUsers, firstUserLens} from 'data/configHelpers';
+import {defaultConfig} from 'testfiles/default/defaultConfig';
+import {applyRegionsToUsers, firstUserLens} from 'lib/configHelpers';
 
 /**
  * California configuration

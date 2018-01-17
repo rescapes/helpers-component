@@ -18,7 +18,7 @@
  * @returns {Object} The "modified" defaultConfig
  */
 import {applyDefaultRegion, mapDefaultUsers, keysAsIdObj, applyRegionsToUsers} from './configHelpers';
-import {defaultConfig, userTemplateKeys} from 'data/default';
+import {defaultConfig, userTemplateKeys} from 'testfiles/default';
 import * as R from 'ramda';
 import {throwing} from 'rescape-ramda';
 const {reqPath} = throwing

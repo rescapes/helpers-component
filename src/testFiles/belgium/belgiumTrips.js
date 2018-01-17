@@ -20,7 +20,7 @@ import {createTripWithStopTimesPair, orderStops, stopTimeGenerator} from 'lib/da
 import {stopResolver, routeResolver} from 'lib/dataQueryHelpers';
 import places from './belgiumPlaces';
 import * as regions from './belgiumRegions';
-import {DEFAULT_SERVICE} from 'data/default/services';
+import {DEFAULT_SERVICE} from 'testfiles/default/services';
 import * as R from 'ramda';
 
 const resolveStop = stopResolver(stops);

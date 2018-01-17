@@ -29,7 +29,7 @@ export const applyDefaultRegion = v(regions =>
         'default',
         // Keys of obj or string indexes of array
         R.keys(regions),
-        reqPath(['regions'], require('data/default').defaultConfig)
+        reqPath(['regions'], require('testfiles/default').defaultConfig)
       ),
       regions
     ),
@@ -57,7 +57,7 @@ export const applyDefaultRegion = v(regions =>
  * @returns {Object} The "modified" defaultConfig.users merged into the defaultUserKeyToUserObjs
  */
 export const mapDefaultUsers = v(defaultUserKeyToUserObjs => {
-    const defaultUsers = reqPath(['users'], require('data/default').defaultConfig);
+    const defaultUsers = reqPath(['users'], require('testfiles/default').defaultConfig);
     return R.mapObjIndexed(
       (users, defaultUserKey) => R.map(
         user => mergeDeep(reqPath([defaultUserKey], defaultUsers), user),
