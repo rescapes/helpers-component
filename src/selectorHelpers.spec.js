@@ -12,7 +12,7 @@
 import * as R from 'ramda';
 import { mergeStateAndProps, makeInnerJoinByLensThenFilterSelector, findOneValueByParams }
   from './selectorHelpers';
-import {asUnaryMemoize} from 'selectors/selectorHelpers';
+import {asUnaryMemoize} from 'selectorHelpers';
 
 describe('reselectHelpers', () => {
 

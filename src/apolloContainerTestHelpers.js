@@ -55,6 +55,7 @@ const theme = {}
 export const apolloContainerTests = (config) => {
 
     const {
+      schema,
       Container,
       componentName,
       childClassDataName,
@@ -101,7 +102,7 @@ export const apolloContainerTests = (config) => {
       test('query', async () => {
         const parentProps = await asyncParentPropsOrDefault;
         const props = await propsFromSampleStateAndContainer(testPropsMaker, parentProps).then(eitherToPromise);
-        const data = await mockApolloClientWithSamples().query({
+        const data = await mockApolloClientWithSamples(schema).query({
           query,
           variables: queryVariables(props),
           context: {

@@ -22,18 +22,19 @@ const {reqPath} = throwing;
  * @param {Object} regions keyed by key if an object and valued by region.
  * @returns {Object} The "modified" defaultConfig.regions
  */
-export const applyDefaultRegion = v(regions =>
+export const applyDefaultRegion = v((defaultConfig, regions) =>
     mergeDeep(
       moveToKeys(
         R.lensPath([]),
         'default',
         // Keys of obj or string indexes of array
         R.keys(regions),
-        reqPath(['regions'], require('testfiles/default').defaultConfig)
+        reqPath(['regions'], defaultConfig)
       ),
       regions
     ),
   [
+    ['defaultConfig', PropTypes.shape().isRequired],
     ['regions', PropTypes.oneOfType([PropTypes.shape(), PropTypes.array]).isRequired]
   ], 'applyDefaultRegion');
 
@@ -42,6 +43,7 @@ export const applyDefaultRegion = v(regions =>
  * This basically clones a template so that it can be merged into each real user
  * The default users of the defaultConfig are copied to the given usersKeys within the defaultConfig,
  * producing a new defaultConfig to merge with the target config
+ * @param {Object} defaultConfig The configuration to use
  * @param {Object} defaultUserKeyToUserObjs Maps each default user key of interest to a list of
  * target user keyed objects.
  * E.g.  {
@@ -56,8 +58,8 @@ export const applyDefaultRegion = v(regions =>
  * }
  * @returns {Object} The "modified" defaultConfig.users merged into the defaultUserKeyToUserObjs
  */
-export const mapDefaultUsers = v(defaultUserKeyToUserObjs => {
-    const defaultUsers = reqPath(['users'], require('testfiles/default').defaultConfig);
+export const mapDefaultUsers = v((defaultConfig, defaultUserKeyToUserObjs) => {
+    const defaultUsers = reqPath(['users'], defaultConfig);
     return R.mapObjIndexed(
       (users, defaultUserKey) => R.map(
         user => mergeDeep(reqPath([defaultUserKey], defaultUsers), user),
@@ -67,6 +69,7 @@ export const mapDefaultUsers = v(defaultUserKeyToUserObjs => {
     );
   },
   [
+    ['defaultConfig', PropTypes.shape().isRequired],
     ['defaultUserKeyToUserKeys', PropTypes.shape().isRequired]
   ], 'mapDefaultUsers'
 );

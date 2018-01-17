@@ -18,13 +18,20 @@
  * @returns {Object} The "modified" defaultConfig
  */
 import {applyDefaultRegion, mapDefaultUsers, keysAsIdObj, applyRegionsToUsers} from './configHelpers';
-import {defaultConfig, userTemplateKeys} from 'testfiles/default';
 import * as R from 'ramda';
 import {throwing} from 'rescape-ramda';
 const {reqPath} = throwing
-const {REGION_MANAGER, REGION_USER, REGION_VISITOR} = userTemplateKeys;
+const REGION_MANAGER = 'region_manager';
+const REGION_USER = 'region_user';
 
 describe('configHelpers', () => {
+  const defaultConfig = {
+    regions: {
+      default: {
+        id: 'aTemplateRegion'
+      }
+    }
+  }
   test('applyDefaultRegion', () => {
     const regions = {
       kamchatka: {
@@ -41,7 +48,7 @@ describe('configHelpers', () => {
       }
     };
     expect(
-      R.keys(applyDefaultRegion(regions).kamchatka).sort()
+      R.keys(applyDefaultRegion(defaultConfig, regions).kamchatka).sort()
     ).toEqual(
       R.keys(
         R.merge(

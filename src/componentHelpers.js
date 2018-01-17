@@ -13,18 +13,14 @@ import React from 'react';
 import * as R from 'ramda';
 import {v} from 'rescape-validate';
 import PropTypes from 'prop-types';
-import {filterWithKeys, mapKeys, mergeDeep, throwing} from 'rescape-ramda';
+import {mergeDeep, throwing} from 'rescape-ramda';
 import * as Either from 'data.either';
 import {getClassAndStyle, getStyleObj} from './styleHelpers';
 import prettyFormat from 'pretty-format';
 import {graphql} from 'graphql';
-import {createSelectorResolvedSchema} from 'testFiles/schema/selectorResolvers';
-import {getCurrentConfig} from 'testFiles/current/currentConfig';
-import makeSchema from 'testFiles/schema/schema';
 import {createSelectorCreator, defaultMemoize} from 'reselect';
 import {compact} from 'enzyme-to-json';
 
-const sampleConfig = getCurrentConfig();
 
 const {reqPath} = throwing;
 
@@ -308,6 +304,10 @@ export const makeTestPropsFunction = (mapStateToProps, mapDispatchToProps) =>
 
 /**
  * Like makeTestPropsFunction, but additionally resolves an Apollo query to supply complete data for a test
+ * @param {Function} createResolvedSchema Function expecting an Apollo schema and sampleConfig that returns
+ * a schema with resolvers that rely on the sampleConfig
+ * @param {Object} the Apollo schema
+ * @param {Object} the sampleConfig
  * @param {Function} mapStateToProps
  * @param {Function} mapDispatchToProps
  * @param {Function} mergeProps
@@ -328,8 +328,8 @@ export const makeTestPropsFunction = (mapStateToProps, mapDispatchToProps) =>
  *  The function returns a Promise that passes an Either.Left or Right. If Left there ar errors in the Either.value. If
  *  Right then the value is the store
  */
-export const makeApolloTestPropsFunction = R.curry((mapStateToProps, mapDispatchToProps, {query, args}) => {
-  const resolvedSchema = createSelectorResolvedSchema(makeSchema(), sampleConfig);
+export const makeApolloTestPropsFunction = R.curry((createResolvedSchema, schema, sampleConfig, mapStateToProps, mapDispatchToProps, {query, args}) => {
+  const resolvedSchema = createResolvedSchema(schema, sampleConfig);
 
   return R.composeP(
     props => {

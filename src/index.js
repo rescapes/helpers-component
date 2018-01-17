@@ -1,4 +1,4 @@
-import {apolloContainerTests} from 'src/lib/apolloContainerTestHelpers';
+import {apolloContainerTests} from 'src/apolloContainerTestHelpers';
 import {loadSpreadsheet} from 'src/lib/authHelpers';
 import {
   applyIfFunction,
@@ -13,71 +13,39 @@ import {
   propLensEqual, propsAndStyle, propsFor,
   propsForItem, propsForSansClass,
   renderChoicepoint, renderErrorDefault, renderLoadingDefault
-} from 'src/lib/componentHelpers';
-import {concatFeatures, featureByType, geojsonByType} from 'src/lib/geojsonHelpers';
-import {calculateDistance} from 'src/lib/geospatialHelpers';
-import {copy, fromImmutable, toImmutable, toImmutableKeyedByProp, toJS} from 'src/lib/immutableHelpers';
+} from 'src/componentHelpers';
+import {concatFeatures, featureByType, geojsonByType} from 'src/geojsonHelpers';
+import {calculateDistance} from 'src/geospatialHelpers';
+import {copy, fromImmutable, toImmutable, toImmutableKeyedByProp, toJS} from 'src/immutableHelpers';
 import {
   nodeToFeature, projectBoundingBox, sankeyGenerator, sankeyGeospatialTranslate, translateNodeFeature,
   unprojectNode
-} from 'src/lib/sankeyHelpers';
+} from 'src/sankeyHelpers';
 import {
   applyStyleFunctionOrDefault,
   createScaledPropertyGetter, getClass, getClassAndStyle, getStyleObj, styleArithmetic,
   styleMultiplier
-} from 'src/lib/styleHelpers';
-import {resolveFeatureFromExtent, resolveSvgPoints, resolveSvgReact} from 'src/lib/svgHelpers';
+} from 'src/styleHelpers';
+import {resolveFeatureFromExtent, resolveSvgPoints, resolveSvgReact} from 'src/svgHelpers';
 import {
   asyncPropsFromSampleStateAndContainer, eitherToPromise,
   expectTask, expectTaskRejected, makeMockStore, makeSampleInitialState, makeSampleStore, mockApolloClient,
   mockApolloClientWithSamples,
   propsFromSampleStateAndContainer, shallowWrap,
   testState, waitForChildComponentRender, wrapWithMockGraphqlAndStore, wrapWithMockStore
-} from 'src/lib/testHelpers';
-import {toTimeString} from 'src/lib/timeHelpers';
+} from 'src/testHelpers';
+import {toTimeString} from 'src/timeHelpers';
 import {
   applyDefaultRegion, applyRegionsToUsers, firstUserLens, mapDefaultUsers,
   wrapLocationsWithFeatures
-} from 'src/lib/configHelpers';
-import {
-  createRoute,
-  createRouteId, createService, createStop, createStopId, createStopTime, createStopTimes, createTrip, createTripId,
-  createTripWithStopTimesPair,
-  FROM_TO_DIRECTION, orderStops, stopTimeGenerator,
-  TO_FROM_DIRECTION
-} from 'src/lib/dataCreationHelpers';
-import {routeResolver, tripResolver} from 'src/lib/dataQueryHelpers';
+} from 'src/configHelpers';
 import {
   asUnaryMemoize, findOneValueByParams, makeInnerJoinByLensThenFilterSelector,
   mergeStateAndProps
-} from 'lib/selectorHelpers';
-
-const dataCreationHelpers = {
-  FROM_TO_DIRECTION,
-  TO_FROM_DIRECTION,
-  createStopId,
-  createStop,
-  createRouteId,
-  createRoute,
-  createService,
-  createTripId,
-  createTrip,
-  createTripWithStopTimesPair,
-  createStopTime,
-  orderStops,
-  stopTimeGenerator,
-  createStopTimes
-};
-
-const dataQueryHelpers = {
-  routeResolver,
-  tripResolver,
-};
-
+} from 'selectorHelpers';
 
 export {
   apolloContainerTests,
-  loadSpreadsheet,
   loadingCompleteStatus,
   propLensEqual,
   eMap,
@@ -152,8 +120,6 @@ export {
   mergeStateAndProps,
   makeInnerJoinByLensThenFilterSelector,
   findOneValueByParams,
-  asUnaryMemoize,
-  dataCreationHelpers,
-  dataQueryHelpers
+  asUnaryMemoize
 };
 

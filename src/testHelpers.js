@@ -11,15 +11,11 @@
 
 
 import {taskToPromise, mergeDeep} from 'rescape-ramda';
-import {getCurrentConfig} from 'data/current/currentConfig'
-import initialState from 'data/initialState';
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import {shallow, mount} from 'enzyme';
 import {mockNetworkInterfaceWithSchema} from 'apollo-test-utils';
 import ApolloClient from 'apollo-client';
-import makeSchema from 'schema/schema';
-import {createSelectorResolvedSchema} from 'schema/selectorResolvers';
 import {InMemoryCache} from 'apollo-client-preset';
 import {SchemaLink} from 'apollo-link-schema';
 import PropTypes from 'prop-types';
@@ -27,7 +23,6 @@ import {createWaitForElement} from 'enzyme-wait';
 import {getClass} from './styleHelpers';
 import {onError} from "apollo-link-error";
 import prettyFormat from 'pretty-format';
-const sampleConfig = getCurrentConfig()
 
 const middlewares = [thunk];
 
@@ -49,25 +44,29 @@ export const expectTaskRejected = task => expect(taskToPromise(task, true));
 /**
  * Create an initial test state based on the sampleConfig for tests to use.
  * This should only be used for sample configuration, unless store functionality is being tested
+ * @param {Function} initialState Function to accept sampleConfig and return the initialState
+ * @param {Object} sampleConfig The config to give the initialState
  * @returns {Object} The initial state
  */
-export const testState = () => initialState(sampleConfig);
+export const testState = (initialState, sampleConfig) => initialState(sampleConfig);
 
 /**
  * Creates a mock store from our sample data an our initialState function
  * @param {Object} sampleUserSettings Merges in sample local settings, like those from a browser cache
+ * @param {Function} createInitialState Function to accept sampleConfig and return the initialState
+ * @param {Object} sampleConfig The config to give the initialState
  * @type {function(*, *=)}
  */
-export const makeSampleStore = (sampleUserSettings = {}) =>
-  makeMockStore(initialState(sampleConfig), sampleUserSettings);
+export const makeSampleStore = (createInitialState, sampleConfig, sampleUserSettings = {}) =>
+  makeMockStore(createInitialState(sampleConfig), sampleUserSettings);
 
 /**
  * Like test state but initializes a mock store. This will probably be unneeded
  * unless the middleware is needed, such as cycle.js
  * @param {Object} sampleUserSettings Merges in sample local settings, like those from a browser cache
  */
-export const makeSampleInitialState = (sampleUserSettings = {}) => {
-  return makeSampleStore(sampleUserSettings).getState();
+export const makeSampleInitialState = (createInitialState, sampleConfig, sampleUserSettings = {}) => {
+  return makeSampleStore(createInitialState, sampleUserSettings).getState();
 };
 
 /**
@@ -78,8 +77,8 @@ export const makeSampleInitialState = (sampleUserSettings = {}) => {
  * @param sampleOwnProps Sample props that would normally come from the parent container
  * @returns {Object|Promise} complete test props or a Promise of the props if the conntainerPropMaker is aysnc
  */
-export const propsFromSampleStateAndContainer = (containerPropMaker, sampleOwnProps = {}) =>
-  containerPropMaker(makeSampleInitialState(), sampleOwnProps);
+export const propsFromSampleStateAndContainer = (initialState, sampleConfig, containerPropMaker, sampleOwnProps = {}) =>
+  containerPropMaker(makeSampleInitialState(initialState, sampleConfig), sampleOwnProps);
 
 /**
  * Async version of propsFromSampleStateAndContainer for containerPropMaker that is asynchronous because it uses
@@ -137,10 +136,9 @@ export const mockApolloClient = (schema, context) => {
 /**
  * Creates a mockApolloClient using makeSchema and makeSampleInitialState
  */
-export const mockApolloClientWithSamples = () => {
+export const mockApolloClientWithSamples = resolvedSchema => {
   const state = makeSampleInitialState();
   const context = {options: {dataSource: state}};
-  const resolvedSchema = createSelectorResolvedSchema(makeSchema(), state);
   return mockApolloClient(resolvedSchema, context);
 };
 
@@ -149,11 +147,11 @@ export const mockApolloClientWithSamples = () => {
  * @param component
  * @return {*}
  */
-export const wrapWithMockGraphqlAndStore = (component) => {
-  const state = makeSampleInitialState();
+export const wrapWithMockGraphqlAndStore = (createInitialState, sampleConfig, resolvedSchema, component) => {
+  const state = makeSampleInitialState(createInitialState, sampleConfig);
   const context = {options: {dataSource: state}};
-  const resolvedSchema = createSelectorResolvedSchema(makeSchema(), state);
-  const store = makeSampleStore();
+  //const resolvedSchema = createSelectorResolvedSchema(makeSchema(), state);
+  const store = makeSampleStore(createInitialState, sampleConfig);
 
   // shallow wrap the component, passing the Apollo client and redux store to the component and children
   // Also dive once to get passed the Apollo wrapper

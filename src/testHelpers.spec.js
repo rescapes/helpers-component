@@ -16,12 +16,38 @@ import {expectTask, testState, makeSampleInitialState, propsFromSampleStateAndCo
 import Task from 'data.task';
 import * as R from 'ramda';
 import {makeMockStore} from './testHelpers';
-import {sampleConfig} from 'data/samples/sampleConfig';
 import {eMap} from './componentHelpers';
-const [div] = eMap(['div']);
 import React from 'react';
 import * as Either from 'data.either';
 import {eitherToPromise} from './testHelpers';
+import {GraphQLObjectType, GraphQLSchema} from 'graphql';
+import {addResolveFunctionsToSchema} from 'graphql-tools';
+const [div] = eMap(['div']);
+const createInitialState = config => R.merge({
+  foo: 'boo'
+}, config)
+const sampleConfig = {
+  bar: 'roo'
+}
+
+// Fake Apollo Schema
+const QueryType = new GraphQLObjectType({
+  name: 'Query',
+  fields: {
+  }
+});
+const MutationType = new GraphQLObjectType({
+  name: 'Mutation',
+  fields: {
+  }
+})
+
+const resolvedSchema = new GraphQLSchema({
+  query: QueryType,
+  mutation: MutationType
+})
+addResolveFunctionsToSchema(resolvedSchema, {})
+
 
 describe('jestHelpers', () => {
   test('expectTask', () => {
@@ -32,11 +58,11 @@ describe('jestHelpers', () => {
   });
 
   test('testState', () =>
-    expect(testState()).toMatchSnapshot()
+    expect(testState(createInitialState, sampleConfig)).toMatchSnapshot()
   );
 
   test('propsFromSampleStateAndContainer', () => {
-    const initialState = makeSampleInitialState();
+    const initialState = makeSampleInitialState(createInitialState, sampleConfig);
 
     // propsFromSampleStateAndContainer should take a function that merges processes
     // state and ownProps based on a container's
@@ -44,6 +70,8 @@ describe('jestHelpers', () => {
     // This function alweays uses makeSampleInitialState as the state and accepts
     // sample ownProps from the test
     expect(propsFromSampleStateAndContainer(
+      createInitialState,
+      sampleConfig,
       // Simply merge a fake dispatch result with the sampleOwnProps
       (sampleInitialState, sampleOwnProps) => R.mergeAll([sampleInitialState, {someAction: R.identity}, sampleOwnProps]),
       // our sample ownProps
@@ -58,7 +86,12 @@ describe('jestHelpers', () => {
   });
 
   test('makeMockStore', () => {
-    expect(makeMockStore(sampleConfig).getState()).toEqual(sampleConfig);
+    const config = {
+      users: [{user: 'joe'}],
+      regions: [{region: 'alberta'}],
+      settings: {go: 'west'}
+    };
+    expect(makeMockStore(config).getState()).toEqual(config);
   });
 
   test('wrapWithMockGraphqlAndStore', () => {
@@ -89,7 +122,7 @@ describe('jestHelpers', () => {
     // Create a factory for container
     const [container] = eMap([Container]);
     // Instantiate
-    const wrapper = wrapWithMockGraphqlAndStore(container(parentProps));
+    const wrapper = wrapWithMockGraphqlAndStore(createInitialState, sampleConfig, resolvedSchema, container(parentProps));
     // Expect the apollo data prop, the redux dispatch, and the someProp we added
     expect(R.keys(wrapper.props()).sort()).toEqual(['data', 'dispatch', 'someProp'])
   });
