@@ -35,6 +35,40 @@ import {
   testState, waitForChildComponentRender, wrapWithMockGraphqlAndStore, wrapWithMockStore
 } from 'src/lib/testHelpers';
 import {toTimeString} from 'src/lib/timeHelpers';
+import {
+  applyDefaultRegion, applyRegionsToUsers, firstUserLens, mapDefaultUsers,
+  wrapLocationsWithFeatures
+} from 'src/lib/configHelpers';
+import {
+  createRoute,
+  createRouteId, createService, createStop, createStopId, createStopTime, createStopTimes, createTrip, createTripId,
+  createTripWithStopTimesPair,
+  FROM_TO_DIRECTION, orderStops, stopTimeGenerator,
+  TO_FROM_DIRECTION
+} from 'src/lib/dataCreationHelpers';
+
+const dataCreationHelpers = {
+  FROM_TO_DIRECTION,
+  TO_FROM_DIRECTION,
+  createStopId,
+  createStop,
+  createRouteId,
+  createRoute,
+  createService,
+  createTripId,
+  createTrip,
+  createTripWithStopTimesPair,
+  createStopTime,
+  orderStops,
+  stopTimeGenerator,
+  createStopTimes
+};
+
+const dataQueryHelpers = {
+  routeResolver,
+  tripResolver,
+};
+
 
 export {
   apolloContainerTests,
@@ -104,8 +138,13 @@ export {
   shallowWrap,
   eitherToPromise,
   waitForChildComponentRender,
-  toTimeString
+  toTimeString,
+  applyDefaultRegion,
+  mapDefaultUsers,
+  applyRegionsToUsers,
+  wrapLocationsWithFeatures,
+  firstUserLens,
+  dataCreationHelpers,
+  dataQueryHelpers
 };
-
-
 
