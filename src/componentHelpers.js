@@ -18,8 +18,6 @@ import * as Either from 'data.either';
 import {getClassAndStyle, getStyleObj} from './styleHelpers';
 import prettyFormat from 'pretty-format';
 import {graphql} from 'graphql';
-import {createSelectorCreator, defaultMemoize} from 'reselect';
-import {compact} from 'enzyme-to-json';
 
 
 const {reqPath} = throwing;

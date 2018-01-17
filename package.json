@@ -6,7 +6,6 @@
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
-    "demo": "node scripts/demo.js",
     "test": "node scripts/test.js --env=jsdom",
     "build-publish-patch": "npm run build && npm run test && npm version patch && npm run publish-patch",
     "build-publish-minor": "npm run build && npm run test && npm version minor && npm run publish-minor",
@@ -17,11 +16,10 @@
     "type": "git",
     "url": "git+https://github.com/udiliaInc/create-react-library.git"
   },
-  "author": "Dimitri Mikadze <dimitri@udilia.com>",
+  "author": "Andy Likuski andy@likuski.org",
   "bugs": {
-    "url": "https://github.com/udiliaInc/create-react-library/issues"
+    "url": "https://github.com/calocan/rescape-helpers"
   },
-  "homepage": "https://github.com/udiliaInc/create-react-library#readme",
   "license": "MIT",
   "dependencies": {
     "@turf/bbox": "^5.1.5",
@@ -53,6 +51,7 @@
     "namedtuplemap": "^1.0.0",
     "numeral": "^2.0.6",
     "pretty-format": "^22.1.0",
+    "prop-types": "^15.6.0",
     "ramda": "^0.25.0",
     "react-apollo": "^2.0.4",
     "react-redux": "^5.0.6",

@@ -13,4 +13,3 @@ We have decided to track and follow philosophy of `create-react-app` and constan
 ### Main
 
 - Updated to `create-react-app` version `1.4.3`
-- Updated demo example of library 

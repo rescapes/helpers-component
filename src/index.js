@@ -1,5 +1,4 @@
-import {apolloContainerTests} from 'src/apolloContainerTestHelpers';
-import {loadSpreadsheet} from 'src/lib/authHelpers';
+import {apolloContainerTests} from './apolloContainerTestHelpers';
 import {
   applyIfFunction,
   applyToIfFunction, composeViews, composeViewsFromStruct,
@@ -13,32 +12,32 @@ import {
   propLensEqual, propsAndStyle, propsFor,
   propsForItem, propsForSansClass,
   renderChoicepoint, renderErrorDefault, renderLoadingDefault
-} from 'src/componentHelpers';
-import {concatFeatures, featureByType, geojsonByType} from 'src/geojsonHelpers';
-import {calculateDistance} from 'src/geospatialHelpers';
-import {copy, fromImmutable, toImmutable, toImmutableKeyedByProp, toJS} from 'src/immutableHelpers';
+} from './componentHelpers';
+import {concatFeatures, featureByType, geojsonByType} from './geojsonHelpers';
+import {calculateDistance} from './geospatialHelpers';
+import {copy, fromImmutable, toImmutable, toImmutableKeyedByProp, toJS} from './immutableHelpers';
 import {
   nodeToFeature, projectBoundingBox, sankeyGenerator, sankeyGeospatialTranslate, translateNodeFeature,
   unprojectNode
-} from 'src/sankeyHelpers';
+} from './sankeyHelpers';
 import {
   applyStyleFunctionOrDefault,
   createScaledPropertyGetter, getClass, getClassAndStyle, getStyleObj, styleArithmetic,
   styleMultiplier
-} from 'src/styleHelpers';
-import {resolveFeatureFromExtent, resolveSvgPoints, resolveSvgReact} from 'src/svgHelpers';
+} from './styleHelpers';
+import {resolveFeatureFromExtent, resolveSvgPoints, resolveSvgReact} from './svgHelpers';
 import {
   asyncPropsFromSampleStateAndContainer, eitherToPromise,
   expectTask, expectTaskRejected, makeMockStore, makeSampleInitialState, makeSampleStore, mockApolloClient,
   mockApolloClientWithSamples,
   propsFromSampleStateAndContainer, shallowWrap,
   testState, waitForChildComponentRender, wrapWithMockGraphqlAndStore, wrapWithMockStore
-} from 'src/testHelpers';
-import {toTimeString} from 'src/timeHelpers';
+} from './testHelpers';
+import {toTimeString} from './timeHelpers';
 import {
   applyDefaultRegion, applyRegionsToUsers, firstUserLens, mapDefaultUsers,
   wrapLocationsWithFeatures
-} from 'src/configHelpers';
+} from './configHelpers';
 import {
   asUnaryMemoize, findOneValueByParams, makeInnerJoinByLensThenFilterSelector,
   mergeStateAndProps

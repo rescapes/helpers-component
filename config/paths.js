@@ -42,10 +42,9 @@ function getServedPath(appPackageJson) {
 module.exports = {
   dotenv: resolveApp('.env'),
   appBuild: resolveApp('build'),
-  appDemoBuild: resolveApp('demo'),
   appPublic: resolveApp('public'),
   appHtml: resolveApp('public/index.html'),
-  appIndexJs: resolveApp('src/demo/index.js'), // CRL: Updated for demo purposes
+  appIndexJs: resolveApp('src/index.js'), // CRL: Updated for demo purposes
   appPackageJson: resolveApp('package.json'),
   appSrc: resolveApp('src'),
   yarnLockFile: resolveApp('yarn.lock'),
@@ -59,6 +58,6 @@ module.exports = {
   appDemoSrc: resolveApp('src/demo'),
 
   // CRL: New paths for library
-  appLibIndexJs: resolveApp('src/lib/index.js'),
-  appLibSrc: resolveApp('src/lib'),
+  appLibIndexJs: resolveApp('src/index.js'),
+  appLibSrc: resolveApp('src'),
 };
