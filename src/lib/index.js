@@ -46,6 +46,7 @@ import {
   FROM_TO_DIRECTION, orderStops, stopTimeGenerator,
   TO_FROM_DIRECTION
 } from 'src/lib/dataCreationHelpers';
+import {routeResolver, tripResolver} from 'src/lib/dataQueryHelpers';
 
 const dataCreationHelpers = {
   FROM_TO_DIRECTION,
