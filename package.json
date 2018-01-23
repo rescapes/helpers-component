@@ -39,7 +39,7 @@
     "enzyme-adapter-react-16": "^1.1.1",
     "enzyme-to-json": "^3.3.0",
     "enzyme-wait": "^1.0.9",
-    "graphql": "^0.12.3",
+    "graphql": "git://github.com/graphql/graphql-js.git#npm",
     "graphql-geojson": "^1.0.0",
     "graphql-tools": "^2.18.0",
     "immutable": "^3.8.2",
