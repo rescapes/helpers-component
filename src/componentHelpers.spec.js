@@ -19,6 +19,7 @@ import {
 } from './componentHelpers';
 import {throwing, hasStrPath} from 'rescape-ramda';
 import {resolvedSchema, sampleConfig} from './sampleData';
+
 const {reqStrPath} = throwing;
 
 describe('componentHelpers', () => {
@@ -207,11 +208,16 @@ describe('componentHelpers', () => {
     };
     const value = await makeApolloTestPropsFunction(resolvedSchema, sampleConfig, mapStateToProps, mapDispatchToProps, queryObj)(sampleState, sampleOwnProps).then(
       either => new Promise((resolve, reject) => either.map(resolve).leftMap(reject))
-    ).catch(
-      e => {
-        throw e;
-      }
-    );
+    ).catch(e => e);
+    if (value.error) {
+      const errors = R.flatten(value.error)
+      R.forEach(
+        error => {
+          console.error(error);
+        },
+      );
+      throw errors[0]
+    }
 
     expect(value).toEqual(
       R.merge({
@@ -390,7 +396,7 @@ describe('componentHelpers', () => {
         a: 1,
         b: R.prop('cucumber'),
         c: item => R.add(2, item.c),
-        styles: {
+        style: {
           // This function should be called with item to produce 'puce'
           color: item => R.defaultTo('taupe', item.color)
         }
@@ -407,7 +413,7 @@ describe('componentHelpers', () => {
         a: 1,
         b: 'tasty',
         c: 7,
-        styles: {
+        style: {
           color: 'puce'
         }
       }

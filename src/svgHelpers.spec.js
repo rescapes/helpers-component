@@ -10,8 +10,7 @@
  */
 
 import {
-  resolveSvgReact, resolveSvgPoints, resolveFeatureFromExtent, nodeToFeature,
-  translateNodeFeature
+  resolveSvgReact, resolveSvgPoints, resolveFeatureFromExtent
 } from './svgHelpers';
 import * as R from 'ramda';
 
@@ -31,53 +30,6 @@ describe('svgHelpers', () => {
         "geometry": {
           "type": "Polygon",
           "coordinates": [[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]]
-        }
-      }
-    );
-  });
-  test('nodeToFeature', () => {
-    expect(nodeToFeature({x0: 0, y0: 0, x1: 1, y1: 1})).toEqual(
-      {
-        "type": "Feature",
-        "geometry": {
-          "type": "Polygon",
-          "coordinates": [[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]]
-        }
-      }
-    );
-  });
-
-  test('translateNodeFeature', () => {
-    expect(R.over(
-      R.lensPath(['geometry', 'coordinates']),
-      // Update the coordinates to round every number, since the operations using floats
-      ([coordinates]) => [R.map(pair => R.map(Math.round, pair), coordinates)],
-      translateNodeFeature(
-        // To the center of this
-        {
-          type: 'Feature',
-          geometry: {
-            type: 'Point',
-            coordinates: [10, 10]
-          }
-        },
-        // Translate this
-        {
-          "type": "Feature",
-          "properties": {yippy: 1},
-          "geometry": {
-            "type": "Polygon",
-            "coordinates": [[[0, 0], [2, 0], [2, 2], [0, 2], [0, 0]]]
-          }
-        }
-      )
-    )).toEqual(
-      {
-        "type": "Feature",
-        "properties": {yippy: 1},
-        "geometry": {
-          "type": "Polygon",
-          "coordinates": [[[9, 9], [11, 9], [11, 11], [9, 11], [9, 9]]]
         }
       }
     );

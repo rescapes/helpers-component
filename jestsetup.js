@@ -80,13 +80,12 @@ class LocalStorageMock {
 
 global.localStorage = new LocalStorageMock;
 
-// Fail tests on any warning
-/*
-console.error = message => {
-    throw new Error(message);
-};
- */
-// https://github.com/facebook/jest/issues/3251
-process.on('unhandledRejection', (reason) => {
-  console.log('Unhandled Promise', reason);
-});
+
+// In Node v7 unhandled promise rejections will terminate the process
+if (!process.env.LISTENING_TO_UNHANDLED_REJECTION) {
+  process.on('unhandledRejection', event => {
+    console.error(event)
+  })
+  // Avoid memory leak by adding too many listeners
+  process.env.LISTENING_TO_UNHANDLED_REJECTION = true
+}

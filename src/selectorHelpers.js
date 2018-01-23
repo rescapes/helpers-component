@@ -102,19 +102,21 @@ export const makeInnerJoinByLensThenFilterSelector = (innerJoinPredicate, predic
 
 /**
  * Finds an item that matches all the given props in params
- * @param params
- * @param items
+ * @param {Object} params object key values to match
+ * @param {Object|Array} items Object or Arrray that can produce values to search
  */
-export const findOneValueByParams = (params, items) => onlyOneValue(findOne(
-  // Compare all the eqProps against each item
-  R.allPass(
-    // Create a eqProps for each prop of params
-    R.map(prop => R.eqProps(prop, params),
-      R.keys(params)
-    )
-  ),
-  items
-));
+export const findOneValueByParams = (params, items) => {
+  return onlyOneValue(findOne(
+    // Compare all the eqProps against each item
+    R.allPass(
+      // Create a eqProps for each prop of params
+      R.map(prop => R.eqProps(prop, params),
+        R.keys(params)
+      )
+    ),
+    R.values(items)
+  ));
+}
 
 
 /***

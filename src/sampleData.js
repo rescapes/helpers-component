@@ -9,6 +9,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import * as R from 'ramda'
 import {addResolveFunctionsToSchema} from 'graphql-tools';
 import {
   GraphQLSchema,
@@ -51,19 +52,23 @@ const QueryType = new GraphQLObjectType({
 export const sampleConfig = {
   regions: [
     {
-      oakland: {
-        id: 'oakland',
-        name: 'Oakland'
-      }
+      id: 'oakland',
+      name: 'Oakland'
     }
   ]
 }
-export const schema = new GraphQLSchema({
+
+/**
+ * Minimum schema for testing
+ * @type {GraphQLSchema}
+ */
+export const resolvedSchema = new GraphQLSchema({
   query: QueryType
 });
-export const resolvedSchema = addResolveFunctionsToSchema(schema, {
+// Mutates resolvedSchema
+addResolveFunctionsToSchema(resolvedSchema, {
   Store: {
-    region: (parent, params, {options: {dataSource}}) => findOneValueByParams(params, R.values(reqPath(['regions'], dataSource)))
+    region: (parent, params, {options: {dataSource}}) => findOneValueByParams(params, reqPath(['regions'], dataSource))
   },
   Query: {
     store(obj, args) {

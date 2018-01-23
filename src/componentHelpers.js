@@ -529,9 +529,9 @@ export const propsAndStyle = (name, viewProps) => R.merge(
 /**
  * Applies an item to props that have unary functional values.
  * Also applies an item to props.styles keys if they are functions.
- * TODO consider making this recursive rather than targeting styles
+ * TODO consider making this recursive rather than targeting style
  * @param {Object|Function} propsOrFunc The props to which to apply the item. This can also be a function
- * expecing the item
+ * expecting the item
  * @param item The item to which to call on properties that are function
  */
 export const itemizeProps = R.curry((propsOrFunc, item) => {
