@@ -18,29 +18,8 @@ import {
   composeViewsFromStruct, whenProp
 } from './componentHelpers';
 import {throwing, hasStrPath} from 'rescape-ramda';
-import {GraphQLObjectType, GraphQLSchema} from 'graphql';
-import {addResolveFunctionsToSchema} from 'graphql-tools';
-
+import {resolvedSchema, sampleConfig} from './sampleData';
 const {reqStrPath} = throwing;
-
-// Fake Apollo Schema
-const QueryType = new GraphQLObjectType({
-  name: 'Query',
-  fields: {
-  }
-});
-const MutationType = new GraphQLObjectType({
-  name: 'Mutation',
-  fields: {
-  }
-})
-
-const resolvedSchema = new GraphQLSchema({
-  query: QueryType,
-  mutation: MutationType
-})
-addResolveFunctionsToSchema(resolvedSchema, {})
-
 
 describe('componentHelpers', () => {
   test('propLensEqual', () => {
@@ -226,8 +205,12 @@ describe('componentHelpers', () => {
         })
       }
     };
-    const value = await makeApolloTestPropsFunction(resolvedSchema, mapStateToProps, mapDispatchToProps, queryObj)(sampleState, sampleOwnProps).then(
+    const value = await makeApolloTestPropsFunction(resolvedSchema, sampleConfig, mapStateToProps, mapDispatchToProps, queryObj)(sampleState, sampleOwnProps).then(
       either => new Promise((resolve, reject) => either.map(resolve).leftMap(reject))
+    ).catch(
+      e => {
+        throw e;
+      }
     );
 
     expect(value).toEqual(

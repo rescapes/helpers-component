@@ -12,7 +12,7 @@
 import * as R from 'ramda';
 import {sankey} from 'd3-sankey';
 import {asUnaryMemoize} from './selectorHelpers';
-import {mergeDeep, throwing} from 'rescape-ramda';
+import {throwing} from 'rescape-ramda';
 import {resolveFeatureFromExtent, resolveSvgPoints} from './svgHelpers';
 import bbox from '@turf/bbox';
 import bboxPolygon from '@turf/bbox-polygon';

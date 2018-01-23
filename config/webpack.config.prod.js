@@ -8,6 +8,7 @@ const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const paths = require('./paths');
 const getClientEnvironment = require('./env');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
 // Webpack uses `publicPath` to determine where the app is being served from.
 // It requires a trailing slash, or the file assets will get an incorrect path.
@@ -51,8 +52,9 @@ module.exports = {
   // We generate sourcemaps in production. This is slow but gives good results.
   // You can exclude the *.map files from the build during deployment.
   devtool: shouldUseSourceMap ? 'source-map' : false,
-  // In production, we only want to load the app code.
-  entry: [paths.appLibIndexJs], // CRL: library index file instead of app index
+  entry: {
+    app: paths.appLibIndexJs
+  }, // CRL: library index file instead of app index
   output: {
     // CRL: Updated whole block with library specific info
     path: paths.appBuild,
@@ -167,7 +169,7 @@ module.exports = {
                       loader: require.resolve('css-loader'),
                       options: {
                         importLoaders: 1,
-                        //minimize: true,
+                        minimize: true,
                         sourceMap: shouldUseSourceMap,
                       },
                     },
@@ -226,29 +228,29 @@ module.exports = {
     // Otherwise React will be compiled in the very slow development mode.
     new webpack.DefinePlugin(env.stringified),
     // Minify the code.
-    // TODO disabling because 	./node_modules/ansi-styles/index.js:4  doesn't minify
-    /*
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false,
-        // Disabled because of an issue with Uglify breaking seemingly valid code:
-        // https://github.com/facebookincubator/create-react-app/issues/2376
-        // Pending further investigation:
-        // https://github.com/mishoo/UglifyJS2/issues/2011
-        comparisons: false,
-      },
-      mangle: {
-        safari10: true,
-      },
-      output: {
-        comments: false,
-        // Turned on because emoji and regex is not minified properly using default
-        // https://github.com/facebookincubator/create-react-app/issues/2488
-        ascii_only: true,
-      },
+    new UglifyJsPlugin({
       sourceMap: shouldUseSourceMap,
+      uglifyOptions: {
+        ecma:8,
+        compress: {
+          warnings: false,
+          // Disabled because of an issue with Uglify breaking seemingly valid code:
+          // https://github.com/facebookincubator/create-react-app/issues/2376
+          // Pending further investigation:
+          // https://github.com/mishoo/UglifyJS2/issues/2011
+          comparisons: false
+        },
+        mangle: {
+          safari10: true,
+        },
+        output: {
+          comments: false,
+          // Turned on because emoji and regex is not minified properly using default
+          // https://github.com/facebookincubator/create-react-app/issues/2488
+          ascii_only: true,
+        },
+      }
     }),
-    */
     // Note: this won't work without ExtractTextPlugin.extract(..) in `loaders`.
     new ExtractTextPlugin({
       filename: cssFilename,

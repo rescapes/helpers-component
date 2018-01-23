@@ -139,9 +139,8 @@ export const apolloContainerTests = (config) => {
           done();
         }
       ).catch(e => {
-        // If we don't find it a timeout error or other error occured.
+        // If we don't find it a timeout error or other error occurred.
         throw e;
-        done();
       });
     });
 

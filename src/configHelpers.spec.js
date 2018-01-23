@@ -20,15 +20,32 @@
 import {applyDefaultRegion, mapDefaultUsers, keysAsIdObj, applyRegionsToUsers} from './configHelpers';
 import * as R from 'ramda';
 import {throwing} from 'rescape-ramda';
-const {reqPath} = throwing
+
+const {reqPath} = throwing;
+const APP_ADMIN = 'app_admin';
 const REGION_MANAGER = 'region_manager';
 const REGION_USER = 'region_user';
+const REGION_VISITOR = 'region_visitor';
 
 describe('configHelpers', () => {
   const defaultConfig = {
     regions: {
       default: {
         id: 'aTemplateRegion'
+      }
+    },
+    users: {
+      [APP_ADMIN]: {
+        regions: {}
+      },
+      [REGION_MANAGER]: {
+        regions: {}
+      },
+      [REGION_USER]: {
+        regions: {}
+      },
+      [REGION_VISITOR]: {
+        regions: {}
       }
     }
   }
@@ -78,7 +95,7 @@ describe('configHelpers', () => {
       }
     };
 
-    const mergedConfig = mapDefaultUsers({
+    const mergedConfig = mapDefaultUsers(defaultConfig, {
       [REGION_MANAGER]: R.pick(['linus', 'lucy'], realUsers),
       [REGION_USER]: R.pick(['pigpen'], realUsers)
     });

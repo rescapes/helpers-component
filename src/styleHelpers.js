@@ -12,10 +12,8 @@
 import * as R from 'ramda';
 import PropTypes from 'prop-types';
 import {v} from 'rescape-validate';
-import {compact, throwing} from 'rescape-ramda';
+import {compact} from 'rescape-ramda';
 import decamelize from 'decamelize';
-
-const {reqPath} = throwing;
 
 /**
  * Creates a class name from a root name and a suffix. The given root and suffix will be decamelized
@@ -90,7 +88,7 @@ export const styleArithmetic = v(R.curry((operator, operand, styleValue) =>
     R.is(Number),
     value => operator(value, operand),
     value => {
-      const [_, val, rest] = value.match(/([\d\.]+)([^\d]+)/)
+      const [val, rest] = R.slice(1, 3, value.match(/([\d.]+)([^\d]+)/))
       return `${operator(val, operand)}${rest}`
     }
   )(styleValue)

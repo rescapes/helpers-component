@@ -304,8 +304,8 @@ export const makeTestPropsFunction = (mapStateToProps, mapDispatchToProps) =>
  * Like makeTestPropsFunction, but additionally resolves an Apollo query to supply complete data for a test
  * @param {Function} createResolvedSchema Function expecting an Apollo schema and sampleConfig that returns
  * a schema with resolvers that rely on the sampleConfig
- * @param {Object} the Apollo schema
- * @param {Object} the sampleConfig
+ * @param {Object} the resolver resolved Apollo schema
+ * @param {Object} the sampleConfig. This is used as a datasource for the resolvers
  * @param {Function} mapStateToProps
  * @param {Function} mapDispatchToProps
  * @param {Function} mergeProps
@@ -326,8 +326,7 @@ export const makeTestPropsFunction = (mapStateToProps, mapDispatchToProps) =>
  *  The function returns a Promise that passes an Either.Left or Right. If Left there ar errors in the Either.value. If
  *  Right then the value is the store
  */
-export const makeApolloTestPropsFunction = R.curry((createResolvedSchema, schema, sampleConfig, mapStateToProps, mapDispatchToProps, {query, args}) => {
-  const resolvedSchema = createResolvedSchema(schema, sampleConfig);
+export const makeApolloTestPropsFunction = R.curry((resolvedSchema, sampleConfig, mapStateToProps, mapDispatchToProps, {query, args}) => {
 
   return R.composeP(
     props => {

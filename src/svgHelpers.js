@@ -10,9 +10,8 @@
  */
 import * as R from 'ramda';
 import {eMap} from './componentHelpers';
-import {throwing} from 'rescape-ramda'
 
-const [Circle, Polygon, Polyline, G] = eMap(['circle', 'polygon', 'polyline', 'g']);
+const [Circle, Polygon, Polyline] = eMap(['circle', 'polygon', 'polyline']);
 
 /**
  * Inspects a feature and returns its type and projected point representation
