@@ -428,7 +428,7 @@ describe('componentHelpers', () => {
           a: 1,
           b: R.prop('cucumber'),
           c: item => R.add(2, item.c),
-          styles: {
+          style: {
             // This function should be called with item to produce 'puce'
             color: item => R.defaultTo('taupe', item.color)
           }
@@ -444,7 +444,7 @@ describe('componentHelpers', () => {
     )).toEqual(
       {
         className: 'some-view',
-        styles: {
+        style: {
           color: 'puce'
         },
         name: 'props',

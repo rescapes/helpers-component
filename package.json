@@ -67,6 +67,8 @@
     "babel-eslint": "7.2.3",
     "babel-jest": "20.0.3",
     "babel-loader": "7.1.2",
+    "babel-plugin-transform-es2015-modules-commonjs-simple": "^6.7.4",
+    "babel-preset-es2015": "^6.24.1",
     "babel-preset-react-app": "^3.1.0",
     "babel-runtime": "6.26.0",
     "case-sensitive-paths-webpack-plugin": "2.1.1",
@@ -148,7 +150,22 @@
   },
   "babel": {
     "presets": [
-      "react-app"
+      "react-app",
+      [
+        "es2015",
+        {
+          "modules": false
+        }
+      ]
+    ],
+    "sourceMaps": true,
+    "plugins": [
+      [
+        "transform-es2015-modules-commonjs-simple",
+        {
+          "noMangle": true
+        }
+      ]
     ]
   },
   "eslintConfig": {
