@@ -26,6 +26,10 @@
   },
   "license": "MIT",
   "dependencies": {
+    "apollo-client-preset": "^1.0.6",
+    "apollo-link-error": "^1.0.3",
+    "apollo-link-schema": "^1.0.2",
+    "apollo-test-utils": "^0.3.2",
     "data.either": "^1.5.1",
     "enzyme": "^3.3.0",
     "enzyme-to-json": "^3.3.0",
@@ -37,7 +41,10 @@
     "prop-types": "^15.6.0",
     "ramda": "^0.25.0",
     "react": "^16.2.0",
+    "react-apollo": "^2.0.4",
     "react-dom": "^16.2.0",
+    "react-redux": "^5.0.6",
+    "redux-mock-store": "^1.4.0",
     "rescape-ramda": "^1.4.8"
   },
   "devDependencies": {

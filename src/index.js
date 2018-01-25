@@ -12,14 +12,24 @@ import {
   propsForItem, propsForSansClass,
   renderChoicepoint, renderErrorDefault, renderLoadingDefault
 } from './componentHelpers';
+
 import {
   resolveSvgReact
-} from './svgComponentHelpers'
+} from './svgComponentHelpers';
+
+import {
+  waitForChildComponentRender, propsFromSampleStateAndContainer, asyncPropsFromSampleStateAndContainer, makeMockStore,
+  makeSampleInitialState, makeSampleStore, mockApolloClient, mockApolloClientWithSamples, shallowWrap, testState,
+  wrapWithMockGraphqlAndStore, wrapWithMockStore
+} from './componentTestHelpers';
+
 import {
   applyStyleFunctionOrDefault,
   createScaledPropertyGetter, getClass, getClassAndStyle, getStyleObj, styleArithmetic,
   styleMultiplier
 } from './styleHelpers';
+
+import { apolloContainerTests } from './apolloContainerTestHelpers'
 
 export {
   loadingCompleteStatus,
@@ -54,6 +64,19 @@ export {
   styleMultiplier,
   createScaledPropertyGetter,
   applyStyleFunctionOrDefault,
-  resolveSvgReact
+  resolveSvgReact,
+  waitForChildComponentRender,
+  propsFromSampleStateAndContainer,
+  asyncPropsFromSampleStateAndContainer,
+  makeMockStore,
+  makeSampleInitialState,
+  makeSampleStore,
+  mockApolloClient,
+  mockApolloClientWithSamples,
+  shallowWrap,
+  testState,
+  wrapWithMockGraphqlAndStore,
+  wrapWithMockStore,
+  apolloContainerTests
 };
 
