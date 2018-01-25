@@ -1,7 +1,7 @@
 {
   "name": "rescape-helpers-component",
   "version": "1.1.15",
-  "description": "React NPM library starter kit based on Facebook's create react app",
+  "description": "Helpers for working with React components",
   "main": "build/index.js",
   "files": [
     "build",
