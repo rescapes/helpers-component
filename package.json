@@ -14,7 +14,7 @@
     "build-publish-patch": "npm run build && npm run test && npm version patch && npm run publish-patch",
     "build-publish-minor": "npm run build && npm run test && npm version minor && npm run publish-minor",
     "publish-patch": "npm version patch && npm publish",
-    "publsih-minor": "npm version minor && npm publish"
+    "publish-minor": "npm version minor && npm publish"
   },
   "repository": {
     "type": "git",
