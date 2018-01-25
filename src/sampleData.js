@@ -17,7 +17,6 @@ import {
   GraphQLString,
   GraphQLNonNull
 } from 'graphql';
-import {findOneValueByParams} from 'selectorHelpers';
 import {throwing, hasStrPath} from 'rescape-ramda';
 const {reqPath} = throwing;
 
