@@ -13,6 +13,9 @@ import {
   renderChoicepoint, renderErrorDefault, renderLoadingDefault
 } from './componentHelpers';
 import {
+  resolveSvgReact
+} from './svgComponentHelpers'
+import {
   applyStyleFunctionOrDefault,
   createScaledPropertyGetter, getClass, getClassAndStyle, getStyleObj, styleArithmetic,
   styleMultiplier
@@ -50,6 +53,7 @@ export {
   styleArithmetic,
   styleMultiplier,
   createScaledPropertyGetter,
-  applyStyleFunctionOrDefault
+  applyStyleFunctionOrDefault,
+  resolveSvgReact
 };
 
