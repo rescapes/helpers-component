@@ -11,7 +11,7 @@
 
 import {inspect} from 'util';
 import {createWaitForElement} from 'enzyme-wait';
-import {PropTypes} from 'prop-types'
+import PropTypes from 'prop-types'
 import {shallow, mount} from 'enzyme'
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
