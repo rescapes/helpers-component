@@ -13,14 +13,11 @@ import React from 'react';
 import * as R from 'ramda';
 import {v} from 'rescape-validate';
 import PropTypes from 'prop-types';
-import {mergeDeep, throwing} from 'rescape-ramda';
+import {mergeDeep, reqPathThrowing} from 'rescape-ramda';
 import * as Either from 'data.either';
 import {getClassAndStyle, getStyleObj} from './styleHelpers';
 import prettyFormat from 'pretty-format';
 import {graphql} from 'graphql';
-
-
-const {reqPath} = throwing;
 
 /**
  * Default statuses for Components that don't have any Apollo queries
@@ -54,7 +51,7 @@ export const propLensEqual = v(R.curry((lens, props, nextProps) =>
 
 /**
  * Maps each Reach element to an curried e function.
- * @param {[String|Element]} types React element types (e.g. ['div', 'svg', React])
+ * @param {(String|Object)} types React element types (e.g. ['div', 'svg', React])
  * @returns {Function} A list of functions that need just the config and children specified, not the type
  */
 export const eMap = types => R.map(component => React.createFactory(component), types);
@@ -249,7 +246,7 @@ export const mergePropsForViews = R.curry((viewNamesToViewProps, props) => {
  * key will simply be referred by 'key'
  * @return {*} viewProps with 'key' added
  */
-export const keyWith = (key, viewProps) => R.merge(viewProps, {key: reqPath([key], viewProps)});
+export const keyWith = (key, viewProps) => R.merge(viewProps, {key: reqPathThrowing([key], viewProps)});
 
 /**
  * If maybeFunc is a func, call it with obj, otherwise return maybeFunc
@@ -315,7 +312,8 @@ export const makeTestPropsFunction = (mapStateToProps, mapDispatchToProps) =>
  *  options: { variables: { query args } }
  * }
  *
- * @return {function({query?: *, args?: *})} query is an Apollo query string and args is a function that
+ * @returns {Function} A function with two arguments, query and args.
+ * query is an Apollo query string and args is a function that
  * expects props and produces query args with their values inside a key 'variables'. This matches the
  * Apollo React client setup. Example
  * args = props => {
@@ -335,7 +333,7 @@ export const makeApolloTestPropsFunction = R.curry((resolvedSchema, sampleConfig
         query, {},
         {options: {dataSource: sampleConfig}},
         // Add data and ownProps since that is what Apollo query arguments props functions expect
-        reqPath(['variables'], args.options(props))
+        reqPathThrowing(['variables'], args.options(props))
       ).then(
         // Merge the makeTestPropsFunction props with the Apollo result. Put Apollo under the data.store key
         // just like our Apollo React Client does by default
@@ -395,7 +393,7 @@ export const makeGraphQlTestPropsFunction = (resolvedSchema, dataSource, queryAr
  * @param {Functor} props An array or object (or any other functor for which we can extract the values
  * Each value contains the props to create on component using the component function. The results are
  * returned as an array of components
- * @return {[Object]} A list of React components
+ * @return {Object[]} A list of React components
  */
 export const liftAndExtract = (component, props) => {
   return R.values(
@@ -412,10 +410,10 @@ export const liftAndExtract = (component, props) => {
  * @param {Function} component A React component function that expects props
  * @param {Object} propsWithItems Has a key items that holds an array or object
  * (or any other functor for which we can extract the values
- * @return {[Object]} A list of React components
+ * @return {Object[]} A list of React components
  */
 export const liftAndExtractItems = (component, propsWithItems) => {
-  return liftAndExtract(component, reqPath(['items'], propsWithItems));
+  return liftAndExtract(component, reqPathThrowing(['items'], propsWithItems));
 };
 
 /**
@@ -620,7 +618,7 @@ export const composeViewsFromStruct = R.curry((viewStruct, props) => {
  * Joins React components with a separatorComponent between each
  * @param {Function} separatorComponent Unary function that expects a key to index the component in the list
  * (using the React key property)
- * @param {[Function]} components List of unary functions returning a component. The function also expects key
+ * @param {Function[]} components List of unary functions returning a component. The function also expects key
  * to index the component in the list
  * @returns {Array} The components interspersed with separatorComponents
  */

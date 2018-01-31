@@ -11,18 +11,20 @@
 
 import {inspect} from 'util';
 import {createWaitForElement} from 'enzyme-wait';
-import PropTypes from 'prop-types'
-import {shallow, mount} from 'enzyme'
+import PropTypes from 'prop-types';
+import {shallow, mount} from 'enzyme';
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import {mergeDeep} from 'rescape-ramda';
-import {mockNetworkInterfaceWithSchema} from 'apollo-test-utils';
+import * as apolloTestUtils from 'apollo-test-utils';
 import ApolloClient from 'apollo-client';
 import {InMemoryCache} from 'apollo-client-preset';
 import {SchemaLink} from 'apollo-link-schema';
 import {getClass} from './styleHelpers';
 import {onError} from "apollo-link-error";
+
 const middlewares = [thunk];
+const mockNetworkInterfaceWithSchema = apolloTestUtils;
 
 /**
  * Create an initial test state based on the sampleConfig for tests to use.
@@ -200,7 +202,7 @@ export const shallowWrap = (componentFactory, props) => {
  */
 export const waitForChildComponentRender = (wrapper, componentName, childClassName) => {
   const component = wrapper.find(componentName);
-  const childClassNameStr = `.${getClass(childClassName)}`
+  const childClassNameStr = `.${getClass(childClassName)}`;
 // Wait for the MapGl component to render, which indicates that data loading completed
   const waitForSample = createWaitForElement(childClassNameStr);
   const find = component.find;
@@ -212,7 +214,7 @@ export const waitForChildComponentRender = (wrapper, componentName, childClassNa
     return find.apply(wrapper.find(componentName), args);
   };
   return waitForSample(component)
-    .then(component => component.find(childClassNameStr).first() )
+    .then(component => component.find(childClassNameStr).first())
     .catch(error => {
       const comp = wrapper.find(componentName);
       if (comp.length) {
@@ -224,7 +226,7 @@ export const waitForChildComponentRender = (wrapper, componentName, childClassNa
         );
       }
       else {
-        throw error
+        throw error;
       }
     });
 };

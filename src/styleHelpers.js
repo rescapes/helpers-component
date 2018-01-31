@@ -102,7 +102,7 @@ export const styleMultiplier = styleArithmetic(R.multiply)
 
 /**
  * Scaled value function creator
- * @param {[Number]} scale Array of scale values, such that array index values 0..n can be passed for
+ * @param {Number[]} scale Array of scale values, such that array index values 0..n can be passed for
  * x and return a corresponding scale value
  * @param {String} prop The style prop, such as 'margin' or 'padding'
  * @param {Number} index The index of scale to access

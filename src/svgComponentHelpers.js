@@ -11,6 +11,7 @@
 
 import * as R from 'ramda';
 import {eMap} from './componentHelpers';
+
 const [Circle, Polygon, Polyline] = eMap(['circle', 'polygon', 'polyline']);
 
 /**
@@ -22,23 +23,26 @@ const [Circle, Polygon, Polyline] = eMap(['circle', 'polygon', 'polyline']);
  * Sensible defaults are supplied for fill, stroke, and strokeWidth if not supplied
  * @returns {Object} React component
  */
-export const resolveSvgReact = ({pointData, ...props}) => {
+export const resolveSvgReact = (pointData, props) => {
   switch (pointData.type) {
     case 'Point':
       const [cx, cy] = R.head(pointData.points);
-      return Circle({cx, cy, ...R.merge({r: '10', fill: 'white', stroke: 'black', strokeWidth: '1'}, props)});
+      return Circle(R.mergeAll([{r: '10', fill: 'white', stroke: 'black', strokeWidth: '1'}, props, {cx, cy}]));
     case 'LineString':
-      return Polyline({
-        points: pointData.points.map(point => point.join(',')).join(' '),
-        ...R.merge({fill: 'none', stroke: 'blue', strokeWidth: '10'}, props)
-      });
+      return Polyline(R.mergeAll([
+        {fill: 'none', stroke: 'blue', strokeWidth: '10'},
+        props,
+        {points: pointData.points.map(point => point.join(',')).join(' ')}
+      ]));
     case 'Polygon':
       // TODO might need to remove a last redundant point here
-      return Polygon({
-        points: pointData.points.map(point => point.join(',')).join(' '),
-        ...R.merge({fill: 'white', stroke: 'black', strokeWidth: '10'}, props)
-      });
+      return Polygon(
+        R.mergeAll([
+          {fill: 'white', stroke: 'black', strokeWidth: '10'},
+          props,
+          {points: pointData.points.map(point => point.join(',')).join(' ') }
+      ]));
     default:
       throw new Error(`Unexpected type ${pointData.type}`);
   }
-}
+};

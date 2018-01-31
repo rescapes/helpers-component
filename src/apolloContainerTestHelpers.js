@@ -11,7 +11,7 @@
 
 
 import {
-  eitherToPromise, makeSampleInitialState, mockApolloClientWithSamples,
+  makeSampleInitialState, mockApolloClientWithSamples,
   propsFromSampleStateAndContainer, waitForChildComponentRender, wrapWithMockGraphqlAndStore
 } from './componentTestHelpers'
 import {getClass} from './styleHelpers';
