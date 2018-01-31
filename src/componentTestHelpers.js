@@ -24,7 +24,8 @@ import {getClass} from './styleHelpers';
 import {onError} from "apollo-link-error";
 
 const middlewares = [thunk];
-const mockNetworkInterfaceWithSchema = apolloTestUtils;
+// Importing this way because rollup can't find it
+const mockNetworkInterfaceWithSchema = apolloTestUtils.mockNetworkInterfaceWithSchema;
 
 /**
  * Create an initial test state based on the sampleConfig for tests to use.

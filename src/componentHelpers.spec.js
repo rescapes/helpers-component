@@ -17,10 +17,8 @@ import {
   propsForSansClass, strPath, itemizeProps, applyToIfFunction, keyWith, propsForItem, applyIfFunction, composeViews,
   composeViewsFromStruct, whenProp
 } from './componentHelpers';
-import {throwing, hasStrPath} from 'rescape-ramda';
+import {reqStrPathThrowing, hasStrPath} from 'rescape-ramda';
 import {resolvedSchema, sampleConfig} from './sampleData';
-
-const {reqStrPath} = throwing;
 
 describe('componentHelpers', () => {
   test('propLensEqual', () => {
@@ -66,16 +64,16 @@ describe('componentHelpers', () => {
     const mergeProps = mergePropsForViews(props => ({
       aComponent: {
         foo: 1,
-        bar: reqStrPath('data.store.bar')
+        bar: reqStrPathThrowing('data.store.bar')
       },
       bComponent: R.merge(
         {
-          bar: reqStrPath('data.store.bar'),
+          bar: reqStrPathThrowing('data.store.bar'),
           // say we need width in bComponent's props, not just its props.styles
-          width: reqStrPath('views.bComponent.styles.width')
+          width: reqStrPathThrowing('views.bComponent.styles.width')
         },
         // This returns multiple prop/values
-        reqStrPath('data.someExtraProps', props)
+        reqStrPathThrowing('data.someExtraProps', props)
       ),
       itemComponent: R.curry((props, item) => ({
         key: R.toUpper(item.key),
@@ -498,10 +496,10 @@ describe('componentHelpers', () => {
         props => ({
           aView: {
             someProp: 'foo',
-            parentProp: reqStrPath('data.parentProp')
+            parentProp: reqStrPathThrowing('data.parentProp')
           },
           bView: p => ({
-            parentProp: reqStrPath('data.parentProp', p)
+            parentProp: reqStrPathThrowing('data.parentProp', p)
           })
         }),
         props => ({
@@ -546,10 +544,10 @@ describe('componentHelpers', () => {
           props: props => ({
             aView: {
               someProp: 'foo',
-              parentProp: reqStrPath('data.parentProp')
+              parentProp: reqStrPathThrowing('data.parentProp')
             },
             bView: p => ({
-              parentProp: reqStrPath('data.parentProp', p)
+              parentProp: reqStrPathThrowing('data.parentProp', p)
             })
           }),
           styles: props => ({

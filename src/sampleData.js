@@ -16,8 +16,8 @@ import {
   GraphQLString,
   GraphQLNonNull
 } from 'graphql';
-import {throwing} from 'rescape-ramda';
-const {reqPath, findOneValueByParams} = throwing;
+import {reqPathThrowing, findOneValueByParamsThrowing} from 'rescape-ramda';
+require('rescape-ramda')
 
 const RegionType = new GraphQLObjectType({
   name: 'Region',
@@ -66,7 +66,7 @@ export const resolvedSchema = new GraphQLSchema({
 // Mutates resolvedSchema
 addResolveFunctionsToSchema(resolvedSchema, {
   Store: {
-    region: (parent, params, {options: {dataSource}}) => findOneValueByParams(params, reqPath(['regions'], dataSource))
+    region: (parent, params, {options: {dataSource}}) => findOneValueByParamsThrowing(params, reqPathThrowing(['regions'], dataSource))
   },
   Query: {
     store(obj, args) {
