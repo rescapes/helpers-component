@@ -1,6 +1,6 @@
 {
   "name": "rescape-helpers-component",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "Helpers for working with React components",
   "main": "build/index.js",
   "files": [
