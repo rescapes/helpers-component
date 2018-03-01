@@ -63,8 +63,7 @@ describe('componentTestHelpers', () => {
     // This function alweays uses makeSampleInitialState as the state and accepts
     // sample ownProps from the test
     expect(propsFromSampleStateAndContainer(
-      createInitialState,
-      sampleConfig,
+      initialState,
       // Simply merge a fake dispatch result with the sampleOwnProps
       (sampleInitialState, sampleOwnProps) => R.mergeAll([sampleInitialState, {someAction: R.identity}, sampleOwnProps]),
       // our sample ownProps

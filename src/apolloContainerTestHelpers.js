@@ -26,6 +26,7 @@ const theme = {}
  * Runs tests on an apollo React container with the * given config.
  * Even if the container being tested does not have an apollo query, this can be used
  * @param {Object} config
+ * @param {Object} config.initialState The initial Redux state
  * @param {Object} config.container The React container to test
  * @param {String} config.componentName The name of the React component that the container wraps
  * @param {String} config.childClassDataName A class used in a React component in the named
@@ -55,6 +56,7 @@ const theme = {}
 export const apolloContainerTests = (config) => {
 
     const {
+      initialState,
       schema,
       Container,
       componentName,
@@ -81,7 +83,7 @@ export const apolloContainerTests = (config) => {
       asyncParentProps ?
         asyncParentProps()
           .then(parentProps => {
-            const result = testPropsMaker ? propsFromSampleStateAndContainer(testPropsMaker, parentProps) : parentProps;
+            const result = testPropsMaker ? propsFromSampleStateAndContainer(initialState, testPropsMaker, parentProps) : parentProps;
             return R.unless(
               R.is(Promise),
               res => Promise.resolve(Either.Right(res))
@@ -101,7 +103,7 @@ export const apolloContainerTests = (config) => {
     if (query) {
       test('query', async () => {
         const parentProps = await asyncParentPropsOrDefault;
-        const props = await propsFromSampleStateAndContainer(testPropsMaker, parentProps).then(eitherToPromise);
+        const props = await propsFromSampleStateAndContainer(initialState, testPropsMaker, parentProps).then(eitherToPromise);
         const data = await mockApolloClientWithSamples(schema).query({
           query,
           variables: queryVariables(props),

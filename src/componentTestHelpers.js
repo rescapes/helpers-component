@@ -30,29 +30,31 @@ const mockNetworkInterfaceWithSchema = apolloTestUtils.mockNetworkInterfaceWithS
 /**
  * Create an initial test state based on the sampleConfig for tests to use.
  * This should only be used for sample configuration, unless store functionality is being tested
- * @param {Function} initialState Function to accept sampleConfig and return the initialState
+ * @param {Function} createInitialState Function to accept sampleConfig and return the initialState
  * @param {Object} sampleConfig The config to give the initialState
  * @returns {Object} The initial state
  */
-export const testState = (initialState, sampleConfig) => initialState(sampleConfig);
+export const testState = (createInitialState, sampleConfig) => createInitialState(sampleConfig);
 
 /**
  * Creates a mock store from our sample data an our initialState function
  * @param {Object} sampleUserSettings Merges in sample local settings, like those from a browser cache
- * @param {Function} createInitialState Function to accept sampleConfig and return the initialState
+ * @param {Object} initialState The initial state
  * @param {Object} sampleConfig The config to give the initialState
  * @type {function(*, *=)}
  */
-export const makeSampleStore = (createInitialState, sampleConfig, sampleUserSettings = {}) =>
-  makeMockStore(createInitialState(sampleConfig), sampleUserSettings);
+export const makeSampleStore = (initialState, sampleUserSettings = {}) =>
+  makeMockStore(initialState, sampleUserSettings);
 
 /**
  * Like test state but initializes a mock store. This will probably be unneeded
  * unless the middleware is needed, such as cycle.js
+ * @param {Function} createInitialState Creates the intial state from the sampleConfig
+ * @param {Object} sampleConfig object for craeteInitialState
  * @param {Object} sampleUserSettings Merges in sample local settings, like those from a browser cache
  */
 export const makeSampleInitialState = (createInitialState, sampleConfig, sampleUserSettings = {}) => {
-  return makeSampleStore(createInitialState, sampleUserSettings).getState();
+  return makeSampleStore(createInitialState(sampleConfig), sampleUserSettings).getState();
 };
 
 /**
@@ -60,22 +62,24 @@ export const makeSampleInitialState = (createInitialState, sampleConfig, sampleU
  * that would normally passed from the container to a component
  * @param {Function} containerPropMaker A function from a container that expects a sample state and sampleOwnProps
  * and then applies the container's mapStateToProps, mapDispatchToProps, and optional mergeProps
+ * @param {Object} initialState The initialState
  * @param sampleOwnProps Sample props that would normally come from the parent container
  * @returns {Object|Promise} complete test props or a Promise of the props if the conntainerPropMaker is aysnc
  */
-export const propsFromSampleStateAndContainer = (initialState, sampleConfig, containerPropMaker, sampleOwnProps = {}) =>
-  containerPropMaker(makeSampleInitialState(initialState, sampleConfig), sampleOwnProps);
+export const propsFromSampleStateAndContainer = (initialState, containerPropMaker, sampleOwnProps = {}) =>
+  containerPropMaker(initialState, sampleOwnProps);
 
 /**
  * Async version of propsFromSampleStateAndContainer for containerPropMaker that is asynchronous because it uses
  * apollo queries or similar
  * @param {Function} containerPropMaker A function from a container that expects a sample state and sampleOwnProps
  * and then applies the container's mapStateToProps, mapDispatchToProps, and optional mergeProps
- * @param sampleOwnProps Sample props that would normally come from the parent container
+ * @param {Object} initialState The initial state
+ * @param {Object} sampleOwnProps Sample props that would normally come from the parent container
  * @returns {Promise} A Promise to the complete test props
  */
 export const asyncPropsFromSampleStateAndContainer =
-  (containerPropMaker, sampleOwnProps = {}) => containerPropMaker(makeSampleInitialState(), sampleOwnProps).then(
+  (initialState, containerPropMaker, sampleOwnProps = {}) => containerPropMaker(initialState, sampleOwnProps).then(
     either => new Promise((resolve, reject) => either.map(resolve).leftMap(reject))
   );
 

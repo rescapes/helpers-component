@@ -424,7 +424,7 @@ export const liftAndExtractItems = (component, propsWithItems) => {
  * @param props
  * @return {*}
  */
-export const mergeStylesIntoViews = R.curry((viewStyles, props) => {
+export const mergeStylesIntoViews = v(R.curry((viewStyles, props) => {
   // viewStyles can be an object or unary function that returns an object
   const viewObjs = applyToIfFunction(props, viewStyles);
 
@@ -447,7 +447,11 @@ export const mergeStylesIntoViews = R.curry((viewStyles, props) => {
     views => mergeDeep(views, viewToStyle),
     props
   );
-});
+}),
+ [
+   ['viewStyles', PropTypes.oneOfType([PropTypes.shape({}), PropTypes.func]).isRequired],
+   ['props', PropTypes.shape().isRequired],
+ ], 'mergeStylesIntoViews');
 
 /**
  * Given viewProps keyed by by view names, find the one that matches name.
@@ -601,7 +605,7 @@ export const composeViews = R.curry((viewActions, viewProps, viewStyles, props) 
  * @param {Object} viewStruct
  * @param {Object} viewStruct.actions Optional. Maps actions to views
  * @param {Object} viewStruct.props Optional. Maps props to views
- * @param {Object} viewStruct.style Optional. Maps styles and className to views
+ * @param {Object} viewStruct.styles Optional. Maps styles and className to views
  * @return {Function} The modified props with view properties added by each of the three functions
  */
 export const composeViewsFromStruct = R.curry((viewStruct, props) => {

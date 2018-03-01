@@ -536,6 +536,26 @@ describe('componentHelpers', () => {
   });
 
   test('composeViewsFromStruct', () => {
+    composeViewsFromStruct({
+      props: {
+        ['logo']: {},
+        ['logoImage']: {
+          src: reqStrPathThrowing('logoSrc')
+        }
+      },
+
+      styles: {
+        ['logo']: {
+          aView: {
+            someStyle: 'foo'
+          }
+        },
+        ['logoImage']: {
+          maxWidth: '100%',
+          maxheight: '100%'
+        }
+      }
+    }, {logoSrc: './image.gif'})
     expect(
       composeViewsFromStruct({
           actions: {

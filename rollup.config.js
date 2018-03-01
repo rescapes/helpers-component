@@ -4,12 +4,14 @@ import replace from 'rollup-plugin-replace';
 import uglify from 'rollup-plugin-uglify';
 import json from 'rollup-plugin-json';
 import commonjs from 'rollup-plugin-commonjs';
+import builtins from 'rollup-plugin-node-builtins';
 
 const env = process.env.NODE_ENV;
 const config = {
   input: 'src/index.js',
   plugins: [
     json(),
+    builtins(),
     nodeResolve({
       preferBuiltins: true,
       jsnext: true,
@@ -23,8 +25,9 @@ const config = {
         'node_modules/process-es6/**'
       ],
       namedExports: {
-        'node_modules/react/index.js': ['Children', 'Component', 'PropTypes', 'createElement'],
-        'node_modules/react-dom/index.js': ['render']
+        'node_modules/react/index.js': ['Children', 'Component', 'PropTypes', 'createElement', 'createFactory'],
+        'node_modules/react-dom/index.js': ['render'],
+        'node_modules/graphql/execution/index.js': ['execute']
       }
     })
   ]
