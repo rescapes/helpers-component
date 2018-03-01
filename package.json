@@ -1,6 +1,6 @@
 {
   "name": "rescape-helpers-component",
-  "version": "1.4.7",
+  "version": "1.4.8",
   "description": "Helpers for working with React components",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -29,7 +29,7 @@
     "build:es": "cross-env BABEL_ENV=es NODE_ENV=es node_modules/.bin/babel src --out-dir es",
     "build:umd": "cross-env BABEL_ENV=es NODE_ENV=development $NODE_DEBUG_OPTION rollup -c -i src/index.js -o dist/index.js",
     "build:umd:min": "cross-env BABEL_ENV=es NODE_ENV=production NODE_ENV=production rollup -c -i src/index.js -o dist/index.min.js",
-    "build": "yarn run build:commonjs && yarn run build:es && yarn run build:umd && yarn run build:umd:min",
+    "build": "yarn run build:commonjs && yarn run build:es",
     "prepare": "yarn run clean && yarn run lint && yarn test && yarn run build",
     "docs:clean": "rimraf _book",
     "docs:prepare": "gitbook install",
