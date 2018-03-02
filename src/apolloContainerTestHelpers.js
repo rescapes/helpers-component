@@ -178,7 +178,7 @@ export const apolloContainerTests = v((config) => {
         testPropsMaker: PropTypes.func,
         asyncParentProps: PropTypes.func,
         query: PropTypes.shape(),
-        queryVariables: PropTypes.shape(),
+        queryVariables: PropTypes.func,
         errorMaker: PropTypes.func
       }
     )]
