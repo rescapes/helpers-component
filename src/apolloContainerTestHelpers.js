@@ -20,7 +20,8 @@ import * as Either from 'data.either';
 import {Provider as provider} from 'rebass';
 import {eMap} from './componentHelpers';
 import {eitherToPromise} from './testHelpers';
-import {PropTypes} from 'prop-types'
+import {PropTypes} from 'prop-types';
+import {v} from 'rescape-validate';
 
 const [Provider] = eMap([provider]);
 const theme = {};
@@ -78,8 +79,13 @@ export const apolloContainerTests = v((config) => {
       // Optional. Only for components with queries
       queryVariables,
       // Optional. Only for components with queries
-      errorMaker
+      errorMaker,
+      // Validate arguments only. Don't run tests
+      validateOnly
     } = config;
+
+    if (validateOnly)
+      return;
 
     // Get the test props for this container
     const asyncProps = () =>
@@ -164,7 +170,7 @@ export const apolloContainerTests = v((config) => {
     ['config', PropTypes.shape({
         initialState: PropTypes.shape().isRequired,
         schema: PropTypes.shape().isRequired,
-        Container: PropTypes.shape().isRequired,
+        Container: PropTypes.func.isRequired,
         componentName: PropTypes.string.isRequired,
         childClassDataName: PropTypes.string.isRequired,
         childClassLoadingName: PropTypes.string,
@@ -175,6 +181,5 @@ export const apolloContainerTests = v((config) => {
         queryVariables: PropTypes.shape(),
         errorMaker: PropTypes.func
       }
-    )],
-    'apolloContainerTests'
-  ]);
+    )]
+  ], 'apolloContainerTests');
