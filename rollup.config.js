@@ -27,7 +27,39 @@ const config = {
       namedExports: {
         'node_modules/react/index.js': ['Children', 'Component', 'PropTypes', 'createElement', 'createFactory'],
         'node_modules/react-dom/index.js': ['render'],
-        'node_modules/graphql/execution/index.js': ['execute']
+        'node_modules/graphql/execution/index.js': [
+          'execute', 'defaultFieldResolver', 'responsePathAsArray', 'getDirectiveValues'
+        ],
+        'node_modules/graphql/type/index.js': [
+          'GraphQLSchema',
+          'GraphQLScalarType', 'GraphQLObjectType', 'GraphQLInterfaceType', 'GraphQLUnionType', 'GraphQLEnumType', 'GraphQLInputObjectType', 'GraphQLList', 'GraphQLNonNull', 'GraphQLDirective',
+          'TypeKind',
+          'specifiedScalarTypes', 'GraphQLInt', 'GraphQLFloat', 'GraphQLString', 'GraphQLBoolean', 'GraphQLID',
+          'specifiedDirectives', 'GraphQLIncludeDirective', 'GraphQLSkipDirective', 'GraphQLDeprecatedDirective',
+          'DEFAULT_DEPRECATION_REASON',
+          'SchemaMetaFieldDef', 'TypeMetaFieldDef', 'TypeNameMetaFieldDef',
+          'introspectionTypes', '__Schema', '__Directive', '__DirectiveLocation', '__Type', '__Field', '__InputValue', '__EnumValue', '__TypeKind',
+          'isSchema', 'isDirective', 'isType', 'isScalarType', 'isObjectType', 'isInterfaceType', 'isUnionType', 'isEnumType', 'isInputObjectType', 'isListType', 'isNonNullType', 'isInputType', 'isOutputType', 'isLeafType', 'isCompositeType', 'isAbstractType', 'isWrappingType', 'isNullableType', 'isNamedType', 'isSpecifiedScalarType', 'isIntrospectionType', 'isSpecifiedDirective',
+          'assertType', 'assertScalarType', 'assertObjectType', 'assertInterfaceType', 'assertUnionType', 'assertEnumType', 'assertInputObjectType', 'assertListType', 'assertNonNullType', 'assertInputType', 'assertOutputType', 'assertLeafType', 'assertCompositeType', 'assertAbstractType', 'assertWrappingType', 'assertNullableType', 'assertNamedType',
+          'getNullableType', 'getNamedType',
+          'validateSchema', 'assertValidSchema',
+        ],
+        'node_modules/graphql/language/index.js': ['Source', 'getLocation', 'parse', 'parseValue', 'parseType', 'print',
+          'visit', 'visitInParallel', 'visitWithTypeInfo', 'getVisitFn', 'Kind', 'TokenKind', 'DirectiveLocation', 'BREAK'
+        ],
+        'node_modules/graphql/subscription/index.js': [
+          'subscribe', 'createSourceEventStream'
+        ],
+        'node_modules/graphql/validation/index.js': [
+          'validate', 'ValidationContext', 'specifiedRules',
+          'FieldsOnCorrectTypeRule', 'FragmentsOnCompositeTypesRule', 'KnownArgumentNamesRule', 'KnownDirectivesRule', 'KnownFragmentNamesRule', 'KnownTypeNamesRule', 'LoneAnonymousOperationRule', 'NoFragmentCyclesRule', 'NoUndefinedVariablesRule', 'NoUnusedFragmentsRule', 'NoUnusedVariablesRule', 'OverlappingFieldsCanBeMergedRule', 'PossibleFragmentSpreadsRule', 'ProvidedNonNullArgumentsRule', 'ScalarLeafsRule', 'SingleFieldSubscriptionsRule', 'UniqueArgumentNamesRule', 'UniqueDirectivesPerLocationRule', 'UniqueFragmentNamesRule', 'UniqueInputFieldNamesRule', 'UniqueOperationNamesRule', 'UniqueVariableNamesRule', 'ValuesOfCorrectTypeRule', 'VariablesAreInputTypesRule', 'VariablesDefaultValueAllowedRule', 'VariablesInAllowedPositionRule'
+        ],
+        'node_modules/graphql/error/index.js': [
+          'GraphQLError', 'formatError', 'printError'
+        ],
+        'node_modules/graphql/utilities/index.js': [
+          'getIntrospectionQuery', 'introspectionQuery', 'getOperationAST', 'introspectionFromSchema', 'buildClientSchema', 'buildASTSchema,'
+        ]
       }
     })
   ]

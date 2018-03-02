@@ -19,6 +19,7 @@ import * as R from 'ramda';
 import * as Either from 'data.either';
 import {Provider as provider} from 'rebass';
 import {eMap} from './componentHelpers';
+import {eitherToPromise} from 'testHelpers';
 const [Provider] = eMap([provider])
 const theme = {}
 
