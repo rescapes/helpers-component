@@ -71,7 +71,7 @@ export const apolloContainerTests = v((config) => {
       childClassErrorName,
       // Optional, if not specified then no container props are needed
       testPropsMaker,
-      // Optional, must return parent props as a Promise
+      // Optional, must be a function that returns parent props as a Promise
       asyncParentProps,
 
       // Optional. Only for components with queries
@@ -176,7 +176,7 @@ export const apolloContainerTests = v((config) => {
         childClassLoadingName: PropTypes.string,
         childClassErrorName: PropTypes.string,
         testPropsMaker: PropTypes.func,
-        asyncParentProps: PropTypes.shape(),
+        asyncParentProps: PropTypes.func,
         query: PropTypes.shape(),
         queryVariables: PropTypes.shape(),
         errorMaker: PropTypes.func
