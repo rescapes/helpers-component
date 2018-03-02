@@ -13,15 +13,17 @@
 import {
   makeSampleInitialState, mockApolloClientWithSamples,
   propsFromSampleStateAndContainer, waitForChildComponentRender, wrapWithMockGraphqlAndStore
-} from './componentTestHelpers'
+} from './componentTestHelpers';
 import {getClass} from './styleHelpers';
 import * as R from 'ramda';
 import * as Either from 'data.either';
 import {Provider as provider} from 'rebass';
 import {eMap} from './componentHelpers';
-import {eitherToPromise} from 'testHelpers';
-const [Provider] = eMap([provider])
-const theme = {}
+import {eitherToPromise} from './testHelpers';
+import {PropTypes} from 'prop-types'
+
+const [Provider] = eMap([provider]);
+const theme = {};
 
 /**
  * Runs tests on an apollo React container with the * given config.
@@ -32,9 +34,9 @@ const theme = {}
  * @param {String} config.componentName The name of the React component that the container wraps
  * @param {String} config.childClassDataName A class used in a React component in the named
  * component's renderData method--or any render code when apollo data is loaded
- * @param {Sting} config.childClassLoadingName A class used in a React component in the named
+ * @param {String} config.childClassLoadingName A class used in a React component in the named
  * component's renderLoading method--or any render code called when apollo loading is true
- * @param {Sting} config.childClassErrorName A class used in a React component in the named
+ * @param {String} config.childClassErrorName A class used in a React component in the named
  * component's renderError method--or any render code called when apollo error is true
  * @param {Function} config.testPropsMaker A function defined in the conatiner being tested that is
  * either created with makeApolloTestPropsFunction or makeTestPropsFunction, the former
@@ -54,7 +56,7 @@ const theme = {}
  * parentProps and mutates something used by the queryVariables to make the query fail. This
  * is for testing the renderError part of the component
  */
-export const apolloContainerTests = (config) => {
+export const apolloContainerTests = v((config) => {
 
     const {
       initialState,
@@ -157,5 +159,22 @@ export const apolloContainerTests = (config) => {
         waitForChildComponentRender(wrapper, componentName, childClassErrorName, done);
       });
     }
-  }
-;
+  },
+  [
+    ['config', PropTypes.shape({
+        initialState: PropTypes.shape().isRequired,
+        schema: PropTypes.shape().isRequired,
+        Container: PropTypes.shape().isRequired,
+        componentName: PropTypes.string.isRequired,
+        childClassDataName: PropTypes.string.isRequired,
+        childClassLoadingName: PropTypes.string,
+        childClassErrorName: PropTypes.string,
+        testPropsMaker: PropTypes.func,
+        asyncParentProps: PropTypes.shape(),
+        query: PropTypes.shape(),
+        queryVariables: PropTypes.shape(),
+        errorMaker: PropTypes.func
+      }
+    )],
+    'apolloContainerTests'
+  ]);
