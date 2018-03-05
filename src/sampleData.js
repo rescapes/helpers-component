@@ -46,6 +46,20 @@ const QueryType = new GraphQLObjectType({
     store: {type: StoreType}
   }
 });
+const MutationType = new GraphQLObjectType({
+  name: 'Mutation',
+  fields: {
+    filterSankeyNodes: {
+      type: SankeyNodeType,
+      args: {
+        filterNodeCategory: { type: new GraphQLNonNull(GraphQLString) },
+        filterNodeValue: { type: new GraphQLNonNull(GraphQLBoolean) }
+      },
+    }
+
+  }
+})
+
 
 export const sampleConfig = {
   regions: [
@@ -61,7 +75,8 @@ export const sampleConfig = {
  * @type {GraphQLSchema}
  */
 export const resolvedSchema = new GraphQLSchema({
-  query: QueryType
+  query: QueryType,
+  mutation: MutationType
 });
 // Mutates resolvedSchema
 addResolveFunctionsToSchema(resolvedSchema, {

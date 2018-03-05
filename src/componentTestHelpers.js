@@ -126,8 +126,7 @@ export const mockApolloClient = (schema, context) => {
 /**
  * Creates a mockApolloClient using makeSchema and makeSampleInitialState
  */
-export const mockApolloClientWithSamples = resolvedSchema => {
-  const state = makeSampleInitialState();
+export const mockApolloClientWithSamples = (state, resolvedSchema) => {
   const context = {options: {dataSource: state}};
   return mockApolloClient(resolvedSchema, context);
 };

@@ -113,7 +113,7 @@ export const apolloContainerTests = v((config) => {
       test('query', async () => {
         const parentProps = await asyncParentPropsOrDefault;
         const props = await propsFromSampleStateAndContainer(initialState, testPropsMaker, parentProps).then(eitherToPromise);
-        const data = await mockApolloClientWithSamples(schema).query({
+        const data = await mockApolloClientWithSamples(initialState, schema).query({
           query,
           variables: queryVariables(props),
           context: {
