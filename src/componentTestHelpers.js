@@ -133,14 +133,14 @@ export const mockApolloClientWithSamples = (state, resolvedSchema) => {
 
 /**
  * Wraps a component in a graphql client and store context for Apollo/Redux testing
+ * @param state
+ * @param resolvedSchema
  * @param component
  * @return {*}
  */
-export const wrapWithMockGraphqlAndStore = (createInitialState, sampleConfig, resolvedSchema, component) => {
-  const state = makeSampleInitialState(createInitialState, sampleConfig);
+export const wrapWithMockGraphqlAndStore = (state, resolvedSchema, component) => {
+  const store = makeSampleStore(state)
   const context = {options: {dataSource: state}};
-  //const resolvedSchema = createSelectorResolvedSchema(makeSchema(), state);
-  const store = makeSampleStore(createInitialState, sampleConfig);
 
   // shallow wrap the component, passing the Apollo client and redux store to the component and children
   // Also dive once to get passed the Apollo wrapper

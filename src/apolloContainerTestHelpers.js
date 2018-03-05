@@ -11,7 +11,7 @@
 
 
 import {
-  makeSampleInitialState, mockApolloClientWithSamples,
+  mockApolloClientWithSamples,
   propsFromSampleStateAndContainer, waitForChildComponentRender, wrapWithMockGraphqlAndStore
 } from './componentTestHelpers';
 import {getClass} from './styleHelpers';
@@ -22,6 +22,7 @@ import {eMap} from './componentHelpers';
 import {eitherToPromise} from './testHelpers';
 import {PropTypes} from 'prop-types';
 import {v} from 'rescape-validate';
+import {resolvedSchema} from 'sampleData';
 
 const [Provider] = eMap([provider]);
 const theme = {};
@@ -128,9 +129,9 @@ export const apolloContainerTests = v((config) => {
       // Wait for the sample parent props that feed this component
       const parentProps = await asyncParentPropsOrDefault;
       // Wrap the component in mock Apollo and Redux providers.
-      // If the compoent doesn't use Apollo it just means that it will render its children synchronously,
+      // If the component doesn't use Apollo it just means that it will render its children synchronously,
       // rather than asynchronously
-      const wrapper = wrapWithMockGraphqlAndStore(Provider({theme}, Container(parentProps)));
+      const wrapper = wrapWithMockGraphqlAndStore(initialState, resolvedSchema, Container(parentProps));
       // Find the top-level component. This is always rendered in any Apollo status (loading, error, store data)
       const component = wrapper.find(componentName);
       // Make sure the component props are consistent since the last test run
@@ -158,7 +159,7 @@ export const apolloContainerTests = v((config) => {
     if (errorMaker) {
       test('renderError', async (done) => {
         const parentProps = await asyncParentPropsOrDefault.then(errorMaker);
-        const wrapper = wrapWithMockGraphqlAndStore(Container(parentProps));
+        const wrapper = wrapWithMockGraphqlAndStore(initialState, resolvedSchema, Container(parentProps));
         const component = wrapper.find(componentName);
         expect(component.find(`.${getClass(childClassLoadingName)}`).length).toEqual(1);
         expect(component.props()).toMatchSnapshot();

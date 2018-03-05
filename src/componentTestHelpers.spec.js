@@ -114,7 +114,7 @@ describe('componentTestHelpers', () => {
     // Create a factory for container
     const [container] = eMap([Container]);
     // Instantiate
-    const wrapper = wrapWithMockGraphqlAndStore(createInitialState, sampleConfig, resolvedSchema, container(parentProps));
+    const wrapper = wrapWithMockGraphqlAndStore(createInitialState(sampleConfig), resolvedSchema, container(parentProps));
     // Expect the apollo data prop, the redux dispatch, and the someProp we added
     expect(R.keys(wrapper.find(Component).props()).sort()).toEqual(['data', 'dispatch', 'someProp'])
   });
