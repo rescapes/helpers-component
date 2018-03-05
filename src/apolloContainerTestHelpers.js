@@ -22,7 +22,7 @@ import {eMap} from './componentHelpers';
 import {eitherToPromise} from './testHelpers';
 import {PropTypes} from 'prop-types';
 import {v} from 'rescape-validate';
-import {resolvedSchema} from 'sampleData';
+import {resolvedSchema} from './sampleData';
 
 const [Provider] = eMap([provider]);
 const theme = {};
