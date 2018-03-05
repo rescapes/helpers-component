@@ -117,7 +117,7 @@ export const apolloContainerTests = v((config) => {
           query,
           variables: queryVariables(props),
           context: {
-            dataSource: makeSampleInitialState()
+            dataSource: initialState
           }
         });
         expect(data).toMatchSnapshot();
