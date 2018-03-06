@@ -86,7 +86,6 @@
     "eslint": "4.18.1",
     "eslint-loader": "2.0.0",
     "eslint-plugin-import": "2.9.0",
-    "graphql": "^0.13.1",
     "install": "^0.10.4",
     "jest": "22.4.2",
     "jest-cli": "^22.4.2",
@@ -102,6 +101,7 @@
     "rollup-plugin-uglify": "^3.0.0"
   },
   "peerDependencies": {
+    "graphql": "^0.13.1",
     "react": ">=0.14",
     "react-dom": ">=0.14"
   },
@@ -165,6 +165,12 @@
         {
           "polyfill": false,
           "regenerator": true
+        }
+      ],
+      [
+        "transform-es2015-modules-commonjs-simple",
+        {
+          "noMangle": true
         }
       ]
     ],

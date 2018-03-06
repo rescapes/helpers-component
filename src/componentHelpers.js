@@ -647,7 +647,7 @@ export const joinComponents = (separatorComponent, components) =>
  * @param viewName The viewname with which to resolve the props
  * @return A function expecting props, which renders the loading component
  */
-export const renderLoadingDefault = (viewName) => ({views}) => {
+export const renderLoadingDefault = viewName => ({views}) => {
   const [Div] = eMap(['div']);
   const props = propsFor(views);
   return Div(props(viewName));
