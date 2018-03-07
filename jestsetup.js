@@ -23,7 +23,9 @@ enzyme.configure({adapter: new Adapter()});
 global.shallow = shallow;
 global.render = render;
 global.mount = mount;
-global.navigator = {};
+global.navigator = {
+  userAgent: 'node.js'
+};
 
 // jsdom, window, document, navigator setup
 // http://airbnb.io/enzyme/docs/guides/jsdom.html

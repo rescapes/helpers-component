@@ -17,12 +17,25 @@ import {
 import {getClass} from './styleHelpers';
 import * as R from 'ramda';
 import * as Either from 'data.either';
-import {Provider as provider} from 'rebass';
-import {eMap} from './componentHelpers';
 import {eitherToPromise} from './testHelpers';
 import {PropTypes} from 'prop-types';
 import {v} from 'rescape-validate';
 import {resolvedSchema} from './sampleData';
+// This is all done in jestsetup.js, but since these tests are called from other packages we have to repeat it here.
+// Apparently the enzyme module here is a different instance than the one imported in the calling package.
+// It might be solvable by using a peer dependeny
+// Make Enzyme Rx available in all test files without importing
+import {shallow, render, mount} from 'enzyme';
+// Enzyme setup
+import enzyme from 'enzyme';
+import Adapter from 'enzyme-adapter-react-16';
+enzyme.configure({adapter: new Adapter()});
+global.shallow = shallow;
+global.render = render;
+global.mount = mount;
+global.navigator = {
+  userAgent: 'node.js'
+};
 
 /**
  * Runs tests on an apollo React container with the * given config.
