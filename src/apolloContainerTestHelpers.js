@@ -24,9 +24,6 @@ import {PropTypes} from 'prop-types';
 import {v} from 'rescape-validate';
 import {resolvedSchema} from './sampleData';
 
-const [Provider] = eMap([provider]);
-const theme = {};
-
 /**
  * Runs tests on an apollo React container with the * given config.
  * Even if the container being tested does not have an apollo query, this can be used

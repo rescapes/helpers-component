@@ -89,14 +89,21 @@ const queryVariables = props => ({
 });
 const errorMaker = parentProps => R.set(R.lensPath(['region', 'id']), 'foo', parentProps);
 
+const testPropsMaker = makeApolloTestPropsFunction(
+  schema,
+  sampleConfig,
+  mapStateToProps,
+  mapDispatchToProps,
+  queries.regionRegions
+);
 
 describe('ApolloContainer', () => {
   // Just check argument validation
   const {testQuery} = apolloContainerTests({
-    initialState: {},
+    initialState: sampleConfig,
     schema,
     Container,
-    testPropsMaker: makeApolloTestPropsFunction(schema, sampleConfig, mapStateToProps, mapDispatchToProps, queries.regionRegions),
+    testPropsMaker,
     componentName,
     childClassDataName,
     childClassErrorName,

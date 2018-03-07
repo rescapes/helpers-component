@@ -299,28 +299,18 @@ export const makeTestPropsFunction = (mapStateToProps, mapDispatchToProps) =>
 
 /**
  * Like makeTestPropsFunction, but additionally resolves an Apollo query to supply complete data for a test
- * @param {Function} createResolvedSchema Function expecting an Apollo schema and sampleConfig that returns
- * a schema with resolvers that rely on the sampleConfig
- * @param {Object} the resolver resolved Apollo schema
- * @param {Object} the sampleConfig. This is used as a datasource for the resolvers
- * @param {Function} mapStateToProps
- * @param {Function} mapDispatchToProps
- * @param {Function} mergeProps
+ * @param {Object} resolvedSchema Apollo schema with resolvers
+ * @param {Object} sampleConfig This is used as a datasource for the resolvers
+ * @param {Function} mapStateToProps Redux container function
+ * @param {Function} mapDispatchToProps Redux container function
+ * @param {Function} mergeProps Redux container function
  * @query {String} query Contains an apollo query string (not gql string)
- * @args {Function} args Contains an apollo query args in the format
+ * @args {Function} args Contains an apollo query args in the format:
  * {
  *  options: { variables: { query args } }
  * }
  *
- * @returns {Function} A function with two arguments, query and args.
- * query is an Apollo query string and args is a function that
- * expects props and produces query args with their values inside a key 'variables'. This matches the
- * Apollo React client setup. Example
- * args = props => {
- *  variables: {
- *    regionId: props.region.id
- *  }
- *  }
+ * @returns {Function} A function with two arguments, initialState and ownProps
  *  The function returns a Promise that passes an Either.Left or Right. If Left there ar errors in the Either.value. If
  *  Right then the value is the store
  */
@@ -361,7 +351,7 @@ export const makeApolloTestPropsFunction = R.curry((resolvedSchema, sampleConfig
         });
       });
     },
-    // Creates Redux function props
+    // Creates Redux function props args are initialState and ownProps
     (...args) => Promise.resolve(makeTestPropsFunction(mapStateToProps, mapDispatchToProps)(...args))
   );
 });

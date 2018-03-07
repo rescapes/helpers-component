@@ -152,8 +152,7 @@
           "exclude": [
             "transform-async-to-generator"
           ],
-          "modules": false,
-          "loose": true
+          "modules": false
         }
       ]
     ],
@@ -192,7 +191,7 @@
           [
             "env",
             {
-              "modules": "commonjs"
+              "node": "current"
             }
           ]
         ]

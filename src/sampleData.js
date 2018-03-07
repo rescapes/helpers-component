@@ -70,7 +70,9 @@ export const resolvedSchema = new GraphQLSchema({
 // Mutates resolvedSchema
 addResolveFunctionsToSchema(resolvedSchema, {
   Store: {
-    region: (parent, params, {options: {dataSource}}) => findOneValueByParamsThrowing(params, reqPathThrowing(['regions'], dataSource))
+    region: (parent, params, {options: {dataSource}}) => {
+      return findOneValueByParamsThrowing(params, reqPathThrowing(['regions'], dataSource))
+    }
   },
   Query: {
     store(obj, args) {
