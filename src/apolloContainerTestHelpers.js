@@ -209,7 +209,7 @@ export const apolloContainerTests = v((config) => {
       const component = wrapper.find(componentName);
       expect(component.find(`.${getClass(childClassLoadingName)}`).length).toEqual(1);
       expect(component.props()).toMatchSnapshot();
-      waitForChildComponentRender(wrapper, componentName, childClassErrorName, done);
+      waitForChildComponentRender(wrapper, componentName, childClassErrorName).then(() => done());
     };
 
     return {

@@ -15,7 +15,7 @@ const [div] = eMap(['div']);
 
 class App extends Component {
   render() {
-    return App.choicepoint(R.merge(this.props, {views: { 'error': {}, 'loading': {}, 'success': {} } }));
+    return App.choicepoint(R.merge(this.props, {views: {'error': {}, 'loading': {}, 'success': {}}}));
   }
 }
 
@@ -68,7 +68,8 @@ const ContainerWithData = graphql(
   queries.regionRegions.args
 )(App);
 
-const mapStateToProps = state => ({data: {region: {id: 'oakland'}}});
+// ownProps will override with bad id for testing error
+const mapStateToProps = (state, ownProps) => R.merge({data: {region: {id: 'oakland'}}}, ownProps);
 const mapDispatchToProps = () => ({});
 const ContainerClass = connect(mapStateToProps, mapDispatchToProps, R.merge)(ContainerWithData);
 const [Container] = eMap([ContainerClass]);
@@ -87,7 +88,7 @@ const childClassErrorName = 'error';
 const queryVariables = props => ({
   regionId: props.data.region.id
 });
-const errorMaker = parentProps => R.set(R.lensPath(['region', 'id']), 'foo', parentProps);
+const errorMaker = parentProps => R.set(R.lensPath(['data', 'region', 'id']), 'foo', parentProps);
 
 const testPropsMaker = makeApolloTestPropsFunction(
   schema,
