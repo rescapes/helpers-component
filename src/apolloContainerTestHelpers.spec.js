@@ -15,7 +15,7 @@ const [div] = eMap(['div']);
 
 class App extends Component {
   render() {
-    App.choicepoint(this.props);
+    return App.choicepoint(R.merge(this.props, {views: { 'error': {}, 'loading': {}, 'success': {} } }));
   }
 }
 
@@ -70,8 +70,8 @@ const ContainerWithData = graphql(
 
 const mapStateToProps = state => ({data: {region: {id: 'oakland'}}});
 const mapDispatchToProps = () => ({});
-const Container = connect(mapStateToProps(), mapDispatchToProps(), R.merge)(ContainerWithData);
-
+const ContainerClass = connect(mapStateToProps, mapDispatchToProps, R.merge)(ContainerWithData);
+const [Container] = eMap([ContainerClass]);
 
 // Find this React component
 const componentName = 'App';
@@ -99,7 +99,7 @@ const testPropsMaker = makeApolloTestPropsFunction(
 
 describe('ApolloContainer', () => {
   // Just check argument validation
-  const {testQuery} = apolloContainerTests({
+  const {testMapStateToProps, testQuery, testRenderError, testRender} = apolloContainerTests({
     initialState: sampleConfig,
     schema,
     Container,
@@ -112,8 +112,9 @@ describe('ApolloContainer', () => {
     queryVariables,
     errorMaker
   });
+  test('testMapStateToProps', testMapStateToProps);
+  test('testQuery', testQuery);
+  test('testRender', testRender);
+  test('testRenderError', testRenderError);
 
-  test('testQuery', () => {
-    return testQuery();
-  });
 });

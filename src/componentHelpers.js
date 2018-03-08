@@ -415,33 +415,33 @@ export const liftAndExtractItems = (component, propsWithItems) => {
  * @return {*}
  */
 export const mergeStylesIntoViews = v(R.curry((viewStyles, props) => {
-  // viewStyles can be an object or unary function that returns an object
-  const viewObjs = applyToIfFunction(props, viewStyles);
+    // viewStyles can be an object or unary function that returns an object
+    const viewObjs = applyToIfFunction(props, viewStyles);
 
-  // if the viewObj has style as a key, we take that to mean that the object is in the
-  // shape {style: {...}, className: 'extra class names'}. Otherwise it means
-  // that it is just style props because no extra className was needed
-  const viewToStyle = R.map(
-    viewObj => R.ifElse(
-      R.has('style'),
-      // Done
-      R.identity,
-      // Wrap it in a style key
-      style => ({style})
-    )(viewObj),
-    viewObjs);
+    // if the viewObj has style as a key, we take that to mean that the object is in the
+    // shape {style: {...}, className: 'extra class names'}. Otherwise it means
+    // that it is just style props because no extra className was needed
+    const viewToStyle = R.map(
+      viewObj => R.ifElse(
+        R.has('style'),
+        // Done
+        R.identity,
+        // Wrap it in a style key
+        style => ({style})
+      )(viewObj),
+      viewObjs);
 
-  // Deep props.views with viewStyles and return entire props
-  return R.over(
-    R.lensProp('views'),
-    views => mergeDeep(views, viewToStyle),
-    props
-  );
-}),
- [
-   ['viewStyles', PropTypes.oneOfType([PropTypes.shape({}), PropTypes.func]).isRequired],
-   ['props', PropTypes.shape().isRequired],
- ], 'mergeStylesIntoViews');
+    // Deep props.views with viewStyles and return entire props
+    return R.over(
+      R.lensProp('views'),
+      views => mergeDeep(views, viewToStyle),
+      props
+    );
+  }),
+  [
+    ['viewStyles', PropTypes.oneOfType([PropTypes.shape({}), PropTypes.func]).isRequired],
+    ['props', PropTypes.shape().isRequired]
+  ], 'mergeStylesIntoViews');
 
 /**
  * Given viewProps keyed by by view names, find the one that matches name.

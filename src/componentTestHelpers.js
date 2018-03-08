@@ -213,7 +213,13 @@ export const waitForChildComponentRender = (wrapper, componentName, childClassNa
   // Override find to call update each time we poll for an update
   // Enzyme 3 doesn't stay synced with React DOM changes without update
   component.find = (...args) => {
-    wrapper.update();
+    try {
+      wrapper.update();
+    }
+    catch(e) {
+      log.warning("Couldn't update wrapper. Assuming that render failed.")
+      // If update failed because of a component error, just quit
+    }
     // Find the component with the updated wrapper, otherwise we get the old component
     return find.apply(wrapper.find(componentName), args);
   };

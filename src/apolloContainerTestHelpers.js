@@ -29,6 +29,7 @@ import {shallow, render, mount} from 'enzyme';
 // Enzyme setup
 import enzyme from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
+
 enzyme.configure({adapter: new Adapter()});
 global.shallow = shallow;
 global.render = render;
@@ -41,22 +42,26 @@ global.navigator = {
  * Runs tests on an apollo React container with the * given config.
  * Even if the container being tested does not have an apollo query, this can be used
  * @param {Object} config
- * @param {Object} config.initialState The initial Redux state
  * @param {Object} config.container The React container to test
  * @param {String} config.componentName The name of the React component that the container wraps
  * @param {String} config.childClassDataName A class used in a React component in the named
  * component's renderData method--or any render code when apollo data is loaded
- * @param {String} config.childClassLoadingName A class used in a React component in the named
- * component's renderLoading method--or any render code called when apollo loading is true
- * @param {String} config.childClassErrorName A class used in a React component in the named
- * component's renderError method--or any render code called when apollo error is true
- * @param {Function} config.testPropsMaker Required. A function defined in the container being tested that is
+ * @param {Object} config.initialState The initial Redux state.
+ *
+ * @param {String} [config.childClassLoadingName] Optional. A class used in a React component in the named
+ * component's renderLoading method--or any render code called when apollo loading is true. Normally
+ * only needed for components with queries.
+ * @param {String} [config.childClassErrorName] Optional. A class used in a React component in the named
+ * component's renderError method--or any render code called when apollo error is true. Normally only
+ * needed for components with queries.
+ * @param {Function} [config.testPropsMaker] Optional A function defined in the container being tested that is
  * either created with makeApolloTestPropsFunction or makeTestPropsFunction, the former
  * if the container has an Apollo query and the latter if it doesn't. This function
  * and the result of asyncParentProps is passed propsFromSampleStateAndContainer, which
- * ultimately generates the test props
- * @param {Function} config.asyncParentProps A function with no arguments that returns a Promise
- * of the parentProps used to call propsFromSampleStateAndContainer
+ * ultimately generates the test props. If this is omitted parentProps from asyncParentProps will be used directly
+ * @param {Function} [config.asyncParentProps] A function with no arguments that returns a Promise
+ * of the parentProps used to call propsFromSampleStateAndContainer. Required if the container component receives
+ * props from its parent (it usually does)
  * @param {Object} [config.query] Optional gql wrapped query string if the Container has an apollo query.
  * The query should be the same as that used by the container
  * @param {Function} [config.queryVariables] Optional Unary function expecting props and return an object of query arguments
@@ -66,13 +71,11 @@ global.navigator = {
   });
  * @param {Function} [config.errorMaker] Optional unary function that expects the results of the
  * parentProps and mutates something used by the queryVariables to make the query fail. This
- * is for testing the renderError part of the component
+ * is for testing the renderError part of the component. Only containers with queries should have an expected error state
  */
 export const apolloContainerTests = v((config) => {
 
     const {
-      initialState,
-      schema,
       Container,
       componentName,
       childClassDataName,
@@ -84,7 +87,10 @@ export const apolloContainerTests = v((config) => {
       testPropsMaker,
       // Optional, must be a function that returns parent props as a Promise
       asyncParentProps,
-
+      // Optional, required if there are asyncParentProps
+      initialState,
+      // Optional. Only for components with queries
+      schema,
       // Optional. Only for components with queries
       query,
       // Optional. Only for components with queries
@@ -93,21 +99,28 @@ export const apolloContainerTests = v((config) => {
       errorMaker
     } = config;
 
-    // Get the test props for this container
-    const asyncProps = () =>
-      asyncParentProps ?
-        asyncParentProps()
-          .then(parentProps => {
-            const result = testPropsMaker ? propsFromSampleStateAndContainer(initialState, testPropsMaker, parentProps) : parentProps;
-            return R.unless(
-              R.is(Promise),
-              res => Promise.resolve(Either.Right(res))
-            )(result);
-          })
-          .then(eitherToPromise) :
-        Promise.resolve({});
-
     const asyncParentPropsOrDefault = asyncParentProps ? asyncParentProps() : Promise.resolve({});
+
+    // Get the test props for this container
+    const asyncProps = () => {
+      if (!asyncParentProps) {
+        return Promise.resolve({});
+      }
+      const promise = asyncParentProps();
+      if (!R.is(Promise)) {
+        throw Error("Result of asyncParentProps must be a Promise");
+      }
+      promise.then(parentProps => {
+        const result = testPropsMaker ? propsFromSampleStateAndContainer(initialState, testPropsMaker, parentProps) : parentProps;
+        // If result is a promise, the promised value will be a Right
+        // If the result is not a promise, wrap in a Right to match
+        return R.unless(
+          R.is(Promise),
+          res => Either.Right(res)
+        )(result);
+      }).then(eitherToPromise);
+    };
+
 
     /***
      * Tests that mapStateToProps matches snapshot
@@ -115,7 +128,7 @@ export const apolloContainerTests = v((config) => {
      */
     const testMapStateToProps = async () => {
       // Get the test props for RegionContainer
-      const props = await asyncProps();
+      const props = await asyncParentPropsOrDefault
       expect(props).toMatchSnapshot();
     };
 
@@ -125,7 +138,7 @@ export const apolloContainerTests = v((config) => {
      */
     const testQuery = async () => {
       if (!query || !queryVariables) {
-        logger.warn("Attempt to run testQuery when query or queryVariables was not specified. Does your component actually need this test?");
+        console.warn("Attempt to run testQuery when query or queryVariables was not specified. Does your component actually need this test?");
         return;
       }
 
@@ -209,13 +222,13 @@ export const apolloContainerTests = v((config) => {
   [
     ['config', PropTypes.shape({
         initialState: PropTypes.shape().isRequired,
-        schema: PropTypes.shape().isRequired,
         Container: PropTypes.func.isRequired,
         componentName: PropTypes.string.isRequired,
         childClassDataName: PropTypes.string.isRequired,
         childClassLoadingName: PropTypes.string,
         childClassErrorName: PropTypes.string,
-        testPropsMaker: PropTypes.func.isRequired,
+        testPropsMaker: PropTypes.func,
+        schema: PropTypes.shape(),
         asyncParentProps: PropTypes.func,
         query: PropTypes.shape(),
         queryVariables: PropTypes.func,
