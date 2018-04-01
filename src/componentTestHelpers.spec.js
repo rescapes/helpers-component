@@ -15,12 +15,13 @@ import {connect} from 'react-redux';
 import * as R from 'ramda';
 import {eMap} from './componentHelpers';
 import React from 'react';
-import {GraphQLObjectType, GraphQLSchema} from 'graphql';
+import {GraphQLObjectType, GraphQLSchema, GraphQLString} from 'graphql';
 import {addResolveFunctionsToSchema} from 'graphql-tools';
 import {
   makeMockStore, makeSampleInitialState, propsFromSampleStateAndContainer, testState,
   wrapWithMockGraphqlAndStore
 } from 'componentTestHelpers';
+import {resolvedSchema} from 'sampleData';
 const [div] = eMap(['div']);
 const createInitialState = config => R.merge({
   foo: 'boo'
@@ -28,23 +29,6 @@ const createInitialState = config => R.merge({
 const sampleConfig = {
   bar: 'roo'
 }
-
-// Fake Apollo Schema
-const QueryType = new GraphQLObjectType({
-  name: 'Query',
-  fields: {
-  }
-});
-const MutationType = new GraphQLObjectType({
-  name: 'Mutation',
-  fields: {
-  }
-})
-
-const resolvedSchema = new GraphQLSchema({
-  query: QueryType,
-  mutation: MutationType
-})
 addResolveFunctionsToSchema(resolvedSchema, {})
 
 

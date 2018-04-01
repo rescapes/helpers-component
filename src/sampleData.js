@@ -18,7 +18,8 @@ import {
   GraphQLSchema,
   GraphQLObjectType,
   GraphQLString,
-  GraphQLNonNull
+  GraphQLNonNull,
+  GraphQLList
 } from 'graphql';
 import {reqPathThrowing, findOneValueByParamsThrowing} from 'rescape-ramda';
 require('rescape-ramda')
@@ -35,6 +36,12 @@ const RegionType = new GraphQLObjectType({
 const StoreType = new GraphQLObjectType({
   name: 'Store',
   fields: {
+    regions: {
+      type: new GraphQLList(RegionType),
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLString) }
+      }
+    },
     region: {
       type: RegionType,
       args: {
@@ -70,6 +77,9 @@ export const resolvedSchema = new GraphQLSchema({
 // Mutates resolvedSchema
 addResolveFunctionsToSchema(resolvedSchema, {
   Store: {
+    regions: (parent, params, {options: {dataSource}}) => {
+      return findOneValueByParamsThrowing(params, reqPathThrowing(['regions'], dataSource))
+    },
     region: (parent, params, {options: {dataSource}}) => {
       return findOneValueByParamsThrowing(params, reqPathThrowing(['regions'], dataSource))
     }
