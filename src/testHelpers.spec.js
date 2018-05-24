@@ -10,13 +10,13 @@
  */
 
 import {expectTask, eitherToPromise} from './testHelpers';
-import Task from 'data.task';
+import {task} from 'folktale/concurrency/task';
 import * as Either from 'data.either';
 
 describe('testHelpers', () => {
   test('expectTask', () => {
-    expectTask(new Task((reject, resolve) => resolve('apple'))).resolves.toEqual('apple');
-    expectTask(new Task((reject, resolve) => {
+    expectTask(task(({reject, resolve}) => resolve('apple'))).resolves.toEqual('apple');
+    expectTask(task(({reject, resolve}) => {
       throw new Error('snapple');
     })).rejects.toEqual(new Error('snapple'));
   });

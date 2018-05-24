@@ -217,7 +217,7 @@ export const waitForChildComponentRender = (wrapper, componentName, childClassNa
       wrapper.update();
     }
     catch(e) {
-      log.warning("Couldn't update wrapper. Assuming that render failed.")
+      console.warn("Couldn't update wrapper. Assuming that render failed.")
       // If update failed because of a component error, just quit
     }
     // Find the component with the updated wrapper, otherwise we get the old component

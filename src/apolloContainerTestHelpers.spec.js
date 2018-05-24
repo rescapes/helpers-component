@@ -53,7 +53,7 @@ const queries = {
           regionId: region.id
         },
         // Pass through error so we can handle it in the component
-        errorPolicy: 'none'
+        errorPolicy: 'all'
       }),
       props: ({data, ownProps}) => R.merge(
         ownProps,
