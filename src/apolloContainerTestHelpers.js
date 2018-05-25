@@ -38,7 +38,7 @@ import {resolvedSchema} from './sampleData';
  * @param {String} [config.childClassErrorName] Optional. A class used in a React component in the named
  * component's renderError method--or any render code called when apollo error is true. Normally only
  * needed for components with queries.
- * @param {Function} [config.testPropsMaker] Optional A function defined in the container being tested that is
+ * @param {Function} [config.samplePropsMaker] Optional A function defined in the container being tested that is
  * either created with makeApolloTestPropsFunction or makeTestPropsFunction, the former
  * if the container has an Apollo query and the latter if it doesn't. This function
  * and the result of asyncParentProps is passed propsFromSampleStateAndContainer, which
@@ -68,7 +68,7 @@ export const apolloContainerTests = v((config) => {
       // Optional, the class name if the component has an Apollo-based error state
       childClassErrorName,
       // Optional, if not specified then no container props are needed
-      testPropsMaker,
+      samplePropsMaker,
       // Optional, must be a function that returns parent props as a Promise
       asyncParentProps,
       // Optional, required if there are asyncParentProps
@@ -95,7 +95,7 @@ export const apolloContainerTests = v((config) => {
         throw Error("Result of asyncParentProps must be a Promise");
       }
       promise.then(parentProps => {
-        const result = testPropsMaker ? propsFromSampleStateAndContainer(initialState, testPropsMaker, parentProps) : parentProps;
+        const result = samplePropsMaker ? propsFromSampleStateAndContainer(initialState, samplePropsMaker, parentProps) : parentProps;
         // If result is a promise, the promised value will be a Right
         // If the result is not a promise, wrap in a Right to match
         return R.unless(
@@ -127,7 +127,7 @@ export const apolloContainerTests = v((config) => {
       }
 
       const parentProps = await asyncParentPropsOrDefault;
-      const props = await propsFromSampleStateAndContainer(initialState, testPropsMaker, parentProps).then(eitherToPromise);
+      const props = await propsFromSampleStateAndContainer(initialState, samplePropsMaker, parentProps).then(eitherToPromise);
       const data = await mockApolloClientWithSamples(initialState, schema).query({
         query,
         variables: queryVariables(props),
@@ -211,7 +211,7 @@ export const apolloContainerTests = v((config) => {
         childClassDataName: PropTypes.string.isRequired,
         childClassLoadingName: PropTypes.string,
         childClassErrorName: PropTypes.string,
-        testPropsMaker: PropTypes.func,
+        samplePropsMaker: PropTypes.func,
         schema: PropTypes.shape(),
         asyncParentProps: PropTypes.func,
         query: PropTypes.shape(),

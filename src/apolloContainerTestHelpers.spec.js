@@ -90,7 +90,7 @@ const queryVariables = props => ({
 });
 const errorMaker = parentProps => R.set(R.lensPath(['data', 'region', 'id']), 'foo', parentProps);
 
-const testPropsMaker = makeApolloTestPropsFunction(
+const samplePropsMaker = makeApolloTestPropsFunction(
   schema,
   sampleConfig,
   mapStateToProps,
@@ -104,7 +104,7 @@ describe('ApolloContainer', () => {
     initialState: sampleConfig,
     schema,
     Container,
-    testPropsMaker,
+    samplePropsMaker,
     componentName,
     childClassDataName,
     childClassErrorName,

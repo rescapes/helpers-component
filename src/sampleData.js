@@ -75,7 +75,7 @@ export const resolvedSchema = new GraphQLSchema({
   query: QueryType,
 });
 // Mutates resolvedSchema
-addResolveFunctionsToSchema(resolvedSchema, {
+addResolveFunctionsToSchema({schema: resolvedSchema, resolvers: {
   Store: {
     regions: (parent, params, {options: {dataSource}}) => {
       return findOneValueByParamsThrowing(params, reqPathThrowing(['regions'], dataSource))
@@ -89,4 +89,4 @@ addResolveFunctionsToSchema(resolvedSchema, {
       return sampleConfig
     }
   }
-});
+}});

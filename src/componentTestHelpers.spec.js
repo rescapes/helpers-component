@@ -29,7 +29,7 @@ const createInitialState = config => R.merge({
 const sampleConfig = {
   bar: 'roo'
 }
-addResolveFunctionsToSchema(resolvedSchema, {})
+addResolveFunctionsToSchema({schema: resolvedSchema, resolvers: {}})
 
 
 describe('componentTestHelpers', () => {
