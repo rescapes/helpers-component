@@ -20,7 +20,6 @@ import * as Either from 'data.either';
 import {eitherToPromise} from './testHelpers';
 import {PropTypes} from 'prop-types';
 import {v} from 'rescape-validate';
-import {resolvedSchema} from './sampleData';
 
 /**
  * Runs tests on an apollo React container with the * given config.
@@ -30,6 +29,8 @@ import {resolvedSchema} from './sampleData';
  * @param {String} config.componentName The name of the React component that the container wraps
  * @param {String} config.childClassDataName A class used in a React component in the named
  * component's renderData method--or any render code when apollo data is loaded
+ * @param {Object} config.schema An graphql schema that resolves queries to sample values. These values should be
+ * based on the Redux initial state or something similar
  * @param {Object} config.initialState The initial Redux state.
  *
  * @param {String} [config.childClassLoadingName] Optional. A class used in a React component in the named
@@ -63,6 +64,8 @@ export const apolloContainerTests = v((config) => {
       Container,
       componentName,
       childClassDataName,
+      // Required. The resolved schema used by Apollo to resolve data. This should be based on the Redux initial state or something similar
+      schema,
       // Optional, the class name if the component has an Apollo-based loading state
       childClassLoadingName,
       // Optional, the class name if the component has an Apollo-based error state
@@ -73,8 +76,6 @@ export const apolloContainerTests = v((config) => {
       asyncParentProps,
       // Optional, required if there are asyncParentProps
       initialState,
-      // Optional. Only for components with queries
-      schema,
       // Optional. Only for components with queries
       query,
       // Optional. Only for components with queries
@@ -153,7 +154,7 @@ export const apolloContainerTests = v((config) => {
       // Wrap the component in mock Apollo and Redux providers.
       // If the component doesn't use Apollo it just means that it will render its children synchronously,
       // rather than asynchronously
-      const wrapper = wrapWithMockGraphqlAndStore(initialState, resolvedSchema, Container(parentProps));
+      const wrapper = wrapWithMockGraphqlAndStore(initialState, schema, Container(parentProps));
       // Find the top-level component. This is always rendered in any Apollo status (loading, error, store data)
       const component = wrapper.find(componentName);
       // Make sure the component props are consistent since the last test run
@@ -189,7 +190,7 @@ export const apolloContainerTests = v((config) => {
         return;
       }
       const parentProps = await asyncParentPropsOrDefault.then(errorMaker);
-      const wrapper = wrapWithMockGraphqlAndStore(initialState, resolvedSchema, Container(parentProps));
+      const wrapper = wrapWithMockGraphqlAndStore(initialState, schema, Container(parentProps));
       const component = wrapper.find(componentName);
       expect(component.find(`.${getClass(childClassLoadingName)}`).length).toEqual(1);
       expect(component.props()).toMatchSnapshot();
@@ -209,10 +210,10 @@ export const apolloContainerTests = v((config) => {
         Container: PropTypes.func.isRequired,
         componentName: PropTypes.string.isRequired,
         childClassDataName: PropTypes.string.isRequired,
+        schema: PropTypes.shape().isRequired,
         childClassLoadingName: PropTypes.string,
         childClassErrorName: PropTypes.string,
         samplePropsMaker: PropTypes.func,
-        schema: PropTypes.shape(),
         asyncParentProps: PropTypes.func,
         query: PropTypes.shape(),
         queryVariables: PropTypes.func,
