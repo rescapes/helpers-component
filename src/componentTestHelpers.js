@@ -118,7 +118,7 @@ export const mockApolloClient = (schema, context) => {
   const apolloCache = new InMemoryCache();
   return new ApolloClient({
     cache: apolloCache,
-    link: errorLink.concat(new SchemaLink({schema, context})),
+    link: new SchemaLink({schema, context}),
     networkInterface: mockNetworkInterface
   });
 };
