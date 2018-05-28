@@ -19,6 +19,7 @@ import {
 } from './componentHelpers';
 import {reqStrPathThrowing, hasStrPath} from 'rescape-ramda';
 import {resolvedSchema, sampleConfig} from './sampleData';
+import {keyWithDatum} from 'componentHelpers';
 
 describe('componentHelpers', () => {
   test('propLensEqual', () => {
@@ -484,6 +485,27 @@ describe('componentHelpers', () => {
       key: billyFunc,
       id: 1,
       billy: billyFunc
+    });
+  });
+
+  test('keyWithDatum', () => {
+    // With constant
+    expect(keyWithDatum('id', {id: 'snakke'}, {
+      id: 1,
+      billy: 'low ground'
+    })).toEqual({
+      key: 'snakke',
+      id: 1,
+      billy: 'low ground'
+    });
+
+    // With func that is resolved later
+    const billyFunc = (props, d) => 'low ground';
+    expect(keyWithDatum('billy', {billy: billyFunc}, {
+      id: 1
+    })).toEqual({
+      key: billyFunc,
+      id: 1,
     });
   });
 

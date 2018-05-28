@@ -13,7 +13,7 @@ import React from 'react';
 import * as R from 'ramda';
 import {v} from 'rescape-validate';
 import PropTypes from 'prop-types';
-import {mergeDeep, reqPathThrowing} from 'rescape-ramda';
+import {mergeDeep, reqPathThrowing, reqStrPathThrowing} from 'rescape-ramda';
 import * as Either from 'data.either';
 import {getClassAndStyle, getStyleObj} from './styleHelpers';
 import prettyFormat from 'pretty-format';
@@ -239,14 +239,28 @@ export const mergePropsForViews = R.curry((viewNamesToViewProps, props) => {
 
 /**
  * Adds a 'key' to the viewProps for React iteration. The value of key must be a key in viewProps
- * that generates a unique value, such as an id, name, or title
- * @param {String} key Any key in viewProps that generates a unique value
+ * that generates a unique value, such as an id, name, or title. This is useful when a property created
+ * in the viewProps can serve as the key
+ * @param {String} keyStr Any key or keyString (e.g. 'foo.bar') in viewProps that generates a unique value
  * @param {Object} viewProps Prop configuration for a particular view (see mergePropsForViews)
  * The values can be constants or functions, as supported by mergePropsForView. The value matching
  * key will simply be referred by 'key'
  * @return {*} viewProps with 'key' added
  */
-export const keyWith = (key, viewProps) => R.merge(viewProps, {key: reqPathThrowing([key], viewProps)});
+export const keyWith = (keyStr, viewProps) => R.merge(viewProps, {key: reqStrPathThrowing(keyStr, viewProps)});
+
+/**
+ * Adds a 'key' to the viewProps for React iteration, where the key is property of the given datum d.
+ * @param {String} keyStr Any key or key string (e.g. 'foo.bar') of d that generates a unique value
+ * @param {Object} d The datum containing key, which has a unique value among the data
+ * @param {Object} viewProps Prop configuration for a particular view (see mergePropsForViews)
+ * The values can be constants or functions, as supported by mergePropsForView. The key value from d will
+ * be merged into this, so don't put a key in the viewProps because it will be overwritten
+ * @return {*} viewProps with a key property added with value d[key]
+ */
+export const keyWithDatum = R.curry(
+  (key, d, viewProps) => R.merge(viewProps, {key: reqStrPathThrowing(key, d)})
+);
 
 /**
  * If maybeFunc is a func, call it with obj, otherwise return maybeFunc
