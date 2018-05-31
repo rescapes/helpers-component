@@ -11,7 +11,7 @@
 import * as R from 'ramda';
 import {
   propLensEqual, mergeActionsForViews, makeTestPropsFunction, liftAndExtract,
-  renderChoicepoint, joinComponents, loadingCompleteStatus, makeApolloTestPropsFunction, mergePropsForViews,
+  renderChoicepoint, joinComponents, loadingCompleteStatus, makeApolloTestPropsTaskFunction, mergePropsForViews,
   mergeStylesIntoViews,
   nameLookup, propsFor,
   propsForSansClass, strPath, itemizeProps, applyToIfFunction, keyWith, propsForItem, applyIfFunction, composeViews,
@@ -148,6 +148,7 @@ describe('componentHelpers', () => {
   });
 
   test('makeTestPropsFunction', () => {
+    // Construct a sample state, props, dispatches, etc
     const sampleState = ({a: 1, views: {aComponent: {stuff: 1}, bComponent: {moreStuff: 2}}});
     const sampleOwnProps = {style: {width: 100}};
     const mapStateToProps = (state, ownProps) => R.merge(state, ownProps);
@@ -173,7 +174,7 @@ describe('componentHelpers', () => {
       );
   });
 
-  test('awaitMakeApolloTestPropsFunction', async () => {
+  test('makeApolloTestPropsTaskFunction', done => {
     const sampleState = ({data: {regionId: 'oakland'}, views: {aComponent: {stuff: 1}, bComponent: {moreStuff: 2}}});
     const sampleOwnProps = {style: {width: 100}};
     const mapStateToProps = (state, ownProps) => R.merge(state, ownProps);
@@ -205,34 +206,43 @@ describe('componentHelpers', () => {
         })
       }
     };
-    const value = await makeApolloTestPropsFunction(resolvedSchema, sampleConfig, mapStateToProps, mapDispatchToProps, queryObj)(sampleState, sampleOwnProps).then(
-      either => new Promise((resolve, reject) => either.map(resolve).leftMap(reject))
-    ).catch(e => e);
-    if (value.error) {
-      const errors = R.flatten(value.error)
-      R.forEach(
-        error => {
-          console.error(error);
-        },
-      );
-      throw errors[0]
-    }
-
-    expect(value).toEqual(
-      R.merge({
-        // Expect this data came from Apollo
-        data: R.merge(
-          loadingCompleteStatus, {
-            store: {region: {id: "oakland", name: "Oakland"}},
-            regionId: 'oakland'
-          }),
-        style: {width: 100},
-        views: {
-          aComponent: {stuff: 1},
-          bComponent: {moreStuff: 2}
-        }
-      }, dispatchResults)
-    );
+    // Make the function with the configuration
+    const func = makeApolloTestPropsTaskFunction(resolvedSchema, sampleConfig, mapStateToProps, mapDispatchToProps, queryObj);
+    // Now pretend we're calling it with state and props
+    func(sampleState, sampleOwnProps).run().listen({
+      // Map the either result, handling Right success and Left failure
+      onResolved: either => either.map(value => {
+        expect(value).toEqual(
+          R.merge({
+            // Expect this data came from Apollo along with the other props that were passed through: style adn views
+            data: R.merge(
+              loadingCompleteStatus, {
+                store: {region: {id: "oakland", name: "Oakland"}},
+                regionId: 'oakland'
+              }),
+            style: {width: 100},
+            views: {
+              aComponent: {stuff: 1},
+              bComponent: {moreStuff: 2}
+            }
+          }, dispatchResults)
+        );
+        done();
+      }).leftMap(value => {
+        // If any Left values turn up, just throw the errors
+        const errors = R.flatten(value.error);
+        R.forEach(
+          error => {
+            console.error(error);
+          }
+        );
+        throw errors[0];
+      }),
+      onRejected: reject => {
+        // If the Task rejects, throw
+        throw(reject);
+      }
+    });
   });
 
   test('liftAndExtract', () => {
@@ -505,7 +515,7 @@ describe('componentHelpers', () => {
       id: 1
     })).toEqual({
       key: billyFunc,
-      id: 1,
+      id: 1
     });
   });
 
@@ -577,7 +587,7 @@ describe('componentHelpers', () => {
           maxheight: '100%'
         }
       }
-    }, {logoSrc: './image.gif'})
+    }, {logoSrc: './image.gif'});
     expect(
       composeViewsFromStruct({
           actions: {

@@ -19,6 +19,8 @@ import {getClassAndStyle, getStyleObj} from './styleHelpers';
 import prettyFormat from 'pretty-format';
 import {graphql} from 'graphql';
 
+const {of, fromPromised} = require('folktale/concurrency/task');
+
 /**
  * Default statuses for Components that don't have any Apollo queries
  * @type {{loading: boolean, error: boolean}}
@@ -325,49 +327,58 @@ export const makeTestPropsFunction = (mapStateToProps, mapDispatchToProps) =>
  * }
  *
  * @returns {Function} A function with two arguments, initialState and ownProps
- *  The function returns a Promise that passes an Either.Left or Right. If Left there are errors in the Either.value. If
+ *  The function returns a Task that resolves to Either.Left or Right. If Left there are errors in the Either.value. If
  *  Right then the value is the Apollo 'store' key
  */
-export const makeApolloTestPropsFunction = R.curry((resolvedSchema, sampleConfig, mapStateToProps, mapDispatchToProps, {query, args}) => {
+export const makeApolloTestPropsTaskFunction = R.curry((resolvedSchema, sampleConfig, mapStateToProps, mapDispatchToProps, {query, args}) => {
 
-  return R.composeP(
+  // composeK executes from right to left (bottom to top)
+  return (state, props) => R.composeK(
+    // Any Left will remain Left.
+    // If the Right contains an error, make a Left with the error
+    // Otherwise merge the results to simulate an Apollo Client return, with the results under the 'data' key
+    // The results will have a store key with the loaded data
+    either => of(either.chain(({props, value: {data, errors}}) => {
+      if (errors)
+        return Either.Left({
+          error: errors
+        });
+      return Either.Right(
+        mergeDeep(
+          props,
+          {
+            data: R.merge(
+              // Simulate loading complete
+              loadingCompleteStatus,
+              data
+            )
+          }
+        )
+      );
+    })),
+    // Next take the merged props and call the graphql query.
+    // Convert the function returning a promise to a Task
+    // If if anything goes wrong wrap it in a Left. Otherwise put it in a Right
     props => {
-      return graphql(
+      return fromPromised(() => graphql(
         resolvedSchema,
         query, {},
+        // Resolve graphql queries with the sampleConfig
         {options: {dataSource: sampleConfig}},
         // Add data and ownProps since that is what Apollo query arguments props functions expect
         reqPathThrowing(['variables'], args.options(props))
-      ).then(
-        // Merge the makeTestPropsFunction props with the Apollo result. Put Apollo under the data.store key
-        // just like our Apollo React Client does by default
-        ({data, errors}) => {
-          if (errors)
-            return Either.Left({
-              error: errors
-            });
-          return Either.Right(
-            mergeDeep(
-              props,
-              {
-                data: R.merge(
-                  // Simulate loading complete
-                  loadingCompleteStatus,
-                  data
-                )
-              }
-            )
-          );
-        }
-      ).catch(e => {
-        return Either.Left({
-          error: e
-        });
-      });
+        ).then(value => Either.Right({value, props})
+        ).catch(e => {
+          return Either.Left({
+            errors: [e]
+          });
+        })
+      )();
     },
-    // Creates Redux function props args are initialState and ownProps
-    (...args) => Promise.resolve(makeTestPropsFunction(mapStateToProps, mapDispatchToProps)(...args))
-  );
+    // First create a function that expects state and props and uses them to call mapStateToProps and mapDispatchToProps
+    // and merges the result. We wrap it in a task to give asynchronous function above
+    (state, props) => of(makeTestPropsFunction(mapStateToProps, mapDispatchToProps)(state, props))
+  )(state, props);
 });
 
 /**

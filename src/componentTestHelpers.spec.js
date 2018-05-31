@@ -15,7 +15,6 @@ import {connect} from 'react-redux';
 import * as R from 'ramda';
 import {eMap} from './componentHelpers';
 import React from 'react';
-import {GraphQLObjectType, GraphQLSchema, GraphQLString} from 'graphql';
 import {addResolveFunctionsToSchema} from 'graphql-tools';
 import {
   makeMockStore, makeSampleInitialState, propsFromSampleStateAndContainer, testState,

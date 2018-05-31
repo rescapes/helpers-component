@@ -16,7 +16,7 @@ import {
 import {getClass} from './styleHelpers';
 import {PropTypes} from 'prop-types';
 import {v} from 'rescape-validate';
-import {of} from 'folktale/concurrency/task';
+import {of, fromPromised} from 'folktale/concurrency/task';
 import {defaultRunConfig, promiseToTask} from 'rescape-ramda';
 
 /**
@@ -79,13 +79,17 @@ export const apolloContainerTests = v((config) => {
     } = config;
 
     // Resolve the Either to the Right value or throw if Left
-    const samplePropsTask = chainedSamplePropsTask.chain(either =>
-      either
-        .map(props => of(props))
-        .leftMap(error => {
-          throw error;
-        })
+    // chainedSamplePropsTask returns and Either so that the an error
+    // in the query can be processed by detected a Left value, but here
+    // we only accept a right
+    const samplePropsTask = chainedSamplePropsTask.chain(either => either
+      .map(props => of(props))
+      .leftMap(error => {
+        // Unacceptable!
+        throw error;
+      }).get()
     );
+
     /***
      * Tests that mapStateToProps matches snapshot
      * @return {Promise<void>}
@@ -112,8 +116,8 @@ export const apolloContainerTests = v((config) => {
         return;
       }
 
-      samplePropsTask.chain(props => {
-        return promiseToTask(mockApolloClientWithSamples(initialState, schema).query({
+      const task = samplePropsTask.chain(props => {
+        return fromPromised(() => mockApolloClientWithSamples(initialState, schema).query({
           query,
           // queryVariables are called with props to give us the variables for our query. This is just like Apollo
           // does, accepting props to allow the Container to form the variables for the query
@@ -123,8 +127,10 @@ export const apolloContainerTests = v((config) => {
           context: {
             dataSource: initialState
           }
-        }));
-      }).run().listen(
+        }))();
+      });
+
+      task.run().listen(
         defaultRunConfig({
           onResolved: data => {
             // If we resolve the task, make sure there is no data.error
