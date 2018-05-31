@@ -11,15 +11,13 @@
 
 
 import {
-  mockApolloClientWithSamples,
-  propsFromSampleStateAndContainer, waitForChildComponentRender, wrapWithMockGraphqlAndStore
+  mockApolloClientWithSamples, waitForChildComponentRender, wrapWithMockGraphqlAndStore
 } from './componentTestHelpers';
 import {getClass} from './styleHelpers';
-import * as R from 'ramda';
-import * as Either from 'data.either';
-import {eitherToPromise} from './testHelpers';
 import {PropTypes} from 'prop-types';
 import {v} from 'rescape-validate';
+import {of} from 'folktale/concurrency/task';
+import {defaultRunConfig, promiseToTask} from 'rescape-ramda';
 
 /**
  * Runs tests on an apollo React container with the * given config.
@@ -39,12 +37,9 @@ import {v} from 'rescape-validate';
  * @param {String} [config.childClassErrorName] Optional. A class used in a React component in the named
  * component's renderError method--or any render code called when apollo error is true. Normally only
  * needed for components with queries.
- * @param {Function} [config.samplePropsMaker] Optional A function defined in the container being tested that is
- * either created with makeApolloTestPropsFunction or makeTestPropsFunction, the former
- * if the container has an Apollo query and the latter if it doesn't. This function
- * and the result of asyncParentProps is passed propsFromSampleStateAndContainer, which
- * ultimately generates the test props. If this is omitted parentProps from asyncParentProps will be used directly
- * @param {Function} [config.asyncParentProps] A function with no arguments that returns a Promise
+ * @param {Function} [config.chainedSamplePropsTask] A Task that resolves to all properties needed by the container.
+ * This can be done with constants, or as the name suggests by chaining all ancestor Components/Container props,
+ * where the ancestor Container props might be Apollo based.
  * of the parentProps used to call propsFromSampleStateAndContainer. Required if the container component receives
  * props from its parent (it usually does)
  * @param {Object} [config.query] Optional gql wrapped query string if the Container has an apollo query.
@@ -70,11 +65,10 @@ export const apolloContainerTests = v((config) => {
       childClassLoadingName,
       // Optional, the class name if the component has an Apollo-based error state
       childClassErrorName,
-      // Optional, if not specified then no container props are needed
-      samplePropsMaker,
-      // Optional, must be a function that returns parent props as a Promise
-      asyncParentProps,
-      // Optional, required if there are asyncParentProps
+      // Optional, A Task that resolves props all the way up the hierarchy chain, ending with props for this
+      // Container based on the ancestor Containers/Components
+      chainedSamplePropsTask = of({}),
+      // Optional, required if there are chainedSamplePropsTask
       initialState,
       // Optional. Only for components with queries
       query,
@@ -84,63 +78,63 @@ export const apolloContainerTests = v((config) => {
       errorMaker
     } = config;
 
-    const asyncParentPropsOrDefault = asyncParentProps ? asyncParentProps() : Promise.resolve({});
-
-    // Get the test props for this container
-    const asyncProps = () => {
-      if (!asyncParentProps) {
-        return Promise.resolve({});
-      }
-      const promise = asyncParentProps();
-      if (!R.is(Promise)) {
-        throw Error("Result of asyncParentProps must be a Promise");
-      }
-      promise.then(parentProps => {
-        const result = samplePropsMaker ? propsFromSampleStateAndContainer(initialState, samplePropsMaker, parentProps) : parentProps;
-        // If result is a promise, the promised value will be a Right
-        // If the result is not a promise, wrap in a Right to match
-        return R.unless(
-          R.is(Promise),
-          res => Either.Right(res)
-        )(result);
-      }).then(eitherToPromise);
-    };
-
-
+    // Resolve the Either to the Right value or throw if Left
+    const samplePropsTask = chainedSamplePropsTask.chain(either =>
+      either
+        .map(props => of(props))
+        .leftMap(error => {
+          throw error;
+        })
+    );
     /***
      * Tests that mapStateToProps matches snapshot
      * @return {Promise<void>}
      */
-    const testMapStateToProps = async () => {
+    const testMapStateToProps = done => {
       // Get the test props for RegionContainer
-      const props = await asyncParentPropsOrDefault
-      expect(props).toMatchSnapshot();
+      samplePropsTask.run().listen(
+        defaultRunConfig({
+          onResolved: props => {
+            expect(props).toMatchSnapshot();
+            done();
+          }
+        })
+      );
     };
 
     /**
      * For Apollo Containers with queries, tests that the query results match the snapshot
      * @return {Promise<void>}
      */
-    const testQuery = async () => {
+    const testQuery = done => {
       if (!query || !queryVariables) {
         console.warn("Attempt to run testQuery when query or queryVariables was not specified. Does your component actually need this test?");
         return;
       }
 
-      const parentProps = await asyncParentPropsOrDefault;
-      const props = await propsFromSampleStateAndContainer(initialState, samplePropsMaker, parentProps).then(eitherToPromise);
-      const data = await mockApolloClientWithSamples(initialState, schema).query({
-        query,
-        variables: queryVariables(props),
-        context: {
-          dataSource: initialState
-        }
-      }).then(data => {
-        if (data.error)
-          throw data.error;
-        return data;
-      });
-      expect(data).toMatchSnapshot();
+      samplePropsTask.chain(props => {
+        return promiseToTask(mockApolloClientWithSamples(initialState, schema).query({
+          query,
+          // queryVariables are called with props to give us the variables for our query. This is just like Apollo
+          // does, accepting props to allow the Container to form the variables for the query
+          variables: queryVariables(props),
+          // Our context is initialState as our dataSource. In real environments Apollo would go to a remote server
+          // to fetch the data, but here our database is simply the initialState for testing purposes
+          context: {
+            dataSource: initialState
+          }
+        }));
+      }).run().listen(
+        defaultRunConfig({
+          onResolved: data => {
+            // If we resolve the task, make sure there is no data.error
+            if (data.error)
+              throw data.error;
+            expect(data).toMatchSnapshot();
+            done();
+          }
+        })
+      );
     };
 
     /**
@@ -148,35 +142,34 @@ export const apolloContainerTests = v((config) => {
      * @param done
      * @return {Promise<void>}
      */
-    const testRender = async (done) => {
-      // Wait for the sample parent props that feed this component
-      const parentProps = await asyncParentPropsOrDefault;
-      // Wrap the component in mock Apollo and Redux providers.
-      // If the component doesn't use Apollo it just means that it will render its children synchronously,
-      // rather than asynchronously
-      const wrapper = wrapWithMockGraphqlAndStore(initialState, schema, Container(parentProps));
-      // Find the top-level component. This is always rendered in any Apollo status (loading, error, store data)
-      const component = wrapper.find(componentName);
-      // Make sure the component props are consistent since the last test run
-      expect(component.props()).toMatchSnapshot();
+    const testRender = done => {
+      chainedSamplePropsTask.chain(props => {
+        // Wrap the component in mock Apollo and Redux providers.
+        // If the component doesn't use Apollo it just means that it will render its children synchronously,
+        // rather than asynchronously
+        const wrapper = wrapWithMockGraphqlAndStore(initialState, schema, Container(props));
+        // Find the top-level component. This is always rendered in any Apollo status (loading, error, store data)
+        const component = wrapper.find(componentName);
+        // Make sure the component props are consistent since the last test run
+        expect(component.props()).toMatchSnapshot();
 
-      // If we have an Apollo component, our immediate status after mounting the component is loading. Confirm
-      if (childClassLoadingName) {
-        expect(component.find(`.${getClass(childClassLoadingName)}`).length).toEqual(1);
-      }
-
-      // If we have an Apollo component, we use enzyme-wait to await the query to run and the the child
-      // component that is dependent on the query result to render. If we don't have an Apollo component,
-      // this child will be rendered immediately without delay
-      waitForChildComponentRender(wrapper, componentName, childClassDataName).then(
-        childComponent => {
-          expect(childComponent.props()).toMatchSnapshot();
-          done();
+        // If we have an Apollo component, our immediate status after mounting the component is loading. Confirm
+        if (childClassLoadingName) {
+          expect(component.find(`.${getClass(childClassLoadingName)}`).length).toEqual(1);
         }
-      ).catch(e => {
-        // If we don't find it a timeout error or other error occurred.
-        throw e;
-      });
+
+        // If we have an Apollo component, we use enzyme-wait to await the query to run and the the child
+        // component that is dependent on the query result to render. If we don't have an Apollo component,
+        // this child will be rendered immediately without delay
+        return promiseToTask(waitForChildComponentRender(wrapper, componentName, childClassDataName));
+      }).run().listen(
+        defaultRunConfig({
+          onResolved: childComponent => {
+            expect(childComponent.props()).toMatchSnapshot();
+            done();
+          }
+        })
+      );
     };
 
     /**
@@ -184,17 +177,25 @@ export const apolloContainerTests = v((config) => {
      * @param done
      * @return {Promise<void>}
      */
-    const testRenderError = async (done) => {
+    const testRenderError = (done) => {
       if (!errorMaker || !childClassErrorName) {
         logger.warn("One or both of errorMaker and childClassErrorName not specified, does your component actually need to test render errors?");
         return;
       }
-      const parentProps = await asyncParentPropsOrDefault.then(errorMaker);
-      const wrapper = wrapWithMockGraphqlAndStore(initialState, schema, Container(parentProps));
-      const component = wrapper.find(componentName);
-      expect(component.find(`.${getClass(childClassLoadingName)}`).length).toEqual(1);
-      expect(component.props()).toMatchSnapshot();
-      waitForChildComponentRender(wrapper, componentName, childClassErrorName).then(() => done());
+      chainedSamplePropsTask.map(errorMaker).chain(props => {
+        const wrapper = wrapWithMockGraphqlAndStore(initialState, schema, Container(props));
+        const component = wrapper.find(componentName);
+        expect(component.find(`.${getClass(childClassLoadingName)}`).length).toEqual(1);
+        expect(component.props()).toMatchSnapshot();
+        return promiseToTask(waitForChildComponentRender(wrapper, componentName, childClassErrorName));
+      }).run().listen(
+        defaultRunConfig({
+          onResolved: () => {
+            // As long as we rendered the error component we're done
+            done();
+          }
+        })
+      );
     };
 
     return {
@@ -221,3 +222,4 @@ export const apolloContainerTests = v((config) => {
       }
     )]
   ], 'apolloContainerTests');
+

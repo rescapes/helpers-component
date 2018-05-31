@@ -60,26 +60,26 @@ export const makeSampleInitialState = (createInitialState, sampleConfig, sampleU
 /**
  * Simulates complete props from a container component by combining mapStateToProps, mapDispatchToProps, and props
  * that would normally passed from the container to a component
- * @param {Function} containerPropMaker A function from a container that expects a sample state and sampleOwnProps
+ * @param {Function} containerPropMaker 2 arity function from a container that expects a sample state and sampleOwnProps
  * and then applies the container's mapStateToProps, mapDispatchToProps, and optional mergeProps
  * @param {Object} initialState The initialState
- * @param sampleOwnProps Sample props that would normally come from the parent container
- * @returns {Object|Promise} complete test props or a Promise of the props if the conntainerPropMaker is aysnc
+ * @param sampleParentProps Sample props that would normally come from the parent container
+ * @returns {Object|Promise} complete test props or Promise of the props if the containerPropMaker is async
  */
-export const propsFromSampleStateAndContainer = (initialState, containerPropMaker, sampleOwnProps = {}) =>
-  containerPropMaker(initialState, sampleOwnProps);
+export const propsFromSampleStateAndContainer = (initialState, containerPropMaker, sampleParentProps = {}) =>
+  containerPropMaker(initialState, sampleParentProps);
 
 /**
  * Async version of propsFromSampleStateAndContainer for containerPropMaker that is asynchronous because it uses
  * apollo queries or similar
- * @param {Function} containerPropMaker A function from a container that expects a sample state and sampleOwnProps
- * and then applies the container's mapStateToProps, mapDispatchToProps, and optional mergeProps
  * @param {Object} initialState The initial state
- * @param {Object} sampleOwnProps Sample props that would normally come from the parent container
+ * @param {Function} containerPropMaker A 2 arity function from a container that expects a sample state and sampleParentProps
+ * and then applies the container's mapStateToProps, mapDispatchToProps, and optional mergeProps
+ * @param {Object} sampleParentProps Sample props that would normally come from the parent container
  * @returns {Promise} A Promise to the complete test props
  */
 export const asyncPropsFromSampleStateAndContainer =
-  (initialState, containerPropMaker, sampleOwnProps = {}) => containerPropMaker(initialState, sampleOwnProps).then(
+  (initialState, containerPropMaker, sampleParentProps = {}) => containerPropMaker(initialState, sampleParentProps).then(
     either => new Promise((resolve, reject) => either.map(resolve).leftMap(reject))
   );
 

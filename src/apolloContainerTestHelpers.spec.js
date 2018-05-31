@@ -9,6 +9,8 @@ import {
 } from 'componentHelpers';
 import {Component} from 'react';
 import {resolvedSchema, sampleConfig} from 'sampleData';
+import {asyncPropsFromSampleStateAndContainer, testState} from 'componentTestHelpers';
+import {reqStrPathThrowing, promiseToTask} from 'rescape-ramda';
 
 const schema = resolvedSchema;
 const [div] = eMap(['div']);
@@ -26,15 +28,22 @@ App.choicepoint = renderChoicepoint(
     return div({className: 'success'});
   }
 );
-App.views = {
+
+// This is the views function for our App component.
+App.views = props => ({
   error: {
     className: 'error'
   },
   loading: {
     className: 'loading'
   },
-  success: {}
-};
+  success: {},
+  // We'll pretend in the second set of tests that we have a child component,
+  // which for convenience is also an App that has a property
+  subApp: {
+    id: reqStrPathThrowing('data.store.region.id', props)
+  }
+});
 
 // Run this apollo query
 const query = `query regionRegions($regionId: String!) {
@@ -90,12 +99,14 @@ const queryVariables = props => ({
 });
 const errorMaker = parentProps => R.set(R.lensPath(['data', 'region', 'id']), 'foo', parentProps);
 
-const samplePropsMaker = makeApolloTestPropsFunction(
-  schema,
-  sampleConfig,
-  mapStateToProps,
-  mapDispatchToProps,
-  queries.regionRegions
+const chainedSamplePropsTask = promiseToTask(
+  makeApolloTestPropsFunction(
+    schema,
+    sampleConfig,
+    mapStateToProps,
+    mapDispatchToProps,
+    queries.regionRegions
+  )(sampleConfig, {})
 );
 
 describe('ApolloContainer', () => {
@@ -104,7 +115,7 @@ describe('ApolloContainer', () => {
     initialState: sampleConfig,
     schema,
     Container,
-    samplePropsMaker,
+    chainedSamplePropsTask,
     componentName,
     childClassDataName,
     childClassErrorName,
@@ -117,5 +128,6 @@ describe('ApolloContainer', () => {
   test('testQuery', testQuery);
   test('testRender', testRender);
   test('testRenderError', testRenderError);
-
 });
+
+;

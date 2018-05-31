@@ -325,8 +325,8 @@ export const makeTestPropsFunction = (mapStateToProps, mapDispatchToProps) =>
  * }
  *
  * @returns {Function} A function with two arguments, initialState and ownProps
- *  The function returns a Promise that passes an Either.Left or Right. If Left there ar errors in the Either.value. If
- *  Right then the value is the store
+ *  The function returns a Promise that passes an Either.Left or Right. If Left there are errors in the Either.value. If
+ *  Right then the value is the Apollo 'store' key
  */
 export const makeApolloTestPropsFunction = R.curry((resolvedSchema, sampleConfig, mapStateToProps, mapDispatchToProps, {query, args}) => {
 
