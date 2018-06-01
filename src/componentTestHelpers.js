@@ -22,6 +22,7 @@ import {InMemoryCache} from 'apollo-client-preset';
 import {SchemaLink} from 'apollo-link-schema';
 import {getClass} from './styleHelpers';
 import {onError} from "apollo-link-error";
+import {fromPromised} from 'folktale/concurrency/task';
 
 const middlewares = [thunk];
 // Importing this way because rollup can't find it
@@ -68,20 +69,6 @@ export const makeSampleInitialState = (createInitialState, sampleConfig, sampleU
  */
 export const propsFromSampleStateAndContainer = (initialState, containerPropMaker, sampleParentProps = {}) =>
   containerPropMaker(initialState, sampleParentProps);
-
-/**
- * Async version of propsFromSampleStateAndContainer for containerPropMaker that is asynchronous because it uses
- * apollo queries or similar
- * @param {Object} initialState The initial state
- * @param {Function} containerPropMaker A 2 arity function from a container that expects a sample state and sampleParentProps
- * and then applies the container's mapStateToProps, mapDispatchToProps, and optional mergeProps
- * @param {Object} sampleParentProps Sample props that would normally come from the parent container
- * @returns {Promise} A Promise to the complete test props
- */
-export const asyncPropsFromSampleStateAndContainer =
-  (initialState, containerPropMaker, sampleParentProps = {}) => containerPropMaker(initialState, sampleParentProps).then(
-    either => new Promise((resolve, reject) => either.map(resolve).leftMap(reject))
-  );
 
 /**
  * Makes a mock store with the given state and optional sampleUserSettings. If the sampleUserSettings

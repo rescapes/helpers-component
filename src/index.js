@@ -18,7 +18,7 @@ import {
 } from './svgComponentHelpers';
 
 import {
-  waitForChildComponentRender, propsFromSampleStateAndContainer, asyncPropsFromSampleStateAndContainer, makeMockStore,
+  waitForChildComponentRender, propsFromSampleStateAndContainer, asyncPropsFromSampleStateAndContainerTask, makeMockStore,
   makeSampleInitialState, makeSampleStore, mockApolloClient, mockApolloClientWithSamples, shallowWrap, testState,
   wrapWithMockGraphqlAndStore, wrapWithMockStore
 } from './componentTestHelpers';
@@ -68,7 +68,7 @@ export {
   resolveSvgReact,
   waitForChildComponentRender,
   propsFromSampleStateAndContainer,
-  asyncPropsFromSampleStateAndContainer,
+  asyncPropsFromSampleStateAndContainerTask,
   makeMockStore,
   makeSampleInitialState,
   makeSampleStore,

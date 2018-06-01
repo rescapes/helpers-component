@@ -38,6 +38,8 @@ import {defaultRunConfig, promiseToTask} from 'rescape-ramda';
  * component's renderError method--or any render code called when apollo error is true. Normally only
  * needed for components with queries.
  * @param {Function} [config.chainedSamplePropsTask] A Task that resolves to all properties needed by the container.
+ * The value must be an Either in case errors occur during loading parent data. An Either.Right contains
+ * successful props and Either.Left indicates an error that causes this function to throw
  * This can be done with constants, or as the name suggests by chaining all ancestor Components/Container props,
  * where the ancestor Container props might be Apollo based.
  * of the parentProps used to call propsFromSampleStateAndContainer. Required if the container component receives
