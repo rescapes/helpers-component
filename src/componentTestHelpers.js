@@ -15,14 +15,17 @@ import PropTypes from 'prop-types';
 import {shallow, mount} from 'enzyme';
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
-import {mergeDeep} from 'rescape-ramda';
+import {mergeDeep, reqStrPathThrowing} from 'rescape-ramda';
 import * as apolloTestUtils from 'apollo-test-utils';
 import ApolloClient from 'apollo-client';
 import {InMemoryCache} from 'apollo-client-preset';
 import {SchemaLink} from 'apollo-link-schema';
 import {getClass} from './styleHelpers';
 import {onError} from "apollo-link-error";
-import {fromPromised} from 'folktale/concurrency/task';
+import {task, fromPromised} from 'folktale/concurrency/task';
+import {makeTestPropsFunction} from 'componentHelpers';
+import * as Either from 'data.either';
+import {v} from 'rescape-validate';
 
 const middlewares = [thunk];
 // Importing this way because rollup can't find it
@@ -126,7 +129,7 @@ export const mockApolloClientWithSamples = (state, resolvedSchema) => {
  * @return {*}
  */
 export const wrapWithMockGraphqlAndStore = (state, resolvedSchema, component) => {
-  const store = makeSampleStore(state)
+  const store = makeSampleStore(state);
   const context = {options: {dataSource: state}};
 
   // shallow wrap the component, passing the Apollo client and redux store to the component and children
@@ -203,8 +206,8 @@ export const waitForChildComponentRender = (wrapper, componentName, childClassNa
     try {
       wrapper.update();
     }
-    catch(e) {
-      console.warn("Couldn't update wrapper. Assuming that render failed.")
+    catch (e) {
+      console.warn("Couldn't update wrapper. Assuming that render failed.");
       // If update failed because of a component error, just quit
     }
     // Find the component with the updated wrapper, otherwise we get the old component
@@ -227,3 +230,42 @@ export const waitForChildComponentRender = (wrapper, componentName, childClassNa
       }
     });
 };
+
+/**
+ * Calls makeTestPropsFunction on a non Apollo container. This is a synchronous but wrapped in a
+ * Task to match calls to apolloTestPropsTaskMaker
+ * @param mapStateToProps
+ * @param mapDispatchToProps
+ * @return {Function} A 2 arity function called with state and props that results in a Task that
+ * resolves the props
+ */
+export const testPropsTaskMaker = (mapStateToProps, mapDispatchToProps) =>
+  // Wrap function result in a Task to match apolloTestPropsTaskMaker
+  (state, props) => of(Either.Right(makeTestPropsFunction(mapStateToProps, mapDispatchToProps)(state, props)));
+
+/**
+ * Given a task that generates parent container props and a parent component's views, and a viewName on that
+ * parent component, returns the properties that are passed to that viewName. This allows us to chain properties
+ * from a parent container to a parent component to a target container with the given viewName. For instance
+ * if the parent container generated Apollo props like {data: {store: {foo: 1}}}} and the component's views
+ * mapped props to viewName like props => ({foo: props.data.store.foo}), then the target container would
+ * receive {foo: 1}
+ * @param {Task} parentContainerSamplePropsTask Task that resolves to the parent container props
+ * @param parentComponentViews A function expecting props that returns an object keyed by view names
+ * and valued by view props, where views are the child containers/components of the component
+ * @param viewName The viewName in the parent component of the target container
+ * @returns {Task} A Task to asynchronously return the parentContainer props passed to the given viewName
+ * in an Either.Right. If anything goes wrong an Either.Left is returned
+ */
+export const parentPropsForContainerTask = v((parentContainerSamplePropsTask, parentComponentViews, viewName) => {
+    return parentContainerSamplePropsTask.map(
+      // the parent props to the props of the desired view in an Either.Right
+      propsEither => propsEither.map(props => reqPathThrowing(['views', viewName], parentComponentViews(props)))
+    );
+  },
+  [
+    ['parentContainerSamplePropsTask', PropTypes.shape().isRequired],
+    ['parentComponentViews', PropTypes.func.isRequired],
+    ['viewName', PropTypes.string.isRequired]
+  ],
+  'parentPropsForContainerTask');

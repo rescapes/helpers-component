@@ -10,6 +10,9 @@ import {
 import {Component} from 'react';
 import {resolvedSchema, sampleConfig} from 'sampleData';
 import {reqStrPathThrowing, promiseToTask, mergeDeep} from 'rescape-ramda';
+import {parentPropsForContainerTask} from 'componentTestHelpers';
+import {of} from 'folktale/concurrency/task';
+import * as Either from 'data.either';
 
 describe('ApolloContainer', () => {
   const schema = resolvedSchema;
@@ -46,7 +49,7 @@ describe('ApolloContainer', () => {
   });
 
 // Run this apollo query
-  const query = `query regionRegions($regionId: String!) {
+  const query = `query region($regionId: String!) {
     store {
         region(id: $regionId) {
             id
@@ -54,7 +57,7 @@ describe('ApolloContainer', () => {
     }
 }`;
   const queries = {
-    regionRegions: {
+    region: {
       query,
       args: {
         options: ({data: {region}}) => ({
@@ -94,19 +97,35 @@ describe('ApolloContainer', () => {
 
   const errorMaker = parentProps => R.set(R.lensPath(['data', 'region', 'id']), 'foo', parentProps);
 
-  const chainedSamplePropsTask =
-    makeApolloTestPropsTaskFunction(
-      schema,
-      sampleConfig,
-      mapStateToProps,
-      mapDispatchToProps,
-      queries.regionRegions
-    )(sampleConfig, {});
+  /**
+   * Returns a function that expects state and parentProps for testing and returns a Task that resolves the
+   * properties the properties in an Either.Right or if there's an error gives an Either.Left
+   */
+  const samplePropsTaskMaker = makeApolloTestPropsTaskFunction(
+    schema, sampleConfig, mapStateToProps, mapDispatchToProps, queries.region
+  );
+
+  // Pretend that there's some parent container that passes the regionId to a view called myContainer, which
+  // is the container we are testing
+  const chainedParentPropsTask = parentPropsForContainerTask(
+    // Pretend the parent returns the given props asynchronously
+    of(Either.Right({regionId: 'belgium'})),
+    props => ({myContainer: {regionId: props.regionId}}),
+    'myContainer'
+  );
+
+  //
+  const chainedSamplePropsTask = chainedParentPropsTask.chain(parentContainerSamplePropsEither =>
+    parentContainerSamplePropsEither.chain(parentContainerSampleProps =>
+      // Chain the Either.Right value to a Task combine the parent props with the props maker
+      samplePropsTaskMaker(sampleInitialState, parentContainerSampleProps))
+  );
 
   const {testMapStateToProps, testQuery, testRenderError, testRender} = apolloContainerTests({
     initialState: sampleConfig,
     schema,
     Container,
+    chainedParentPropsTask,
     chainedSamplePropsTask,
     componentName,
     childClassDataName,

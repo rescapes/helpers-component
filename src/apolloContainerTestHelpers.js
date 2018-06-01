@@ -31,6 +31,8 @@ import {gql} from 'apollo-client-preset';
  * @param {Object} config.schema An graphql schema that resolves queries to sample values. These values should be
  * based on the Redux initial state or something similar
  * @param {Object} config.initialState The initial Redux state.
+ * @param {Task} chainedSampleProps. A task that calls mapStateToProps and optionally the Container's queries. The result is an Either.Rights
+ * containing the resulting props or an Either.Left if an error occurs generating the props
  *
  * @param {String} [config.childClassLoadingName] Optional. A class used in a React component in the named
  * component's renderLoading method--or any render code called when apollo loading is true. Normally
@@ -38,7 +40,7 @@ import {gql} from 'apollo-client-preset';
  * @param {String} [config.childClassErrorName] Optional. A class used in a React component in the named
  * component's renderError method--or any render code called when apollo error is true. Normally only
  * needed for components with queries.
- * @param {Function} [config.chainedSamplePropsTask] A Task that resolves to all properties needed by the container.
+ * @param {Function} [config.chainedParentPropsTask] A Task that resolves to all properties needed by the container.
  * The value must be an Either in case errors occur during loading parent data. An Either.Right contains
  * successful props and Either.Left indicates an error that causes this function to throw
  * This can be done with constants, or as the name suggests by chaining all ancestor Components/Container props,
@@ -76,14 +78,17 @@ export const apolloContainerTests = v((config) => {
       childClassDataName,
       // Required. The resolved schema used by Apollo to resolve data. This should be based on the Redux initial state or something similar
       schema,
+      // Required. A task that calls mapStateToProps and optionally the Container's queries. The result is an Either.Rights
+      // containing the resulting props or an Either.Left if an error occurs generating the props
+      chainedSamplePropsTask,
       // Optional, the class name if the component has an Apollo-based loading state
       childClassLoadingName,
       // Optional, the class name if the component has an Apollo-based error state
       childClassErrorName,
       // Optional, A Task that resolves props all the way up the hierarchy chain, ending with props for this
       // Container based on the ancestor Containers/Components
-      chainedSamplePropsTask = of({}),
-      // Optional, required if there are chainedSamplePropsTask
+      chainedParentPropsTask = of({}),
+      // Optional, required if there are chainedParentPropsTask
       initialState,
       // Optional. Oly for components with queries
       queryConfig,
@@ -96,10 +101,10 @@ export const apolloContainerTests = v((config) => {
     const queryVariables = props => reqStrPathThrowing('variables', reqStrPathThrowing('args.options', queryConfig)(props));
 
     // Resolve the Either to the Right value or throw if Left
-    // chainedSamplePropsTask returns and Either so that the an error
+    // chainedParentPropsTask returns and Either so that the an error
     // in the query can be processed by detected a Left value, but here
     // we only accept a right
-    const samplePropsTask = chainedSamplePropsTask.chain(either => either
+    const parentPropsTask = chainedParentPropsTask.chain(either => either
       .map(props => of(props))
       .leftMap(error => {
         // Unacceptable!
@@ -113,7 +118,7 @@ export const apolloContainerTests = v((config) => {
      */
     const testMapStateToProps = done => {
       // Get the test props for RegionContainer
-      samplePropsTask.run().listen(
+      chainedSamplePropsTask.run().listen(
         defaultRunConfig({
           onResolved: props => {
             expect(props).toMatchSnapshot();
@@ -133,7 +138,7 @@ export const apolloContainerTests = v((config) => {
         return;
       }
 
-      const task = samplePropsTask.chain(props => {
+      const task = parentPropsTask.chain(props => {
         return fromPromised(() => mockApolloClientWithSamples(initialState, schema).query({
           query,
           // queryVariables are called with props to give us the variables for our query. This is just like Apollo
@@ -166,10 +171,11 @@ export const apolloContainerTests = v((config) => {
      * @return {Promise<void>}
      */
     const testRender = done => {
-      samplePropsTask.chain(props => {
+      parentPropsTask.chain(props => {
         // Wrap the component in mock Apollo and Redux providers.
         // If the component doesn't use Apollo it just means that it will render its children synchronously,
         // rather than asynchronously
+
         const wrapper = wrapWithMockGraphqlAndStore(initialState, schema, Container(props));
         // Find the top-level component. This is always rendered in any Apollo status (loading, error, store data)
         const component = wrapper.find(componentName);
@@ -205,7 +211,7 @@ export const apolloContainerTests = v((config) => {
         logger.warn("One or both of errorMaker and childClassErrorName not specified, does your component actually need to test render errors?");
         return;
       }
-      samplePropsTask.map(errorMaker).chain(props => {
+      parentPropsTask.map(errorMaker).chain(props => {
         const wrapper = wrapWithMockGraphqlAndStore(initialState, schema, Container(props));
         const component = wrapper.find(componentName);
         expect(component.find(`.${getClass(childClassLoadingName)}`).length).toEqual(1);

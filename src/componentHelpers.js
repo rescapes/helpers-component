@@ -382,26 +382,6 @@ export const makeApolloTestPropsTaskFunction = R.curry((resolvedSchema, sampleCo
 });
 
 /**
- * Wraps a function that expects states and props and returns sample props with a function that
- * runs a graphql query
- * @param resolvedSchema
- * @param dataSource
- * @param queryArgs
- */
-/*
-export const makeGraphQlTestPropsFunction = (resolvedSchema, dataSource, queryArgs) => async (state, props) => {
-  const result = await graphql(resolvedSchema, queryArgs.query, {}, {options: {dataSource}}).then(result =>
-    queryArgs.args.props
-
-  (sampleState, sampleOwnProps) =>
-    mergeProps(
-      mapStateToProps(sampleState, sampleOwnProps),
-      mapDispatchToProps(R.identity), sampleOwnProps
-    );
-}
-*/
-
-/**
  * Given a React component function that expects props and given props that are a functor (Array or Object),
  * lift the component to handle all values of the functor and then extract the values
  * @param {Function} component A React component function that expects props
