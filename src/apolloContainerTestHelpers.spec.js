@@ -76,12 +76,12 @@ describe('ApolloContainer', () => {
   };
 
   const ContainerWithData = graphql(
-    gql`${queries.regionRegions.query}`,
-    queries.regionRegions.args
+    gql`${queries.region.query}`,
+    queries.region.args
   )(App);
 
 // ownProps will override with bad id for testing error
-  const mapStateToProps = (state, ownProps) => R.merge({data: {region: {id: 'oakland'}}}, ownProps);
+  const mapStateToProps = (state, ownProps) => R.merge({data: {region: {id: ownProps.regionId}}}, ownProps);
   const mapDispatchToProps = () => ({});
   const ContainerClass = connect(mapStateToProps, mapDispatchToProps, R.merge)(ContainerWithData);
   const [Container] = eMap([ContainerClass]);
@@ -109,16 +109,9 @@ describe('ApolloContainer', () => {
   // is the container we are testing
   const chainedParentPropsTask = parentPropsForContainerTask(
     // Pretend the parent returns the given props asynchronously
-    of(Either.Right({regionId: 'belgium'})),
-    props => ({myContainer: {regionId: props.regionId}}),
+    of(Either.Right({regionId: 'oakland'})),
+    props => ({views: {myContainer: {regionId: props.regionId}}}),
     'myContainer'
-  );
-
-  //
-  const chainedSamplePropsTask = chainedParentPropsTask.chain(parentContainerSamplePropsEither =>
-    parentContainerSamplePropsEither.chain(parentContainerSampleProps =>
-      // Chain the Either.Right value to a Task combine the parent props with the props maker
-      samplePropsTaskMaker(sampleInitialState, parentContainerSampleProps))
   );
 
   const {testMapStateToProps, testQuery, testRenderError, testRender} = apolloContainerTests({
@@ -126,12 +119,12 @@ describe('ApolloContainer', () => {
     schema,
     Container,
     chainedParentPropsTask,
-    chainedSamplePropsTask,
+    mapStateToProps,
     componentName,
     childClassDataName,
     childClassErrorName,
     childClassLoadingName,
-    queryConfig: queries.regionRegions,
+    queryConfig: queries.region,
     errorMaker
   });
   test('testMapStateToProps', testMapStateToProps);

@@ -15,7 +15,7 @@ import PropTypes from 'prop-types';
 import {shallow, mount} from 'enzyme';
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
-import {mergeDeep, reqStrPathThrowing} from 'rescape-ramda';
+import {mergeDeep, reqPathThrowing, reqStrPathThrowing} from 'rescape-ramda';
 import * as apolloTestUtils from 'apollo-test-utils';
 import ApolloClient from 'apollo-client';
 import {InMemoryCache} from 'apollo-client-preset';

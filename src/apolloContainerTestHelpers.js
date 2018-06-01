@@ -31,9 +31,7 @@ import {gql} from 'apollo-client-preset';
  * @param {Object} config.schema An graphql schema that resolves queries to sample values. These values should be
  * based on the Redux initial state or something similar
  * @param {Object} config.initialState The initial Redux state.
- * @param {Task} chainedSampleProps. A task that calls mapStateToProps and optionally the Container's queries. The result is an Either.Rights
- * containing the resulting props or an Either.Left if an error occurs generating the props
- *
+ * @param {Function} mapStateToProps Container function that expects state and props
  * @param {String} [config.childClassLoadingName] Optional. A class used in a React component in the named
  * component's renderLoading method--or any render code called when apollo loading is true. Normally
  * only needed for components with queries.
@@ -78,9 +76,7 @@ export const apolloContainerTests = v((config) => {
       childClassDataName,
       // Required. The resolved schema used by Apollo to resolve data. This should be based on the Redux initial state or something similar
       schema,
-      // Required. A task that calls mapStateToProps and optionally the Container's queries. The result is an Either.Rights
-      // containing the resulting props or an Either.Left if an error occurs generating the props
-      chainedSamplePropsTask,
+      mapStateToProps,
       // Optional, the class name if the component has an Apollo-based loading state
       childClassLoadingName,
       // Optional, the class name if the component has an Apollo-based error state
@@ -97,7 +93,8 @@ export const apolloContainerTests = v((config) => {
 
     // Run this apollo query
     const query = gql`${queryConfig.query}`;
-    // Use these query variables
+    // Use these query variables to call the function at queryConfig.arg.options, and then get the .variables of
+    // the returned value
     const queryVariables = props => reqStrPathThrowing('variables', reqStrPathThrowing('args.options', queryConfig)(props));
 
     // Resolve the Either to the Right value or throw if Left
@@ -118,10 +115,10 @@ export const apolloContainerTests = v((config) => {
      */
     const testMapStateToProps = done => {
       // Get the test props for RegionContainer
-      chainedSamplePropsTask.run().listen(
+      parentPropsTask.run().listen(
         defaultRunConfig({
-          onResolved: props => {
-            expect(props).toMatchSnapshot();
+          onResolved: parentProps => {
+            expect(mapStateToProps(initialState, parentProps)).toMatchSnapshot();
             done();
           }
         })
@@ -139,11 +136,12 @@ export const apolloContainerTests = v((config) => {
       }
 
       const task = parentPropsTask.chain(props => {
+        const mappedProps = mapStateToProps(initialState, props);
         return fromPromised(() => mockApolloClientWithSamples(initialState, schema).query({
           query,
           // queryVariables are called with props to give us the variables for our query. This is just like Apollo
           // does, accepting props to allow the Container to form the variables for the query
-          variables: queryVariables(props),
+          variables: queryVariables(mappedProps),
           // Our context is initialState as our dataSource. In real environments Apollo would go to a remote server
           // to fetch the data, but here our database is simply the initialState for testing purposes
           context: {
