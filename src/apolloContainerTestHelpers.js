@@ -49,8 +49,8 @@ import {gql} from 'apollo-client-preset';
  * an args.options function that expects props and resolves to an object with a variables property which holds an
  * object of query variables. Example:
  * queryConfig =
-    query: some query string
-    args: {
+ query: some query string
+ args: {
       // options is a function that expects props an returns a vasriable object with variable key/values
       options: ({data: {region}}) => ({
         variables: {
@@ -63,7 +63,7 @@ import {gql} from 'apollo-client-preset';
         {data}
       )
     }
-  }
+ }
  * @param {Function} [config.errorMaker] Optional unary function that expects the results of the
  * parentProps and mutates something used by the queryVariables to make the query fail. This
  * is for testing the renderError part of the component. Only containers with queries should have an expected error state
@@ -93,7 +93,7 @@ export const apolloContainerTests = v((config) => {
     // Run this apollo query
     const query = gql`${queryConfig.query}`;
     // Use these query variables
-    const queryVariables = props => reqStrPathThrowing('variables', reqStrPathThrowing('args.options', queryConfig)(props))
+    const queryVariables = props => reqStrPathThrowing('variables', reqStrPathThrowing('args.options', queryConfig)(props));
 
     // Resolve the Either to the Right value or throw if Left
     // chainedSamplePropsTask returns and Either so that the an error
@@ -213,8 +213,9 @@ export const apolloContainerTests = v((config) => {
         return promiseToTask(waitForChildComponentRender(wrapper, componentName, childClassErrorName));
       }).run().listen(
         defaultRunConfig({
-          onResolved: () => {
-            // As long as we rendered the error component we're done
+          // The error component should have an error message as props.children
+          onResolved: childComponent => {
+            expect(childComponent.props()).toMatchSnapshot();
             done();
           }
         })
