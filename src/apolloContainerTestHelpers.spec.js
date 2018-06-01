@@ -9,7 +9,7 @@ import {
 } from 'componentHelpers';
 import {Component} from 'react';
 import {resolvedSchema, sampleConfig} from 'sampleData';
-import {reqStrPathThrowing, promiseToTask} from 'rescape-ramda';
+import {reqStrPathThrowing, promiseToTask, mergeDeep} from 'rescape-ramda';
 
 describe('ApolloContainer', () => {
   const schema = resolvedSchema;
@@ -92,11 +92,6 @@ describe('ApolloContainer', () => {
 // Find this class in the error renderer
   const childClassErrorName = 'error';
 
-
-// Use these query variables
-  const queryVariables = props => ({
-    regionId: props.data.region.id
-  });
   const errorMaker = parentProps => R.set(R.lensPath(['data', 'region', 'id']), 'foo', parentProps);
 
   const chainedSamplePropsTask =
@@ -108,7 +103,6 @@ describe('ApolloContainer', () => {
       queries.regionRegions
     )(sampleConfig, {});
 
-  // Just check argument validation
   const {testMapStateToProps, testQuery, testRenderError, testRender} = apolloContainerTests({
     initialState: sampleConfig,
     schema,
@@ -118,8 +112,7 @@ describe('ApolloContainer', () => {
     childClassDataName,
     childClassErrorName,
     childClassLoadingName,
-    query: gql`${query}`,
-    queryVariables,
+    queryConfig: queries.regionRegions,
     errorMaker
   });
   test('testMapStateToProps', testMapStateToProps);

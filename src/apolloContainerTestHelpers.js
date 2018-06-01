@@ -17,7 +17,8 @@ import {getClass} from './styleHelpers';
 import {PropTypes} from 'prop-types';
 import {v} from 'rescape-validate';
 import {of, fromPromised} from 'folktale/concurrency/task';
-import {defaultRunConfig, promiseToTask} from 'rescape-ramda';
+import {defaultRunConfig, promiseToTask, reqStrPathThrowing} from 'rescape-ramda';
+import {gql} from 'apollo-client-preset';
 
 /**
  * Runs tests on an apollo React container with the * given config.
@@ -44,13 +45,25 @@ import {defaultRunConfig, promiseToTask} from 'rescape-ramda';
  * where the ancestor Container props might be Apollo based.
  * of the parentProps used to call propsFromSampleStateAndContainer. Required if the container component receives
  * props from its parent (it usually does)
- * @param {Object} [config.query] Optional gql wrapped query string if the Container has an apollo query.
- * The query should be the same as that used by the container
- * @param {Function} [config.queryVariables] Optional Unary function expecting props and return an object of query arguments
- * for the given query. Example:
- * props => ({
-    regionId: props.data.region.id
-  });
+ * @param {Object} [queryConfig] Optional Object that has a query property, a string representing the graphql query and
+ * an args.options function that expects props and resolves to an object with a variables property which holds an
+ * object of query variables. Example:
+ * queryConfig =
+    query: some query string
+    args: {
+      // options is a function that expects props an returns a vasriable object with variable key/values
+      options: ({data: {region}}) => ({
+        variables: {
+          regionId: region.id
+        },
+      }),
+      // Resolves the props to give to the Component. data is the query result and ownProps comes from mapStateToProps
+      props: ({data, ownProps}) => mergeDeep(
+        ownProps,
+        {data}
+      )
+    }
+  }
  * @param {Function} [config.errorMaker] Optional unary function that expects the results of the
  * parentProps and mutates something used by the queryVariables to make the query fail. This
  * is for testing the renderError part of the component. Only containers with queries should have an expected error state
@@ -72,13 +85,15 @@ export const apolloContainerTests = v((config) => {
       chainedSamplePropsTask = of({}),
       // Optional, required if there are chainedSamplePropsTask
       initialState,
-      // Optional. Only for components with queries
-      query,
-      // Optional. Only for components with queries
-      queryVariables,
-      // Optional. Only for components with queries
+      // Optional. Oly for components with queries
+      queryConfig,
       errorMaker
     } = config;
+
+    // Run this apollo query
+    const query = gql`${queryConfig.query}`;
+    // Use these query variables
+    const queryVariables = props => reqStrPathThrowing('variables', reqStrPathThrowing('args.options', queryConfig)(props))
 
     // Resolve the Either to the Right value or throw if Left
     // chainedSamplePropsTask returns and Either so that the an error
@@ -151,7 +166,7 @@ export const apolloContainerTests = v((config) => {
      * @return {Promise<void>}
      */
     const testRender = done => {
-      chainedSamplePropsTask.chain(props => {
+      samplePropsTask.chain(props => {
         // Wrap the component in mock Apollo and Redux providers.
         // If the component doesn't use Apollo it just means that it will render its children synchronously,
         // rather than asynchronously
@@ -190,7 +205,7 @@ export const apolloContainerTests = v((config) => {
         logger.warn("One or both of errorMaker and childClassErrorName not specified, does your component actually need to test render errors?");
         return;
       }
-      chainedSamplePropsTask.map(errorMaker).chain(props => {
+      samplePropsTask.map(errorMaker).chain(props => {
         const wrapper = wrapWithMockGraphqlAndStore(initialState, schema, Container(props));
         const component = wrapper.find(componentName);
         expect(component.find(`.${getClass(childClassLoadingName)}`).length).toEqual(1);
