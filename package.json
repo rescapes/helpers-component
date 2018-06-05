@@ -1,6 +1,6 @@
 {
   "name": "rescape-helpers-component",
-  "version": "1.5.6",
+  "version": "1.5.7",
   "description": "Helpers for working with React components",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -20,15 +20,16 @@
   },
   "license": "MIT",
   "scripts": {
+    "install-peers": "cross-env node ./installPeers | sh",
     "clean": "rimraf lib dist es coverage",
     "lint": "eslint src",
     "test": "cross-env BABEL_ENV=commonjs jest",
     "test:watch": "yarn test -- --watch",
     "test:cov": "yarn test -- --coverage",
     "build:commonjs": "cross-env NODE_ENV=production BABEL_ENV=commonjs  node_modules/.bin/babel src --out-dir lib",
-    "build:es": "cross-env BABEL_ENV=es NODE_ENV=es rollup -c -i src/index.js -o es/index.js",
-    "build:umd": "cross-env BABEL_ENV=es NODE_ENV=development rollup -c -i src/index.js -o dist/index.js",
-    "build:umd:min": "cross-env BABEL_ENV=es NODE_ENV=production NODE_ENV=production rollup -c -i src/index.js -o dist/index.min.js",
+    "build:es": "cross-env BABEL_ENV=es NODE_ENV=es rollup -c",
+    "build:umd": "cross-env BABEL_ENV=es NODE_ENV=development rollup -c -out-dir dist",
+    "build:umd:min": "cross-env BABEL_ENV=es NODE_ENV=production NODE_ENV=production rollup -c -out-dir dist",
     "build": "yarn run build:commonjs && yarn run build:es",
     "prepare": "yarn run clean && yarn run lint && yarn test && yarn run build",
     "docs:clean": "rimraf _book",
@@ -42,28 +43,18 @@
     "publish-minor": "yarn --new-version version minor && yarn publish"
   },
   "dependencies": {
-    "apollo-client": "^2.3.1",
     "apollo-client-preset": "^1.0.8",
     "apollo-link-error": "^1.0.9",
     "apollo-link-schema": "^1.1.0",
     "apollo-test-utils": "^0.3.2",
-    "data.either": "^1.5.1",
-    "folktale": "^2.1.0",
-    "graphql-tools": "^3.0.2",
-    "jsdom": "^11.11.0",
     "longjohn": "^0.2.12",
     "prop-types": "^15.6.1",
-    "ramda": "^0.25.0",
-    "react": "^16.4.0",
     "react-apollo": "^2.1.4",
     "react-dom": "^16.4.0",
     "react-redux": "^5.0.7",
     "rebass": "^1.0.7",
-    "redux": "^4.0.0",
     "redux-mock-store": "^1.5.1",
-    "redux-thunk": "^2.2.0",
-    "rescape-ramda": "^1.4.38",
-    "rescape-validate": "^1.2.9"
+    "redux-thunk": "^2.2.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -91,6 +82,7 @@
     "jest": "22.4.4",
     "jest-cli": "^22.4.4",
     "jsdoc-babel": "^0.4.0",
+    "jsdom": "^11.11.0",
     "react-dev-utils": "^5.0.1",
     "rollup": "^0.59.2",
     "rollup-plugin-babel": "^3.0.4",
@@ -100,12 +92,21 @@
     "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-plugin-peer-deps-external": "^2.1.1",
     "rollup-plugin-replace": "^2.0.0",
-    "rollup-plugin-uglify": "^4.0.0"
+    "rollup-plugin-uglify": "^4.0.0",
+    "rollup-watch": "^4.3.1"
   },
   "peerDependencies": {
+    "apollo-client": "^2.3.1",
+    "data.either": "^1.5.1",
+    "folktale": "^2.1.0",
     "graphql": "^0.13.1",
-    "react": ">=0.14",
-    "react-dom": ">=0.14"
+    "graphql-tools": "^3.0.2",
+    "ramda": "^0.25.0",
+    "react": "^16.4.0",
+    "react-dom": ">=0.14",
+    "redux": "^4.0.0",
+    "rescape-ramda": "^1.4.38",
+    "rescape-validate": "^1.2.9"
   },
   "jest": {
     "setupTestFrameworkScriptFile": "<rootDir>/jestsetup.js",
@@ -160,14 +161,7 @@
     ],
     "sourceMaps": true,
     "plugins": [
-      "transform-object-rest-spread",
-      [
-        "transform-runtime",
-        {
-          "polyfill": false,
-          "regenerator": true
-        }
-      ]
+      "transform-object-rest-spread"
     ],
     "env": {
       "commonjs": {
