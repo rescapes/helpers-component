@@ -1,6 +1,6 @@
 {
   "name": "rescape-helpers-component",
-  "version": "1.5.3",
+  "version": "1.5.4",
   "description": "Helpers for working with React components",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -26,8 +26,8 @@
     "test:watch": "yarn test -- --watch",
     "test:cov": "yarn test -- --coverage",
     "build:commonjs": "cross-env NODE_ENV=production BABEL_ENV=commonjs  node_modules/.bin/babel src --out-dir lib",
-    "build:es": "cross-env BABEL_ENV=es NODE_ENV=es node_modules/.bin/babel src --out-dir es",
-    "build:umd": "cross-env BABEL_ENV=es NODE_ENV=development $NODE_DEBUG_OPTION rollup -c -i src/index.js -o dist/index.js",
+    "build:es": "cross-env BABEL_ENV=es NODE_ENV=es rollup -c -i src/index.js -o es/index.js",
+    "build:umd": "cross-env BABEL_ENV=es NODE_ENV=development rollup -c -i src/index.js -o dist/index.js",
     "build:umd:min": "cross-env BABEL_ENV=es NODE_ENV=production NODE_ENV=production rollup -c -i src/index.js -o dist/index.min.js",
     "build": "yarn run build:commonjs && yarn run build:es",
     "prepare": "yarn run clean && yarn run lint && yarn test && yarn run build",
@@ -98,6 +98,7 @@
     "rollup-plugin-json": "^3.0.0",
     "rollup-plugin-node-builtins": "^2.1.2",
     "rollup-plugin-node-resolve": "^3.3.0",
+    "rollup-plugin-peer-deps-external": "^2.1.1",
     "rollup-plugin-replace": "^2.0.0",
     "rollup-plugin-uglify": "^4.0.0"
   },
@@ -165,12 +166,6 @@
         {
           "polyfill": false,
           "regenerator": true
-        }
-      ],
-      [
-        "transform-es2015-modules-commonjs-simple",
-        {
-          "noMangle": true
         }
       ]
     ],
