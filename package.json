@@ -1,6 +1,6 @@
 {
   "name": "rescape-helpers-component",
-  "version": "1.5.9",
+  "version": "1.5.10",
   "description": "Helpers for working with React components",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -20,6 +20,7 @@
   },
   "license": "MIT",
   "scripts": {
+    "install-peers": "cross-env node ./installPeersCommand.js | sh",
     "clean": "rimraf lib dist es coverage",
     "lint": "eslint src",
     "test": "cross-env BABEL_ENV=commonjs jest",
@@ -42,18 +43,26 @@
     "publish-minor": "yarn --new-version version minor && yarn publish"
   },
   "dependencies": {
+    "apollo-client": "^2.3.1",
     "apollo-client-preset": "^1.0.8",
     "apollo-link-error": "^1.0.9",
     "apollo-link-schema": "^1.1.0",
     "apollo-test-utils": "^0.3.2",
+    "data.either": "^1.5.1",
+    "folktale": "^2.1.0",
+    "graphql-tools": "^3.0.2",
     "longjohn": "^0.2.12",
     "prop-types": "^15.6.1",
+    "ramda": "^0.25.0",
     "react-apollo": "^2.1.4",
     "react-dom": "^16.4.0",
     "react-redux": "^5.0.7",
     "rebass": "^1.0.7",
+    "redux": "^4.0.0",
     "redux-mock-store": "^1.5.1",
-    "redux-thunk": "^2.2.0"
+    "redux-thunk": "^2.2.0",
+    "rescape-ramda": "^1.4.38",
+    "rescape-validate": "^1.2.9"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -78,11 +87,11 @@
     "eslint-loader": "2.0.0",
     "eslint-plugin-import": "2.12.0",
     "install": "^0.11.0",
-    "install-peers": "^1.0.2",
     "jest": "22.4.4",
     "jest-cli": "^22.4.4",
     "jsdoc-babel": "^0.4.0",
     "jsdom": "^11.11.0",
+    "npm-install-peers": "^1.2.1",
     "react-dev-utils": "^5.0.1",
     "rollup": "^0.59.2",
     "rollup-plugin-auto-external": "^1.2.0",
@@ -96,17 +105,9 @@
     "rollup-watch": "^4.3.1"
   },
   "peerDependencies": {
-    "apollo-client": "^2.3.1",
-    "data.either": "^1.5.1",
-    "folktale": "^2.1.0",
     "graphql": "^0.13.1",
-    "graphql-tools": "^3.0.2",
-    "ramda": "^0.25.0",
     "react": "^16.4.0",
-    "react-dom": ">=0.14",
-    "redux": "^4.0.0",
-    "rescape-ramda": "^1.4.38",
-    "rescape-validate": "^1.2.9"
+    "react-dom": ">=0.14"
   },
   "jest": {
     "setupTestFrameworkScriptFile": "<rootDir>/jestsetup.js",
