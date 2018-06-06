@@ -22,8 +22,8 @@ import {InMemoryCache} from 'apollo-client-preset';
 import {SchemaLink} from 'apollo-link-schema';
 import {getClass} from './styleHelpers';
 import {onError} from "apollo-link-error";
-import {task, fromPromised} from 'folktale/concurrency/task';
-import {makeTestPropsFunction} from 'componentHelpers';
+import {of} from 'folktale/concurrency/task';
+import {makeTestPropsFunction} from './componentHelpers';
 import * as Either from 'data.either';
 import {v} from 'rescape-validate';
 

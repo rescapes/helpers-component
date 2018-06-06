@@ -19,7 +19,7 @@ import {
 } from './componentHelpers';
 import {reqStrPathThrowing, hasStrPath} from 'rescape-ramda';
 import {resolvedSchema, sampleConfig} from './sampleData';
-import {keyWithDatum} from 'componentHelpers';
+import {keyWithDatum, renderLoadingDefault} from 'componentHelpers';
 
 describe('componentHelpers', () => {
   test('propLensEqual', () => {
@@ -634,4 +634,5 @@ describe('componentHelpers', () => {
       }
     });
   });
+
 });

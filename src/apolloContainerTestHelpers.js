@@ -14,7 +14,7 @@ import {
   mockApolloClientWithSamples, waitForChildComponentRender, wrapWithMockGraphqlAndStore
 } from './componentTestHelpers';
 import {getClass} from './styleHelpers';
-import {PropTypes} from 'prop-types';
+import PropTypes from 'prop-types';
 import {v} from 'rescape-validate';
 import {of, fromPromised} from 'folktale/concurrency/task';
 import {defaultRunConfig, promiseToTask, reqStrPathThrowing} from 'rescape-ramda';

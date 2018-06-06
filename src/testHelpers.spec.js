@@ -17,13 +17,13 @@ describe('testHelpers', () => {
   test('expectTask', () => {
     expectTask(task(({reject, resolve}) => resolve('apple'))).resolves.toEqual('apple');
     expectTask(task(({reject, resolve}) => {
-      throw new Error('snapple');
+      reject(new Error('snapple'));
     })).rejects.toEqual(new Error('snapple'));
   });
 
   test('eitherToPromise', () => {
-    expect(eitherToPromise(Either.Right(1))).resolves.toBe(1)
-    expect(eitherToPromise(Either.Left(1))).rejects.toBe(1)
-  })
+    expect(eitherToPromise(Either.Right(1))).resolves.toBe(1);
+    expect(eitherToPromise(Either.Left(1))).rejects.toBe(1);
+  });
 });
 

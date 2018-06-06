@@ -13,10 +13,9 @@ import React from 'react';
 import * as R from 'ramda';
 import {v} from 'rescape-validate';
 import PropTypes from 'prop-types';
-import {mergeDeep, reqPathThrowing, reqStrPathThrowing} from 'rescape-ramda';
+import {mergeDeep, reqPathThrowing, reqStrPathThrowing, mergeDeepWith} from 'rescape-ramda';
 import * as Either from 'data.either';
 import {getClassAndStyle, getStyleObj} from './styleHelpers';
-import prettyFormat from 'pretty-format';
 import {graphql} from 'graphql';
 
 const {of, fromPromised} = require('folktale/concurrency/task');
@@ -74,7 +73,7 @@ export const renderChoicepoint = R.curry((onError, onLoading, onData, props) =>
     [R.view(R.lensPath(['data', 'loading'])), onLoading],
     [R.view(R.lensPath(['data', 'store'])), onData],
     [R.T, props => {
-      throw new Error(`No error, loading, nor store prop: ${prettyFormat(props)}`);
+      throw new Error(`No error, loading, nor store prop: ${JSON.stringify(props)}`);
     }]
   ])(props)
 );
@@ -190,18 +189,7 @@ export const mergeActionsForViews = R.curry((viewToActionNames, props) => {
  */
 export const mergePropsForViews = R.curry((viewNamesToViewProps, props) => {
 
-  const mergeDeepWith = module.exports.mergeDeepWith = R.curry((fn, left, right) => R.mergeWith((l, r) => {
-    // If either (hopefully both) items are arrays or not both objects
-    // accept the right value
-    return (
-      (l && l.concat && R.is(Array, l)) ||
-      (r && r.concat && R.is(Array, r))
-    ) ||
-    !(R.all(R.is(Object)))([l, r]) ||
-    R.any(R.is(Function))([l, r]) ?
-      fn(l, r) :
-      mergeDeepWith(fn, l, r); // tail recursive
-  })(left, right));
+
 
   // If either matching view props object is a function, wrap them in a function
   // These functions have to accept an item, the props arg has already been given to them
@@ -621,7 +609,7 @@ export const composeViewsFromStruct = R.curry((viewStruct, props) => {
  * to index the component in the list
  * @returns {Array} The components interspersed with separatorComponents
  */
-export const joinComponents = (separatorComponent, components) =>
+export const joinComponents = v((separatorComponent, components) =>
   R.addIndex(R.reduce)(
     (prevComponents, component, key) => R.ifElse(
       R.isNil,
@@ -635,25 +623,31 @@ export const joinComponents = (separatorComponent, components) =>
     )(prevComponents),
     null,
     components
-  );
+  ), [
+    ['separatorComponent', PropTypes.func.isRequired],
+    ['components', PropTypes.arrayOf(PropTypes.func).isRequired]
+  ], 'renderLoadingDefault');
+;
 
 /**
  * A default loading React component, which is passed the props in props.views.viewName
  * @param viewName The viewname with which to resolve the props
  * @return A function expecting props, which renders the loading component
  */
-export const renderLoadingDefault = viewName => ({views}) => {
+export const renderLoadingDefault = v(viewName => ({views}) => {
   const [Div] = eMap(['div']);
   const props = propsFor(views);
   return Div(props(viewName));
-};
+}, [
+  ['viewName', PropTypes.string.isRequired]
+], 'renderLoadingDefault');
 
 /**
  * A default error React component, which is passed the props in props.views.viewName
  * @param viewName The viewname with which to resolve the props
  * @return A function expecting props, which renders the error component
  */
-export const renderErrorDefault = viewName => ({data, views}) => {
+export const renderErrorDefault = v(viewName => ({data, views}) => {
   const [Div] = eMap(['div']);
   const props = propsFor(views);
   const errors = data.error.graphQLErrors;
@@ -665,5 +659,7 @@ export const renderErrorDefault = viewName => ({data, views}) => {
       )
     )
   );
-};
+}, [
+  ['viewName', PropTypes.string.isRequired]
+], 'renderLoadingDefault');
 
