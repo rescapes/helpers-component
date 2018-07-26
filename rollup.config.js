@@ -11,9 +11,7 @@ const env = process.env.NODE_ENV;
 const config = {
   input: [
     'src/index.js',
-    'src/apolloContainerTestHelpers.js',
     'src/componentHelpers.js',
-    'src/componentTestHelpers.js',
     'src/styleHelpers',
     'src/svgComponentHelpers'
   ],
@@ -22,6 +20,7 @@ const config = {
     // peerDependencies from all builds)
     autoExternal(),
     /*
+      I don't know if any of this stuff is still needed
     json(),
     builtins(),
     nodeResolve({
@@ -72,9 +71,6 @@ const config = {
         'node_modules/graphql/utilities/index.js': [
           'getIntrospectionQuery', 'introspectionQuery', 'getOperationAST', 'introspectionFromSchema', 'buildClientSchema', 'buildASTSchema,'
         ],
-        'node_modules/data.either/lib/index.js': [
-          'Left', 'Right'
-        ],
         'node_modules/apollo-test-utils/dist/src/index.js': [
           'mockNetworkInterfaceWithSchema'
         ]
@@ -95,7 +91,7 @@ if (env === 'es' || env === 'cjs') {
   // folktale needs to be explicitly external because rollup can't
   // match folktale to folktale/concurrency/task
   // enzyme and enzyme-wait are dev-dependencies that are used by componentTestHelpers, so mark external here
-  config.external = ['symbol-observable', 'folktale/concurrency/task', 'enzyme', 'enzyme-wait']
+  config.external = ['symbol-observable', 'folktale/concurrency/task', 'folktale/result', 'enzyme', 'enzyme-wait']
   config.plugins.push(
     babel({
       exclude: ['node_modules/**'],

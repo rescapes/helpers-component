@@ -14,7 +14,7 @@ import * as R from 'ramda';
 import {v} from 'rescape-validate';
 import PropTypes from 'prop-types';
 import {mergeDeep, reqPathThrowing, reqStrPathThrowing, mergeDeepWith} from 'rescape-ramda';
-import * as Either from 'data.either';
+import * as Result from 'folktale/result';
 import {getClassAndStyle, getStyleObj} from './styleHelpers';
 import {graphql} from 'graphql';
 
@@ -120,7 +120,7 @@ export const mergeActionsForViews = R.curry((viewToActionNames, props) => {
  * the same keys as viewNamesToViewProps and valued by the resolution of the viewNamesToViewProps
  * This allows a Container or Component to efficiently specify which props to give the view
  * used by each sub component. Each props object of viewNamesToViewProps can be a constant value or
- * a unary function that is passed props. Either way, it results in an object keyed by props and
+ * a unary function that is passed props. Result way, it results in an object keyed by props and
  * valued by prop values or a function that accepts props.
  *
  * The functions that accept props can optionally take a second argument (they must be curried) or
@@ -191,7 +191,7 @@ export const mergePropsForViews = R.curry((viewNamesToViewProps, props) => {
 
 
 
-  // If either matching view props object is a function, wrap them in a function
+  // If result matching view props object is a function, wrap them in a function
   // These functions have to accept an item, the props arg has already been given to them
   const mergeFunctions = (left, right) => R.ifElse(
     R.any(R.is(Function)),
@@ -206,7 +206,7 @@ export const mergePropsForViews = R.curry((viewNamesToViewProps, props) => {
   return R.over(
     R.lensProp('views'),
     views => mergeDeepWith(
-      // If either merged value is a function, wrap it in a function to resolve later
+      // If result merged value is a function, wrap it in a function to resolve later
       mergeFunctions,
       // Merge any existing values in props.views
       views,
@@ -216,7 +216,7 @@ export const mergePropsForViews = R.curry((viewNamesToViewProps, props) => {
           // If any individual prop value is a function, pass props to it.
           applyToIfFunction(props),
           // If the viewProps are a function, pass props to it
-          // Either way we end up wih an object of prop keys pointing to prop values or prop functions
+          // Result way we end up wih an object of prop keys pointing to prop values or prop functions
           applyToIfFunction(props, viewPropsObjOrFunction)
         ),
         // If the entire viewToPropValuesOrFuncs is a function pass props to it
@@ -232,12 +232,15 @@ export const mergePropsForViews = R.curry((viewNamesToViewProps, props) => {
  * that generates a unique value, such as an id, name, or title. This is useful when a property created
  * in the viewProps can serve as the key
  * @param {String} keyStr Any key or keyString (e.g. 'foo.bar') in viewProps that generates a unique value
+ * This will be converted to a string. If you want the key to be based on the datum use the keyWithDatum function instead
  * @param {Object} viewProps Prop configuration for a particular view (see mergePropsForViews)
  * The values can be constants or functions, as supported by mergePropsForView. The value matching
  * key will simply be referred by 'key'
- * @return {*} viewProps with 'key' added
+ * @return {*} viewProps with 'key' added, where the value is a string or function
  */
-export const keyWith = (keyStr, viewProps) => R.merge(viewProps, {key: reqStrPathThrowing(keyStr, viewProps)});
+export const keyWith = (keyStr, viewProps) => R.merge(viewProps, {
+  key: reqStrPathThrowing(keyStr, viewProps).toString()
+});
 
 /**
  * Adds a 'key' to the viewProps for React iteration, where the key is property of the given datum d.
@@ -249,7 +252,10 @@ export const keyWith = (keyStr, viewProps) => R.merge(viewProps, {key: reqStrPat
  * @return {*} viewProps with a key property added with value d[key]
  */
 export const keyWithDatum = R.curry(
-  (key, d, viewProps) => R.merge(viewProps, {key: reqStrPathThrowing(key, d)})
+  (key, d, viewProps) => R.merge(
+    viewProps,
+    {key: reqStrPathThrowing(key, d).toString()}
+  )
 );
 
 /**
@@ -285,89 +291,7 @@ export const applyIfFunction = R.curry((args, maybeFunc) =>
   )(maybeFunc)
 );
 
-/**
- * Given a container's mapStateToProps and mapDispatchToProps, returns a function that accepts a sample state
- * and sample ownProps. This function may be exported by a container to help with unit tests
- * @param {Function} mapStateToProps The mapStatesToProps function of a container. It will be passed
- * sampleState and sampleOwnProps when invoked
- * @param {Function} mapDispatchToProps The mapDispatchToProps function of a container. It will be passed
- * the identity function for a fake dispatch and sampleOwnProps when invoked
- * @returns {Function} A function that expects a sample state and sample ownProps and returns a complete
- * sample props according to the functions of the container
- */
-export const makeTestPropsFunction = (mapStateToProps, mapDispatchToProps) =>
-  (sampleState, sampleOwnProps) => R.merge(
-    mapStateToProps(sampleState, sampleOwnProps),
-    mapDispatchToProps(R.identity)
-  );
 
-/**
- * Like makeTestPropsFunction, but additionally resolves an Apollo query to supply complete data for a test
- * @param {Object} resolvedSchema Apollo schema with resolvers
- * @param {Object} sampleConfig This is used as a datasource for the resolvers
- * @param {Function} mapStateToProps Redux container function
- * @param {Function} mapDispatchToProps Redux container function
- * @param {Function} mergeProps Redux container function
- * @query {String} query Contains an apollo query string (not gql string)
- * @args {Function} args Contains an apollo query args in the format:
- * {
- *  options: { variables: { query args } }
- * }
- *
- * @returns {Function} A function with two arguments, initialState and ownProps
- *  The function returns a Task that resolves to Either.Left or Right. If Left there are errors in the Either.value. If
- *  Right then the value is the Apollo 'store' key
- */
-export const makeApolloTestPropsTaskFunction = R.curry((resolvedSchema, sampleConfig, mapStateToProps, mapDispatchToProps, {query, args}) => {
-
-  // composeK executes from right to left (bottom to top)
-  return (state, props) => R.composeK(
-    // Any Left will remain Left.
-    // If the Right contains an error, make a Left with the error
-    // Otherwise merge the results to simulate an Apollo Client return, with the results under the 'data' key
-    // The results will have a store key with the loaded data
-    either => of(either.chain(({props, value: {data, errors}}) => {
-      if (errors)
-        return Either.Left({
-          error: errors
-        });
-      return Either.Right(
-        mergeDeep(
-          props,
-          {
-            data: R.merge(
-              // Simulate loading complete
-              loadingCompleteStatus,
-              data
-            )
-          }
-        )
-      );
-    })),
-    // Next take the merged props and call the graphql query.
-    // Convert the function returning a promise to a Task
-    // If if anything goes wrong wrap it in a Left. Otherwise put it in a Right
-    props => {
-      return fromPromised(() => graphql(
-        resolvedSchema,
-        query, {},
-        // Resolve graphql queries with the sampleConfig
-        {options: {dataSource: sampleConfig}},
-        // Add data and ownProps since that is what Apollo query arguments props functions expect
-        reqPathThrowing(['variables'], args.options(props))
-        ).then(value => Either.Right({value, props})
-        ).catch(e => {
-          return Either.Left({
-            errors: [e]
-          });
-        })
-      )();
-    },
-    // First create a function that expects state and props and uses them to call mapStateToProps and mapDispatchToProps
-    // and merges the result. We wrap it in a task to give asynchronous function above
-    (state, props) => of(makeTestPropsFunction(mapStateToProps, mapDispatchToProps)(state, props))
-  )(state, props);
-});
 
 /**
  * Given a React component function that expects props and given props that are a functor (Array or Object),
@@ -402,7 +326,7 @@ export const liftAndExtractItems = (component, propsWithItems) => {
 /**
  * Given a viewStyles function that expects props and returns styles keyed by view, merges those
  * view values into the views of the props.
- * @param {Function|Object} viewStyles Either an object mapping of view names to styles, or a function that expects
+ * @param {Function|Object} viewStyles Result an object mapping of view names to styles, or a function that expects
  * props and returns that object. viewStyles often merge props or apply them to functions.
  * @param props
  * @return {*}
@@ -624,9 +548,9 @@ export const joinComponents = v((separatorComponent, components) =>
     null,
     components
   ), [
-    ['separatorComponent', PropTypes.func.isRequired],
-    ['components', PropTypes.arrayOf(PropTypes.func).isRequired]
-  ], 'renderLoadingDefault');
+  ['separatorComponent', PropTypes.func.isRequired],
+  ['components', PropTypes.arrayOf(PropTypes.func).isRequired]
+], 'renderLoadingDefault');
 ;
 
 /**

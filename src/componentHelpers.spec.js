@@ -10,16 +10,17 @@
  */
 import * as R from 'ramda';
 import {
-  propLensEqual, mergeActionsForViews, makeTestPropsFunction, liftAndExtract,
-  renderChoicepoint, joinComponents, loadingCompleteStatus, makeApolloTestPropsTaskFunction, mergePropsForViews,
+  propLensEqual, mergeActionsForViews, liftAndExtract,
   mergeStylesIntoViews,
   nameLookup, propsFor,
   propsForSansClass, strPath, itemizeProps, applyToIfFunction, keyWith, propsForItem, applyIfFunction, composeViews,
   composeViewsFromStruct, whenProp
 } from './componentHelpers';
+import {makeTestPropsFunction} from 'rescape-helpers-test'
 import {reqStrPathThrowing, hasStrPath} from 'rescape-ramda';
-import {resolvedSchema, sampleConfig} from './sampleData';
-import {keyWithDatum, renderLoadingDefault} from 'componentHelpers';
+import {
+  joinComponents, keyWithDatum, mergePropsForViews, renderChoicepoint,
+} from 'componentHelpers';
 
 describe('componentHelpers', () => {
   test('propLensEqual', () => {
@@ -150,17 +151,19 @@ describe('componentHelpers', () => {
   test('makeTestPropsFunction', () => {
     // Construct a sample state, props, dispatches, etc
     const sampleState = ({a: 1, views: {aComponent: {stuff: 1}, bComponent: {moreStuff: 2}}});
-    const sampleOwnProps = {style: {width: 100}};
-    const mapStateToProps = (state, ownProps) => R.merge(state, ownProps);
-    const dispatchResults = {
+    const sampleOwnProps = {junk: 99, style: {width: 100}};
+    const mapStateToProps = (state, {style}) => R.merge(state, {style});
+    const dispatchResults = ownProps => ({
       action1: R.identity,
       action2: R.identity,
-      action3: R.identity
-    };
-    const mapDispatchToProps = (dispatch, ownProps) => dispatchResults;
+      action3: R.identity,
+      // This would normally be a function embedding something from props. Leave as a value for easy test comparison
+      action4: ownProps.junk
+    });
+    const mapDispatchToProps = (dispatch, ownProps) => dispatchResults(ownProps);
     // given mapStateToProps, mapDispatchToProps, and mergeProps we get a function back
     // that then takes sample state and ownProps. The result is a merged object based on container methods
-    // and sample da
+    // and sample data
     expect(makeTestPropsFunction(mapStateToProps, mapDispatchToProps)(sampleState, sampleOwnProps))
       .toEqual(
         R.merge({
@@ -170,79 +173,8 @@ describe('componentHelpers', () => {
             aComponent: {stuff: 1},
             bComponent: {moreStuff: 2}
           }
-        }, dispatchResults)
+        }, dispatchResults({junk: 99}))
       );
-  });
-
-  test('makeApolloTestPropsTaskFunction', done => {
-    const sampleState = ({data: {regionId: 'oakland'}, views: {aComponent: {stuff: 1}, bComponent: {moreStuff: 2}}});
-    const sampleOwnProps = {style: {width: 100}};
-    const mapStateToProps = (state, ownProps) => R.merge(state, ownProps);
-    const dispatchResults = {
-      action1: R.identity,
-      action2: R.identity,
-      action3: R.identity
-    };
-    const mapDispatchToProps = (dispatch, ownProps) => dispatchResults;
-    // given mapStateToProps, mapDispatchToProps, and mergeProps we get a function back
-    // that then takes sample state and ownProps. The result is a merged object based on container methods
-    // and sample data. Next apply the apollo query
-    const queryObj = {
-      query: `
-          query region($regionId: String!) {
-              store {
-                  region(id: $regionId) {
-                      id
-                      name
-                  },
-              }
-          }
-      `,
-      args: {
-        options: ({data: {regionId}}) => ({
-          variables: {
-            regionId
-          }
-        })
-      }
-    };
-    // Make the function with the configuration
-    const func = makeApolloTestPropsTaskFunction(resolvedSchema, sampleConfig, mapStateToProps, mapDispatchToProps, queryObj);
-    // Now pretend we're calling it with state and props
-    func(sampleState, sampleOwnProps).run().listen({
-      // Map the either result, handling Right success and Left failure
-      onResolved: either => either.map(value => {
-        expect(value).toEqual(
-          R.merge({
-            // Expect this data came from Apollo along with the other props that were passed through: style adn views
-            data: R.merge(
-              loadingCompleteStatus, {
-                store: {region: {id: "oakland", name: "Oakland"}},
-                regionId: 'oakland'
-              }),
-            style: {width: 100},
-            views: {
-              aComponent: {stuff: 1},
-              bComponent: {moreStuff: 2}
-            }
-          }, dispatchResults)
-        );
-        done();
-      }).leftMap(value => {
-        // If any Left values turn up, just throw the errors
-        const errors = R.flatten(value.error);
-        R.forEach(
-          error => {
-            console.error(error);
-          }
-        );
-        throw errors[0];
-      }),
-      onRejected: reject => {
-        // If the Task rejects, throw
-        throw(reject);
-      }
-    });
   });
 
   test('liftAndExtract', () => {
@@ -481,20 +413,9 @@ describe('componentHelpers', () => {
       id: 1,
       billy: 'low ground'
     })).toEqual({
-      key: 1,
+      key: "1",
       id: 1,
       billy: 'low ground'
-    });
-
-    // With func that is resolvec later
-    const billyFunc = (props, d) => 'low ground';
-    expect(keyWith('billy', {
-      id: 1,
-      billy: billyFunc
-    })).toEqual({
-      key: billyFunc,
-      id: 1,
-      billy: billyFunc
     });
   });
 
@@ -507,15 +428,6 @@ describe('componentHelpers', () => {
       key: 'snakke',
       id: 1,
       billy: 'low ground'
-    });
-
-    // With func that is resolved later
-    const billyFunc = (props, d) => 'low ground';
-    expect(keyWithDatum('billy', {billy: billyFunc}, {
-      id: 1
-    })).toEqual({
-      key: billyFunc,
-      id: 1
     });
   });
 

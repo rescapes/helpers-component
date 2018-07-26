@@ -2,8 +2,6 @@ import {
   applyIfFunction,
   applyToIfFunction, composeViews, composeViewsFromStruct,
   eMap, itemizeProps, joinComponents, keyWith, keyWithDatum, liftAndExtract, liftAndExtractItems, loadingCompleteStatus,
-  makeApolloTestPropsTaskFunction,
-  makeTestPropsFunction,
   mergeActionsForViews,
   mergePropsForViews,
   mergeStylesIntoViews,
@@ -18,18 +16,10 @@ import {
 } from './svgComponentHelpers';
 
 import {
-  waitForChildComponentRender, propsFromSampleStateAndContainer, makeMockStore,
-  makeSampleInitialState, makeSampleStore, mockApolloClient, mockApolloClientWithSamples, shallowWrap, testState,
-  wrapWithMockGraphqlAndStore, wrapWithMockStore, testPropsTaskMaker, parentPropsForContainerTask
-} from './componentTestHelpers';
-
-import {
   applyStyleFunctionOrDefault,
   createScaledPropertyGetter, getClass, getClassAndStyle, getStyleObj, styleArithmetic,
   styleMultiplier
 } from './styleHelpers';
-
-import { apolloContainerTests } from './apolloContainerTestHelpers'
 
 export {
   loadingCompleteStatus,
@@ -42,8 +32,6 @@ export {
   keyWithDatum,
   applyToIfFunction,
   applyIfFunction,
-  makeTestPropsFunction,
-  makeApolloTestPropsTaskFunction,
   liftAndExtract,
   liftAndExtractItems,
   mergeStylesIntoViews,
@@ -66,19 +54,5 @@ export {
   createScaledPropertyGetter,
   applyStyleFunctionOrDefault,
   resolveSvgReact,
-  waitForChildComponentRender,
-  propsFromSampleStateAndContainer,
-  makeMockStore,
-  makeSampleInitialState,
-  makeSampleStore,
-  mockApolloClient,
-  mockApolloClientWithSamples,
-  shallowWrap,
-  testState,
-  wrapWithMockGraphqlAndStore,
-  wrapWithMockStore,
-  testPropsTaskMaker,
-  parentPropsForContainerTask,
-  apolloContainerTests
 };
 

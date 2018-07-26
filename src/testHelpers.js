@@ -27,9 +27,9 @@ export const expectTask = task => expect(taskToPromise(task));
 export const expectTaskRejected = task => expect(taskToPromise(task, true));
 
 /**
- * Converts an Either to a Promise. Either.right calls resolve and Either.left calls reject
- * @param either
+ * Converts an Result to a Promise. Result.Right calls resolve and Result.Left calls reject
+ * @param result
  */
-export const eitherToPromise = either => {
-  return new Promise((resolve, reject) => either.map(resolve).leftMap(reject));
+export const resultToPromise = result => {
+  return new Promise((resolve, reject) => result.map(resolve).mapError(reject));
 };
