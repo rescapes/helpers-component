@@ -1,9 +1,10 @@
 {
   "name": "rescape-helpers-component",
-  "version": "1.5.23",
+  "version": "1.5.24",
   "description": "Helpers for working with React components",
   "main": "lib/index.js",
   "module": "es/index.js",
+  "jsnext:main": "es/index.js",
   "files": [
     "dist",
     "lib",
@@ -20,7 +21,6 @@
   },
   "license": "MIT",
   "scripts": {
-    "install-peers": "cross-env node ./installPeersCommand.js | sh",
     "clean": "rimraf lib dist es coverage",
     "lint": "eslint src",
     "test": "cross-env BABEL_ENV=commonjs jest",
@@ -43,11 +43,6 @@
     "publish-minor": "yarn --new-version version minor && yarn publish"
   },
   "dependencies": {
-    "apollo-client": "^2.3.5",
-    "apollo-client-preset": "^1.0.8",
-    "apollo-link-error": "^1.1.0",
-    "apollo-link-schema": "^1.1.0",
-    "apollo-test-utils": "^0.3.2",
     "decamelize": "^2.0.0",
     "folktale": "^2.1.0",
     "graphql-tools": "^3.0.5",
@@ -92,10 +87,10 @@
     "jest-cli": "^23.4.1",
     "jsdoc-babel": "^0.4.0",
     "jsdom": "^11.11.0",
-    "npm-install-peers": "^1.2.1",
     "react": "^16.4.1",
     "react-dev-utils": "^5.0.1",
     "react-dom": "^16.4.1",
+    "rescape-helpers-test": "^0.0.4",
     "rollup": "^0.62.0",
     "rollup-plugin-auto-external": "^1.2.0",
     "rollup-plugin-babel": "^3.0.7",
@@ -128,7 +123,6 @@
     "testURL": "http://localhost",
     "transform": {
       "^.+\\.(js|jsx|mjs)$": "<rootDir>/node_modules/babel-jest",
-      "^.+\\.css$": "<rootDir>/config/jest/cssTransform.js",
       "^(?!.*\\.(js|jsx|mjs|css|json)$)": "<rootDir>/config/jest/fileTransform.js"
     },
     "transformIgnorePatterns": [
@@ -181,14 +175,22 @@
         ]
       },
       "test": {
-        "presets": [
+        "plugins": [
           [
-            "env",
+            "transform-es2015-modules-commonjs-simple",
             {
-              "node": "current"
+              "noMangle": true
+            }
+          ],
+          [
+            "transform-runtime",
+            {
+              "polyfill": false,
+              "regenerator": false
             }
           ]
-        ]
+        ],
+        "presets": []
       }
     }
   },
