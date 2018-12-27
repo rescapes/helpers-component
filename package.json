@@ -1,6 +1,6 @@
 {
   "name": "rescape-helpers-component",
-  "version": "1.5.28",
+  "version": "1.5.29",
   "description": "Helpers for working with React components",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -43,6 +43,7 @@
     "publish-minor": "yarn --new-version version minor && yarn publish"
   },
   "dependencies": {
+    "apollo-client": "^2.4.8",
     "decamelize": "^2.0.0",
     "folktale": "^2.1.0",
     "graphql-tag": "^2.10.0",
@@ -92,7 +93,6 @@
     "react": "^16.4.1",
     "react-dev-utils": "^5.0.1",
     "react-dom": "^16.4.1",
-    "rescape-helpers-test": "^0.0.4",
     "rollup": "^0.62.0",
     "rollup-plugin-auto-external": "^1.2.0",
     "rollup-plugin-babel": "^3.0.7",
