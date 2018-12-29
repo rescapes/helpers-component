@@ -13,7 +13,7 @@ import React from 'react';
 import * as R from 'ramda';
 import {v} from 'rescape-validate';
 import PropTypes from 'prop-types';
-import {mergeDeep, reqPathThrowing, reqStrPathThrowing, mergeDeepWith} from 'rescape-ramda';
+import {mergeDeep, strPathOr, reqPathThrowing, reqStrPathThrowing, mergeDeepWith} from 'rescape-ramda';
 import * as Result from 'folktale/result';
 import {getClassAndStyle, getStyleObj} from './styleHelpers';
 import {graphql} from 'graphql';
@@ -292,6 +292,20 @@ export const mergePropsForViews = R.curry((viewNamesToViewProps, props) => {
  */
 export const keyWith = (keyStr, viewProps) => R.merge(viewProps, {
   key: reqStrPathThrowing(keyStr, viewProps).toString()
+});
+
+/**
+ * Same as keyWith but allows a default if the keyStr returns nil
+ * @param {String} defaultValue Default value for the key
+ * @param {String} keyStr Any key or keyString (e.g. 'foo.bar') in viewProps that generates a unique value
+ * This will be converted to a string. If you want the key to be based on the datum use the keyWithDatum function instead
+ * @param {Object} viewProps Prop configuration for a particular view (see mergePropsForViews)
+ * The values can be constants or functions, as supported by mergePropsForView. The value matching
+ * key will simply be referred by 'key'
+ * @return {*} viewProps with 'key' added, where the value is a string or function or the defaultValue
+ */
+export const keyWithOr = (defaultValue, keyStr, viewProps) => R.merge(viewProps, {
+  key: strPathOr(keyStr, viewProps).toString()
 });
 
 /**
