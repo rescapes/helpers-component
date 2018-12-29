@@ -27,8 +27,17 @@ const {of, fromPromised} = require('folktale/concurrency/task');
 export const loadingCompleteStatus = {
   loading: false,
   error: false,
-  store: {}
+  networkStatus: 7
 };
+
+/**
+ *
+ * Given a data object picks loading, error, and networkStatus and returns an object
+ * keyed by the three status flags
+ * @param {Object} data
+ * @return {Object} {loading: ..., error: ..., networkStatus: ....}
+ */
+export const apolloStatuses = data => R.pick(R.keys(loadingCompleteStatus), data);
 
 /**
  * Returns true if the lens applied to props equals the lens applied to nextProps
@@ -51,15 +60,15 @@ export const propLensEqual = v(R.curry((lens, props, nextProps) =>
 
 
 /**
- * Maps each Reach element to an curried e function.
+ * Maps each React element to an curried e function.
  * @param {(String|Object)} types React element types (e.g. ['div', 'svg', React])
  * @returns {Function} A list of functions that need just the config and children specified, not the type
  */
 export const eMap = types => R.map(component => React.createFactory(component), types);
 
 /**
- * Returns a function that expects props containing one of data.loading|error|store
- * If error is defined it calls onError. If loading is true it calls onLoading. If store it calls onData
+ * Returns a function that expects props containing one of data.loading, data.error or data.networkStatue = 7 (loaded)
+ * If error is defined it calls onError. If loading is true it calls onLoading. If data.networkStatue = 7  it calls onData
  * Otherwise an exception is thrown
  * @param onError. Function expecting data and called if data.error is not null
  * @param onLoading Function expecting data and called if data.loading is true
@@ -71,9 +80,9 @@ export const renderChoicepoint = R.curry((onError, onLoading, onData, props) =>
   R.cond([
     [R.view(R.lensPath(['data', 'error'])), onError],
     [R.view(R.lensPath(['data', 'loading'])), onLoading],
-    [R.view(R.lensPath(['data', 'store'])), onData],
+    [R.compose(R.equals(7), R.view(R.lensPath(['data', 'networkStatus']))), onData],
     [R.T, props => {
-      throw new Error(`No error, loading, nor store prop: ${JSON.stringify(props)}`);
+      throw new Error(`No error, loading, nor data ready status: ${JSON.stringify(props)}`);
     }]
   ])(props)
 );
@@ -189,10 +198,8 @@ export const mergeActionsForViews = R.curry((viewToActionNames, props) => {
  */
 export const mergePropsForViews = R.curry((viewNamesToViewProps, props) => {
 
-
-
   // If result matching view props object is a function, wrap them in a function
-  // These functions have to accept an item, the props arg has already been given to them
+  // These functions have to accept an item (datum), the props arg has already been given to them
   const mergeFunctions = (left, right) => R.ifElse(
     R.any(R.is(Function)),
     ([l, r]) => {
@@ -203,6 +210,45 @@ export const mergePropsForViews = R.curry((viewNamesToViewProps, props) => {
     R.apply(mergeDeep)
   )([left, right]);
 
+  // Merge a default key for the view if we have an object.
+  // This key gets lowest priority, so if key is already defined this is dropped
+  const keyView = viewName => R.ifElse(
+    R.is(Function),
+    // If we have a function compose the merge and make the key a function taking a datum
+    f => {
+      let i = 0;
+      return d => R.compose(
+        R.merge({
+          key: R.propOr(R.concat(viewName, (++i).toString()), 'key', d)
+        }),
+        f
+      )(d);
+    },
+    // Just merge the key
+    R.merge({key: viewName})
+  );
+
+  // If any item is still a function, we have to assume that items are being applied, so convert
+  // our key value to a function if needed
+  const keyViewIfAnyFunctionsRemain = viewName => R.when(
+    R.allPass([
+      R.complement(R.is)(Function),
+      // Any key is a function
+      R.compose(R.any(R.is(Function)), R.values),
+      // key value is not already a function
+      x => R.compose(R.complement(R.is)(Function), R.prop('key'))(x)
+    ]),
+    obj => {
+      let i = 0;
+      return R.merge(
+        obj,
+        {
+          key: d => R.propOr(R.concat(viewName, (++i).toString()), 'key', d)
+        }
+      );
+    }
+  );
+
   return R.over(
     R.lensProp('views'),
     views => mergeDeepWith(
@@ -211,14 +257,20 @@ export const mergePropsForViews = R.curry((viewNamesToViewProps, props) => {
       // Merge any existing values in props.views
       views,
       // Map each propPath to the value in props or undefined
-      R.map(
-        viewPropsObjOrFunction => R.map(
-          // If any individual prop value is a function, pass props to it.
-          applyToIfFunction(props),
+      R.mapObjIndexed(
+        (viewPropsObjOrFunction, viewName) => R.compose(
+          // If anything is still a function, an item function, make sure our key property is an item function
+          keyViewIfAnyFunctionsRemain(viewName),
+          R.map(
+            // If any individual prop value is a function, pass props to it.
+            applyToIfFunction(props)
+          ),
+          // Add a key to the view based on the viewName or datum.key or the viewName plus datum index
+          keyView(viewName),
           // If the viewProps are a function, pass props to it
           // Result way we end up wih an object of prop keys pointing to prop values or prop functions
-          applyToIfFunction(props, viewPropsObjOrFunction)
-        ),
+          applyToIfFunction(props)
+        )(viewPropsObjOrFunction),
         // If the entire viewToPropValuesOrFuncs is a function pass props to it
         applyToIfFunction(props, viewNamesToViewProps)
       )
@@ -290,7 +342,6 @@ export const applyIfFunction = R.curry((args, maybeFunc) =>
     R.identity
   )(maybeFunc)
 );
-
 
 
 /**
@@ -587,3 +638,19 @@ export const renderErrorDefault = v(viewName => ({data, views}) => {
   ['viewName', PropTypes.string.isRequired]
 ], 'renderLoadingDefault');
 
+
+/**
+ * Given a container's mapStateToProps and mapDispatchToProps, returns a function that accepts a sample state
+ * and sample ownProps. This function may be exported by a container to help with unit tests
+ * @param {Function} mapStateToProps The mapStatesToProps function of a container. It will be passed
+ * sampleState and sampleOwnProps when invoked
+ * @param {Function} mapDispatchToProps The mapDispatchToProps function of a container. It will be passed
+ * the identity function for a fake dispatch and sampleOwnProps when invoked
+ * @returns {Function} A function that expects a sample state and sample ownProps and returns a complete
+ * sample props according to the functions of the container
+ */
+export const makeTestPropsFunction = (mapStateToProps, mapDispatchToProps) =>
+  (sampleState, sampleOwnProps) => R.merge(
+    mapStateToProps(sampleState, sampleOwnProps),
+    mapDispatchToProps(R.identity, sampleOwnProps)
+  );

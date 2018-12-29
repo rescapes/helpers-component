@@ -58,7 +58,7 @@ export const getClassAndStyle = (name, views) =>
       },
       getStyleObj(name, views))
     )
-  )
+  );
 
 /**
  * Given a name, generates a style object with the matching object in views, i.e. views[name].style
@@ -88,8 +88,8 @@ export const styleArithmetic = v(R.curry((operator, operand, styleValue) =>
     R.is(Number),
     value => operator(value, operand),
     value => {
-      const [val, rest] = R.slice(1, 3, value.match(/([\d.]+)([^\d]+)/))
-      return `${operator(val, operand)}${rest}`
+      const [val, rest] = R.slice(1, 3, value.match(/([\d.]+)([^\d]+)/));
+      return `${operator(val, operand)}${rest}`;
     }
   )(styleValue)
 ), [
@@ -98,7 +98,7 @@ export const styleArithmetic = v(R.curry((operator, operand, styleValue) =>
   ['styleValue', PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired]
 ], 'styleArithmetic');
 
-export const styleMultiplier = styleArithmetic(R.multiply)
+export const styleMultiplier = styleArithmetic(R.multiply);
 
 /**
  * Scaled value function creator
@@ -130,9 +130,9 @@ export const createScaledPropertyGetter = R.curry((scale, prop, index) => {
  * @param {Function} styleFunction A unary function expecting props[prop]
  * @return {*} The defaultValue or result of the function call
  */
-export const applyStyleFunctionOrDefault = (defaultValue, prop, styleFunction)  =>
+export const applyStyleFunctionOrDefault = (defaultValue, prop, styleFunction) =>
   R.ifElse(
     R.has(prop),
     s => styleFunction(R.prop(prop, s)),
     R.always(defaultValue)
-  )
+  );

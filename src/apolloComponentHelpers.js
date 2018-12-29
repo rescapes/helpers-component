@@ -8,6 +8,9 @@
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+import * as R from 'ramda';
+import {graphql} from 'react-apollo';
+import gql from 'graphql-tag';
 
 /**
  * Composes all queries/mutations in queryDefinitions.
@@ -31,10 +34,11 @@
         )
       }
  */
-export const composeGraphqlQueryDefinitions = queryDefinitions => {
-  return R.compose(
-    // Each graphql call calls the next
-    ...R.map(queryDefintion => graphql(gql`${R.prop('query', queryDefintion)}`, R.prop('args', queryDefintion))),
-    R.values,
-  )(queryDefinitions)
+export const composeGraphqlQueryDefinitions = queryDefinitions => component => {
+  return R.reduce(
+    // Use reduce to compose the queries
+    (prev, [queryKey, queryDefinition]) => graphql(gql`${R.prop('query', queryDefinition)}`, R.prop('args', queryDefinition))(prev),
+    component,
+    R.toPairs(queryDefinitions)
+  )
 };

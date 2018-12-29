@@ -1,3 +1,5 @@
+import {composeGraphqlQueryDefinitions} from './apolloComponentHelpers';
+import {Component} from 'react';
 
 /**
  * Query
@@ -8,6 +10,7 @@
  * Without prerequisites:
  *  Skip render
  */
+
 const geojsonQuery = `
     query geojson($regionId: String!) {
           region(id: $regionId) {
@@ -146,6 +149,17 @@ export const queries = {
   }
 };
 
-describe('apolloComponentHelpers', ())
-// Create the GraphQL Container.
-const ContainerWithData = composeGraphqlQueryDefinitions(queries)(Sankey);
+class SomeComponent extends Component {
+  render() {
+    return null;
+  }
+}
+
+describe('apolloComponentHelpers', () => {
+
+  test('composeGraphqlQueryDefinitions', () => {
+    const ContainerWithData = composeGraphqlQueryDefinitions(queries)(SomeComponent);
+    // Testing this requires running data through the Container, connecting to a graphql schema etc.
+    expect(ContainerWithData).toBeTruthy()
+  })
+});

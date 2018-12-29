@@ -14,9 +14,8 @@ import {
   mergeStylesIntoViews,
   nameLookup, propsFor,
   propsForSansClass, strPath, itemizeProps, applyToIfFunction, keyWith, propsForItem, applyIfFunction, composeViews,
-  composeViewsFromStruct, whenProp
+  composeViewsFromStruct, whenProp, makeTestPropsFunction
 } from './componentHelpers';
-import {makeTestPropsFunction} from 'rescape-helpers-test'
 import {reqStrPathThrowing, hasStrPath} from 'rescape-ramda';
 import {
   joinComponents, keyWithDatum, mergePropsForViews, renderChoicepoint,
@@ -77,12 +76,13 @@ describe('componentHelpers', () => {
         // This returns multiple prop/values
         reqStrPathThrowing('data.someExtraProps', props)
       ),
+      // This entire view expects an item
       itemComponent: R.curry((props, item) => ({
-        key: R.toUpper(item.key),
         title: R.toLower(item.title)
       })),
       anotherItemComponent: {
-        key: props => item => `${props.data.a}${item.key}`
+        boo: props => item => `${props.data.a}${item.name}`
+        // This will get a per item number key assignment
       }
     }));
     const props = {
@@ -113,8 +113,15 @@ describe('componentHelpers', () => {
     const mergedProps = R.compose(
       R.over(
         R.lensPath(['views', 'anotherItemComponent']),
-        // keyFunc is expecting an item
-        propObj => R.map(item => ({key: propObj.key(item)}), [{key: 'a'}, {key: 'b'}])
+        propObj => R.map(
+          item => ({
+            // boo function is expecting an item
+            boo: propObj.boo(item),
+            // key function was auto generated to expect an item
+            key: propObj.key(item)
+          }),
+          [{name: 'a'}, {name: 'b'}]
+        )
       ),
       R.over(
         R.lensPath(['views', 'itemComponent']),
@@ -126,13 +133,13 @@ describe('componentHelpers', () => {
     expect(mergedProps).toEqual(
       {
         views: {
-          aComponent: {stuff: 1, foo: 1, bar: 2},
+          aComponent: {key: 'aComponent', stuff: 1, foo: 1, bar: 2},
           bComponent: R.merge(
-            {moreStuff: 2, bar: 2, styles: {width: 10}, width: 10},
+            {key: 'bComponent', moreStuff: 2, bar: 2, styles: {width: 10}, width: 10},
             props.data.someExtraProps
           ),
-          itemComponent: [{key: 'A', title: 'a'}, {key: 'B', title: 'b'}],
-          anotherItemComponent: [{key: '1a'}, {key: '1b'}]
+          itemComponent: [{key: 'a', title: 'a'}, {key: 'b', title: 'b'}],
+          anotherItemComponent: [{key: 'anotherItemComponent1', boo: '1a'}, {key: 'anotherItemComponent2', boo: '1b'}]
         },
         data: {
           a: 1,
@@ -268,7 +275,7 @@ describe('componentHelpers', () => {
     );
     expect(func({data: {error: true}, bad: 'bad'})).toEqual('bad');
     expect(func({data: {loading: true}, okay: 'okay'})).toEqual('okay');
-    expect(func({data: {store: true}, good: 'good'})).toEqual('good');
+    expect(func({data: {networkStatus: 7}, good: 'good'})).toEqual('good');
   });
 
   test('propsFor', () => {
@@ -465,6 +472,7 @@ describe('componentHelpers', () => {
       },
       views: {
         aView: {
+          key: 'aView',
           someAction: 'someAction',
           someProp: 'foo',
           parentProp: 1,
@@ -473,6 +481,7 @@ describe('componentHelpers', () => {
           }
         },
         bView: {
+          key: 'bView',
           parentProp: 1
         }
       }
@@ -533,6 +542,7 @@ describe('componentHelpers', () => {
       },
       views: {
         aView: {
+          key: 'aView',
           someAction: 'someAction',
           someProp: 'foo',
           parentProp: 1,
@@ -541,6 +551,7 @@ describe('componentHelpers', () => {
           }
         },
         bView: {
+          key: 'bView',
           parentProp: 1
         }
       }

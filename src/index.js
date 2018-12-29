@@ -1,4 +1,4 @@
-import {
+export {
   applyIfFunction,
   applyToIfFunction, composeViews, composeViewsFromStruct,
   eMap, itemizeProps, joinComponents, keyWith, keyWithDatum, liftAndExtract, liftAndExtractItems, loadingCompleteStatus,
@@ -8,51 +8,19 @@ import {
   nameLookup,
   propLensEqual, propsAndStyle, propsFor,
   propsForItem, propsForSansClass,
-  renderChoicepoint, renderErrorDefault, renderLoadingDefault
+  renderChoicepoint, renderErrorDefault, renderLoadingDefault, makeTestPropsFunction
 } from './componentHelpers';
 
-import {
+export {
   resolveSvgReact
 } from './svgComponentHelpers';
 
-import {
+export {
   applyStyleFunctionOrDefault,
   createScaledPropertyGetter, getClass, getClassAndStyle, getStyleObj, styleArithmetic,
   styleMultiplier
 } from './styleHelpers';
 
-export {
-  loadingCompleteStatus,
-  propLensEqual,
-  eMap,
-  renderChoicepoint,
-  mergeActionsForViews,
-  mergePropsForViews,
-  keyWith,
-  keyWithDatum,
-  applyToIfFunction,
-  applyIfFunction,
-  liftAndExtract,
-  liftAndExtractItems,
-  mergeStylesIntoViews,
-  propsFor,
-  propsForSansClass,
-  propsAndStyle,
-  itemizeProps,
-  propsForItem,
-  nameLookup,
-  composeViews,
-  composeViewsFromStruct,
-  joinComponents,
-  renderLoadingDefault,
-  renderErrorDefault,
-  getClass,
-  getClassAndStyle,
-  getStyleObj,
-  styleArithmetic,
-  styleMultiplier,
-  createScaledPropertyGetter,
-  applyStyleFunctionOrDefault,
-  resolveSvgReact,
-};
+export {composeGraphqlQueryDefinitions} from './apolloComponentHelpers';
 
+export {FlexAuto, Grid, Half, Logo, maxedImage, Quarter, Third, ThreeQuarters} from './atoms/atoms';

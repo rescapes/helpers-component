@@ -10,18 +10,17 @@
  */
 
 import {Box as box, Flex as flex, Image as image} from 'rebass';
-import {composeViewsFromStruct, nameLookup, propsFor} from 'rescape-helpers-component';
-import {eMap} from 'rescape-helpers-component'
 import * as R from 'ramda';
 import {reqStrPathThrowing} from 'rescape-ramda';
 import styled from 'styled-components';
+import {composeViewsFromStruct, eMap, nameLookup, propsFor} from '../componentHelpers';
 
 // Adapted from http://jxnblk.com/writing/posts/patterns-for-style-composition-in-react/
 
 export const maxedImage = styled(image)`
   max-width: 100%;
   max-height: 100%;
-`
+`;
 
 const [Div, Box, Flex, Image] = eMap(['div', box, flex, maxedImage]);
 
@@ -35,7 +34,7 @@ export const Grid = props =>
       style: {
         display: 'inline-block',
         verticalAlign: 'top'
-      },
+      }
     })
   );
 
