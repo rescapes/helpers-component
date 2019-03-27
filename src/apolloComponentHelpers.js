@@ -35,6 +35,7 @@ import gql from 'graphql-tag';
       }
  */
 export const composeGraphqlQueryDefinitions = queryDefinitions => component => {
+  // TODO this is also in rescape-apollo. The two projects don't use one another
   return R.reduce(
     // Use reduce to compose the queries
     (prev, [queryKey, queryDefinition]) => graphql(gql`${R.prop('query', queryDefinition)}`, R.prop('args', queryDefinition))(prev),
