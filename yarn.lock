@@ -5263,9 +5263,9 @@ rescape-ramda@^1.5.24:
     ramda-maybe "^0.18.0"
     util "^0.11.0"
 
-rescape-validate@^1.2.14:
-  version "1.2.14"
-  resolved "https://registry.yarnpkg.com/rescape-validate/-/rescape-validate-1.2.14.tgz#42cd475a06b0819b8c9c4ed93e4a5c226109cf68"
+rescape-validate@^1.2.15:
+  version "1.2.15"
+  resolved "https://registry.yarnpkg.com/rescape-validate/-/rescape-validate-1.2.15.tgz#6cd8d6aca9406882392d836a643ebb88f68f4f09"
   dependencies:
     folktale "^2.3.2"
     prop-types "^15.6.2"
