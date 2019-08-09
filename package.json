@@ -1,14 +1,13 @@
 {
   "name": "rescape-helpers-component",
-  "version": "1.5.35",
+  "version": "1.5.36",
   "description": "Helpers for working with React components",
   "main": "lib/index.js",
-  "module": "es/index.js",
-  "jsnext:main": "es/index.js",
+  "module": "esm/index.js",
+  "jsnext:main": "esm/index.js",
   "files": [
-    "dist",
     "lib",
-    "es",
+    "esm",
     "src"
   ],
   "repository": {
