@@ -19,39 +19,6 @@ import {JSDOM} from 'jsdom';
 
 enzyme.configure({adapter: new Adapter()});
 
-
-global.shallow = shallow;
-global.render = render;
-global.mount = mount;
-global.navigator = {
-  userAgent: 'node.js'
-};
-
-// jsdom, window, document, navigator setup
-// http://airbnb.io/enzyme/docs/guides/jsdom.html
-function copyProps(src, target) {
-  const props = Object.getOwnPropertyNames(src)
-    .filter(prop => typeof target[prop] === 'undefined')
-    .reduce((result, prop) => R.merge(
-      result,
-      {
-        [prop]: Object.getOwnPropertyDescriptor(src, prop)
-      }),
-      {});
-  Object.defineProperties(target, props);
-}
-
-global.jsdom = new JSDOM('<!doctype html><html><body></body></html>');
-const {window} = jsdom;
-global.window = window;
-global.document = window.document;
-global.navigator = {
-  userAgent: 'node.js'
-};
-copyProps(window, global);
-window.URL = window.URL || {}
-window.URL.createObjectURL = () => {}
-
 Error.stackTraceLimit = Infinity;
 // Have exceptions traces traverse async processes
 if (process.env.NODE_ENV !== 'production') {
