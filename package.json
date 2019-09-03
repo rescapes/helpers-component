@@ -1,6 +1,6 @@
 {
   "name": "rescape-helpers-component",
-  "version": "1.5.46",
+  "version": "1.5.47",
   "description": "Helpers for working with React components",
   "main": "lib/index.js",
   "module": "esm/index.mjs",
@@ -34,7 +34,8 @@
     "build-publish-patch": "yarn run build && yarn run publish-patch",
     "build-publish-minor": "yarn run build && yarn run publish-minor",
     "patch": "yarn --new-version version patch",
-    "publish-patch": "yarn --new-version version patch && yarn publish",
+    "publish": "yarn publish",
+    "publish-patch": "yarn patch && yarn publish",
     "publish-minor": "yarn --new-version version minor && yarn publish"
   },
   "dependencies": {
