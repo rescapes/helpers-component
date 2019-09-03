@@ -1,6 +1,6 @@
 {
   "name": "rescape-helpers-component",
-  "version": "1.5.43",
+  "version": "1.5.44",
   "description": "Helpers for working with React components",
   "main": "lib/index.js",
   "module": "esm/index.mjs",
