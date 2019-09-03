@@ -1,6 +1,6 @@
 {
   "name": "rescape-helpers-component",
-  "version": "1.5.44",
+  "version": "1.5.45",
   "description": "Helpers for working with React components",
   "main": "lib/index.js",
   "module": "esm/index.mjs",
@@ -33,6 +33,7 @@
     "docs:publish": "yarn run docs:clean && yarn run docs:build && cp CNAME _book && cd _book && git init && git commit --allow-empty -m 'update book' && git checkout -b gh-pages && touch .nojekyll && git add . && git commit -am 'update book' && git push git@github.com:reactjs/redux gh-pages --force",
     "build-publish-patch": "yarn run build && yarn run publish-patch",
     "build-publish-minor": "yarn run build && yarn run publish-minor",
+    "patch": "yarn --new-version version patch",
     "publish-patch": "yarn --new-version version patch && yarn publish",
     "publish-minor": "yarn --new-version version minor && yarn publish"
   },
