@@ -10,12 +10,10 @@
  */
 
 // Make Enzyme Rx available in all test files without importing
-import {shallow, render, mount} from 'enzyme';
 // Enzyme setup
 import enzyme from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
-import * as R from 'ramda'
-import {JSDOM} from 'jsdom';
+
 
 enzyme.configure({adapter: new Adapter()});
 

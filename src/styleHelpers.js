@@ -27,9 +27,7 @@ export const getClass = (root, suffix = null) => R.join(
   '-',
   R.map(
     // flip decamelize so the map arg is separate
-    R.flip(
-      decamelize
-    )('-'),
+    x => decamelize(x, '-'),
     compact(
       [root, suffix]
     )

@@ -10,7 +10,7 @@
  */
 
 import * as atoms from './atoms';
-import {mount} from 'enzyme';
+import {mount, shallow} from 'enzyme';
 import {eMap} from '../componentHelpers';
 
 const [Logo] = eMap([atoms.Logo]);

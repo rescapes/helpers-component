@@ -46,7 +46,7 @@ const configs = R.map(c => {
   // ES
   {
     output: {
-      dir: 'esm',
+      dir: 'lib',
       format: 'esm',
       indent: true,
       sourcemap: true
@@ -57,11 +57,12 @@ const configs = R.map(c => {
       ...Object.keys(pkg.peerDependencies || {})
     ],
     plugins: R.concat(config.plugins, [
-      nodeResolve({}), babel()
+      //nodeResolve({}), babel()
     ])
   },
 
   // ES for Browsers
+  /*
   {
     output: {
       dir: 'esm',
@@ -91,5 +92,6 @@ const configs = R.map(c => {
       })
     ])
   }
+   */
 ]);
 export default configs;
