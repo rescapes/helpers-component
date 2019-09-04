@@ -3,9 +3,10 @@
   "version": "1.5.55",
   "description": "Helpers for working with React components",
   "main": "lib/index.js",
-  "module": "lib/index.js",
+  "module": "esm/index.js",
   "files": [
     "lib",
+    "esm",
     "src"
   ],
   "repository": {
