@@ -46,7 +46,7 @@ const configs = R.map(c => {
   // ES
   {
     output: {
-      dir: 'esm,
+      dir: 'esm',
       format: 'esm',
       indent: true,
       sourcemap: true
