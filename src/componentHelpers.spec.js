@@ -14,7 +14,7 @@ import {
   mergeStylesIntoViews,
   nameLookup, propsFor,
   propsForSansClass, strPath, itemizeProps, applyToIfFunction, keyWith, propsForItem, applyIfFunction, composeViews,
-  composeViewsFromStruct, whenProp, makeTestPropsFunction, r
+  composeViewsFromStruct, whenProp, makeTestPropsFunction, e
 } from './componentHelpers';
 import {reqStrPathThrowing, hasStrPath} from 'rescape-ramda';
 import {
@@ -421,13 +421,11 @@ describe('componentHelpers', () => {
   });
 
 
-  test('r', () => {
-      expect(r('div')({prop: 'me up!'}, r('div')({prop: 'some child'}))).toEqual(
-        React.createFactory('div')({prop: 'me up!'}, React.createFactory('div')({prop: 'some child'}))
+  test('e', () => {
+      expect(e('div', {prop: 'me up!'}, e('div', {prop: 'some child'}))).toEqual(
+        React.createElement('div', {prop: 'me up!'}, React.createElement('div', {prop: 'some child'}))
       );
-      expect(r('div') === r('div')).toBeTruthy();
-      expect(r(Joker)({prop: 'ace'})).toEqual(React.createFactory(Joker)({prop: 'ace'}));
-      expect(r(Joker) === r(Joker)).toBeTruthy();
+      expect(e(Joker, {prop: 'ace'})).toEqual(React.createElement(Joker, {prop: 'ace'}));
     }
   );
 
