@@ -1,6 +1,6 @@
 {
   "name": "rescape-helpers-component",
-  "version": "1.5.61",
+  "version": "1.5.62",
   "description": "Helpers for working with React components",
   "main": "lib/index.js",
   "module": "esm/index.js",
@@ -25,16 +25,11 @@
     "test:watch": "yarn test -- --watch",
     "test:cov": "yarn test -- --coverage",
     "build": "rollup -c",
-    "prepare": "yarn run clean && yarn run lint && yarn test && yarn run build",
-    "docs:clean": "rimraf _book",
-    "docs:prepare": "gitbook install",
-    "docs:build": "yarn run docs:prepare && gitbook build -g reactjs/redux && cp logo/apple-touch-icon.png _book/gitbook/images/apple-touch-icon-precomposed-152.png && cp logo/favicon.ico _book/gitbook/images",
-    "docs:watch": "yarn run docs:prepare && gitbook serve",
-    "docs:publish": "yarn run docs:clean && yarn run docs:build && cp CNAME _book && cd _book && git init && git commit --allow-empty -m 'update book' && git checkout -b gh-pages && touch .nojekyll && git add . && git commit -am 'update book' && git push git@github.com:reactjs/redux gh-pages --force",
+    "prepare": "yarn run install-peers -f && cross-env ENABLE_INTEGRATION_TESTS=false yarn run clean && yarn run lint && yarn run build",
     "build-publish-patch": "yarn run build && yarn run publish-patch",
     "build-publish-minor": "yarn run build && yarn run publish-minor",
-    "publish-patch": "yarn --new-version version patch && yarn publish",
-    "publish-minor": "yarn --new-version version minor && yarn publish"
+    "publish-patch": "yarn version --patch && yarn publish --non-interactive",
+    "publish-minor": "yarn version --minor && yarn publish --non-interactive"
   },
   "dependencies": {
     "apollo-client": "^2.6.4",
