@@ -14,12 +14,24 @@ import {
   mergeStylesIntoViews,
   nameLookup, propsFor,
   propsForSansClass, strPath, itemizeProps, applyToIfFunction, keyWith, propsForItem, applyIfFunction, composeViews,
-  composeViewsFromStruct, whenProp, makeTestPropsFunction
+  composeViewsFromStruct, whenProp, makeTestPropsFunction, r
 } from './componentHelpers';
 import {reqStrPathThrowing, hasStrPath} from 'rescape-ramda';
 import {
-  joinComponents, keyWithDatum, mergePropsForViews, renderChoicepoint,
+  joinComponents, keyWithDatum, mergePropsForViews, renderChoicepoint
 } from 'componentHelpers';
+import * as React from 'react';
+
+let i = 0;
+
+class Joker extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      warn: ++i
+    };
+  }
+}
 
 describe('componentHelpers', () => {
   test('propLensEqual', () => {
@@ -407,6 +419,17 @@ describe('componentHelpers', () => {
     expect(applyToIfFunction({kangaroo: 1}, R.prop('kangaroo'))).toEqual(1);
     expect(applyToIfFunction({kangaroo: 1}, 'rat')).toEqual('rat');
   });
+
+
+  test('r', () => {
+      expect(r('div')({prop: 'me up!'}, r('div')({prop: 'some child'}))).toEqual(
+        React.createFactory('div')({prop: 'me up!'}, React.createFactory('div')({prop: 'some child'}))
+      );
+      expect(r('div') === r('div')).toBeTruthy();
+      expect(r(Joker)({prop: 'ace'})).toEqual(React.createFactory(Joker)({prop: 'ace'}));
+      expect(r(Joker) === r(Joker)).toBeTruthy();
+    }
+  );
 
 
   test('applyIfFunction', () => {

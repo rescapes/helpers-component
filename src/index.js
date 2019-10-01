@@ -1,7 +1,7 @@
 export {
   applyIfFunction,
   applyToIfFunction, composeViews, composeViewsFromStruct,
-  eMap, itemizeProps, joinComponents, keyWith, keyWithOr, keyWithDatum, liftAndExtract, liftAndExtractItems, loadingCompleteStatus,
+  r, eMap, itemizeProps, joinComponents, keyWith, keyWithOr, keyWithDatum, liftAndExtract, liftAndExtractItems, loadingCompleteStatus,
   apolloStatuses,
   mergeActionsForViews,
   mergePropsForViews,

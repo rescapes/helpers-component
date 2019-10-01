@@ -13,7 +13,7 @@ import React from 'react';
 import * as R from 'ramda';
 import {v} from 'rescape-validate';
 import PropTypes from 'prop-types';
-import {mergeDeep, strPathOr, reqPathThrowing, reqStrPathThrowing, mergeDeepWith} from 'rescape-ramda';
+import {mergeDeep, strPathOr, reqPathThrowing, reqStrPathThrowing, mergeDeepWith, memoized} from 'rescape-ramda';
 import * as Result from 'folktale/result';
 import {getClassAndStyle, getStyleObj} from './styleHelpers';
 import {graphql} from 'graphql';
@@ -61,10 +61,17 @@ export const propLensEqual = v(R.curry((lens, props, nextProps) =>
 
 /**
  * Maps each React element to an curried e function.
- * @param {(String|Object)} types React element types (e.g. ['div', 'svg', React])
+ * @param {(String|Object)} types React element types (e.g. ['div', 'svg', Router, MyComponent])
  * @returns {Function} A list of functions that need just the config and children specified, not the type
  */
 export const eMap = types => R.map(component => React.createFactory(component), types);
+
+/**
+ * Memoized react create factory
+ * @param {String|Function|Object} React element types (e.g. 'div', 'svg', Router, or MyComponent)
+ * @returns the factory for the component. Thus you can call r('div')({...props...}, ...child components)
+ */
+export const r = memoized(component => React.createFactory(component));
 
 /**
  * Returns a function that expects props containing one of data.loading, data.error or data.networkStatue = 7 (loaded)

@@ -9,6 +9,8 @@ import * as R from 'ramda';
 const config = {
   input: [
     'src/index.js',
+    'src/atoms/atoms.js',
+    'src/apolloComponentHelpers.js',
     'src/componentHelpers.js',
     'src/styleHelpers',
     'src/svgComponentHelpers'
@@ -49,16 +51,13 @@ const configs = R.map(c => {
       dir: 'esm',
       format: 'esm',
       indent: true,
-      sourcemap: true
     },
     external: [
       ...externals,
       ...Object.keys(pkg.dependencies || {}),
       ...Object.keys(pkg.peerDependencies || {})
     ],
-    plugins: R.concat(config.plugins, [
-      //nodeResolve({}), babel()
-    ])
+    plugins: R.concat(config.plugins, [])
   },
 
   // ES for Browsers
