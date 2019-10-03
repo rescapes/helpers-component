@@ -1,6 +1,6 @@
 {
   "name": "rescape-helpers-component",
-  "version": "1.5.64",
+  "version": "1.5.65",
   "description": "Helpers for working with React components",
   "main": "lib/index.js",
   "module": "esm/index.js",
@@ -131,8 +131,7 @@
       "json",
       "web.jsx",
       "jsx",
-      "node",
-      "mjs"
+      "node"
     ]
   },
   "babel": {
