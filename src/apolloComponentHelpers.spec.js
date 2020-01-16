@@ -89,7 +89,7 @@ export const queries = {
   /**
    * Expects a region with an id and resolves geojson of the region
    */
-  geojson: {
+  queryGeojon: {
     query: geojsonQuery,
     args: {
       options: ({data: {region}}) => ({

@@ -16,7 +16,7 @@ import {
   propsForSansClass, strPath, itemizeProps, applyToIfFunction, keyWith, propsForItem, applyIfFunction, composeViews,
   composeViewsFromStruct, whenProp, makeTestPropsFunction, e
 } from './componentHelpers';
-import {reqStrPathThrowing, hasStrPath} from 'rescape-ramda';
+import {reqStrPathThrowing, hasStrPath, mergeDeep} from 'rescape-ramda';
 import {
   joinComponents, keyWithDatum, mergePropsForViews, renderChoicepoint
 } from 'componentHelpers';
@@ -70,6 +70,25 @@ describe('componentHelpers', () => {
         }
       }, dispatchProps)
     );
+  });
+
+
+  test('mergePropsForViewsProplem', () => {
+    const viewNamesToViewProps = {
+      sankeySvgLinks: {
+        links: []
+      }
+    };
+    const props = {
+      views: {
+        sankeySvgLinks: {
+          fontFamily: "sans-serif",
+          fontSize: 10,
+          key: "sankeySvgLinks"
+        }
+      }
+    };
+    expect(mergePropsForViews(viewNamesToViewProps, props)).toEqual(mergeDeep({views: viewNamesToViewProps}, props))
   });
 
   test('mergePropsForViews', () => {

@@ -10,9 +10,8 @@
  */
 
 import * as R from 'ramda';
-import {eMap} from './componentHelpers';
+import {e} from './componentHelpers';
 
-const [Circle, Polygon, Polyline] = eMap(['circle', 'polygon', 'polyline']);
 
 /**
  * Inspects props.pointData to determine what type of Svg React Component to render
@@ -27,16 +26,16 @@ export const resolveSvgReact = (pointData, props) => {
   switch (pointData.type) {
     case 'Point':
       const [cx, cy] = R.head(pointData.points);
-      return Circle(R.mergeAll([{r: '10', fill: 'white', stroke: 'black', strokeWidth: '1'}, props, {cx, cy}]));
+      return e('circle', R.mergeAll([{r: '10', fill: 'white', stroke: 'black', strokeWidth: '1'}, props, {cx, cy}]));
     case 'LineString':
-      return Polyline(R.mergeAll([
+      return e('polyline', R.mergeAll([
         {fill: 'none', stroke: 'blue', strokeWidth: '10'},
         props,
         {points: pointData.points.map(point => point.join(',')).join(' ')}
       ]));
     case 'Polygon':
       // TODO might need to remove a last redundant point here
-      return Polygon(
+      return e('polygon',
         R.mergeAll([
           {fill: 'white', stroke: 'black', strokeWidth: '10'},
           props,

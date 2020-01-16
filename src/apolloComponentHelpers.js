@@ -9,8 +9,10 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 import * as R from 'ramda';
-import {graphql} from 'react-apollo';
 import gql from 'graphql-tag';
+import {Mutation, Query} from '@apollo/react-components';
+import React from 'react'
+const e = React.createElement;
 
 /**
  * Composes all queries/mutations in queryDefinitions.
@@ -34,12 +36,37 @@ import gql from 'graphql-tag';
         )
       }
  */
-export const composeGraphqlQueryDefinitions = queryDefinitions => component => {
-  // TODO this is also in rescape-apollo. The two projects don't use one another
+export const composeGraphqlQueryDefinitions = R.curry((queryDefinitions, component) => {
   return R.reduce(
-    // Use reduce to compose the queries
-    (prev, [queryKey, queryDefinition]) => graphql(gql`${R.prop('query', queryDefinition)}`, R.prop('args', queryDefinition))(prev),
+    // Use reduce to compose component query/mutation wrapper.
+    // The first component query/mutation wrapper is passed the component.
+    // That result is passed to the subsequent component, and so on
+    (composedComponent, [queryKey, queryDefinition]) => {
+      const query = R.prop('query', queryDefinition);
+      const props = R.prop('args', queryDefinition);
+      const q = R.compose(R.toLower, R.trim)(query);
+      // Construct the graphql component based on the queryDefinition.query and queryDefinition.args
+      const QueryOrMutation = R.cond([
+        [query => R.startsWith('query', query), () => Query],
+        [query => R.startsWith('mutation', query), () => Mutation],
+        [R.T, query => {
+          throw new Error(`String isn't a valid query or mutation ${query}`);
+        }]
+      ])(q);
+      return e(
+        QueryOrMutation,
+        R.merge(
+          {
+            query: gql`${query}`,
+            // Default the display name to queryKey if it's not set explicitly in the props
+            displayName: queryKey
+          },
+          props
+        ),
+        composedComponent
+      );
+    },
     component,
     R.toPairs(queryDefinitions)
-  )
-};
+  );
+});

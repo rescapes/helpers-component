@@ -11,14 +11,12 @@
 
 import * as atoms from './atoms';
 import {mount, shallow} from 'enzyme';
-import {eMap} from '../componentHelpers';
-
-const [Logo] = eMap([atoms.Logo]);
+import {e} from '../componentHelpers'
 
 describe('atoms', () => {
   test('Logo', () => {
     expect(
-      shallow(Logo({
+      shallow(e(atoms.Logo, {
         logoSrc: './foo.jpg'
       }))
     ).toMatchSnapshot();

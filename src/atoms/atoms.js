@@ -9,20 +9,18 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import {Box as box, Flex as flex, Image as image} from 'rebass';
+import {Box, Flex, Image} from 'rebass';
 import * as R from 'ramda';
 import {reqStrPathThrowing} from 'rescape-ramda';
 import styled from 'styled-components';
-import {composeViewsFromStruct, eMap, nameLookup, propsFor} from '../componentHelpers';
+import {composeViewsFromStruct, e, nameLookup, propsFor} from '../componentHelpers';
 
 // Adapted from http://jxnblk.com/writing/posts/patterns-for-style-composition-in-react/
 
-export const maxedImage = styled(image)`
+export const maxedImage = styled(Image)`
   max-width: 100%;
   max-height: 100%;
 `;
-
-const [Div, Box, Flex, Image] = eMap(['div', box, flex, maxedImage]);
 
 /**
  * Creates a full size Box
@@ -30,7 +28,7 @@ const [Div, Box, Flex, Image] = eMap(['div', box, flex, maxedImage]);
  * @constructor
  */
 export const Grid = props =>
-  Box(R.merge(props, {
+  e(Box, R.merge(props, {
       style: {
         display: 'inline-block',
         verticalAlign: 'top'
@@ -46,7 +44,7 @@ export const Grid = props =>
  * @constructor
  */
 export const Half = props =>
-  Grid(R.merge(props, {
+  e(Grid, R.merge(props, {
       width: 1 / 2
     })
   );
@@ -58,7 +56,7 @@ export const Half = props =>
  * @constructor
  */
 export const Third = props =>
-  Grid(R.merge(props, {
+  e(Grid, R.merge(props, {
       width: 1 / 3
     })
   );
@@ -70,13 +68,13 @@ export const Third = props =>
  * @constructor
  */
 export const Quarter = props =>
-  Grid(R.merge(props, {
+  e(Grid, R.merge(props, {
       w: 1 / 4
     })
   );
 
 export const ThreeQuarters = props =>
-  Grid(R.merge(props, {
+  e(Grid, R.merge(props, {
       w: 3 / 4
     })
   );
@@ -88,7 +86,7 @@ export const ThreeQuarters = props =>
  * @constructor
  */
 export const FlexAuto = props =>
-  Flex(R.merge(props, {
+  e(Flex, R.merge(props, {
       flex: '1 1 auto'
     })
   );
@@ -126,7 +124,7 @@ export const Logo = props => {
     }, props).views
   );
 
-  return Box(viewProps(c.logo),
-    Image(viewProps(c.logoImage))
+  return e(Box, viewProps(c.logo),
+    e(Image, viewProps(c.logoImage))
   );
 };

@@ -10,9 +10,7 @@
  */
 
 import {resolveSvgReact} from 'svgComponentHelpers';
-import {eMap} from './componentHelpers';
-
-const [Circle, Polygon, Polyline] = eMap(['circle', 'polygon', 'polyline']);
+import {e} from './componentHelpers';
 
 test('resolveSvgReact', () => {
   expect(resolveSvgReact(
@@ -24,7 +22,7 @@ test('resolveSvgReact', () => {
       foo: 1
     }
     )
-  ).toEqual(Circle({cx: 0, cy: 0, fill: 'white', foo: 1, r: '10', stroke: 'black', strokeWidth: '1'}));
+  ).toEqual(e('circle', {cx: 0, cy: 0, fill: 'white', foo: 1, r: '10', stroke: 'black', strokeWidth: '1'}));
 
   expect(resolveSvgReact(
     {
@@ -34,7 +32,7 @@ test('resolveSvgReact', () => {
     {
       foo: 1
     })
-  ).toEqual(Polyline({points: '0,0 1,1', fill: 'none', foo: 1, stroke: 'blue', strokeWidth: '10'}));
+  ).toEqual(e('polyline', {points: '0,0 1,1', fill: 'none', foo: 1, stroke: 'blue', strokeWidth: '10'}));
 
   expect(resolveSvgReact(
     {
@@ -44,5 +42,5 @@ test('resolveSvgReact', () => {
     {
       foo: 1
     })
-  ).toEqual(Polygon({points: '0,0 1,1 1,0 0,0', fill: 'white', foo: 1, stroke: 'black', strokeWidth: '10'}));
+  ).toEqual(e('polygon', {points: '0,0 1,1 1,0 0,0', fill: 'white', foo: 1, stroke: 'black', strokeWidth: '10'}));
 });

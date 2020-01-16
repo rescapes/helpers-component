@@ -8,51 +8,20 @@
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+// Makes localStorage available in node to Apollo
+import {rescapeDefaultTransports} from 'rescape-log';
+import "core-js/stable";
+import "regenerator-runtime/runtime";
 
 // Make Enzyme Rx available in all test files without importing
 // Enzyme setup
 import enzyme from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 
+// Set the loggers to debug level
+rescapeDefaultTransports.fileCombined.level = 'debug';
+rescapeDefaultTransports.console.level = 'debug';
+Error.stackTraceLimit = Infinity;
+
 
 enzyme.configure({adapter: new Adapter()});
-
-Error.stackTraceLimit = Infinity;
-// Have exceptions traces traverse async processes
-if (process.env.NODE_ENV !== 'production') {
-  require('longjohn');
-}
-
-class LocalStorageMock {
-  constructor() {
-    this.store = {};
-  }
-
-  clear() {
-    this.store = {};
-  }
-
-  getItem(key) {
-    return this.store[key] || null;
-  }
-
-  setItem(key, value) {
-    this.store[key] = value.toString();
-  }
-
-  removeItem(key) {
-    delete this.store[key];
-  }
-};
-
-global.localStorage = new LocalStorageMock;
-
-
-// In Node v7 unhandled promise rejections will terminate the process
-if (!process.env.LISTENING_TO_UNHANDLED_REJECTION) {
-  process.on('unhandledRejection', event => {
-    console.error(event)
-  })
-  // Avoid memory leak by adding too many listeners
-  process.env.LISTENING_TO_UNHANDLED_REJECTION = true
-}

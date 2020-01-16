@@ -14,11 +14,7 @@ import * as R from 'ramda';
 import {v} from 'rescape-validate';
 import PropTypes from 'prop-types';
 import {mergeDeep, strPathOr, reqPathThrowing, reqStrPathThrowing, mergeDeepWith, memoized} from 'rescape-ramda';
-import * as Result from 'folktale/result';
 import {getClassAndStyle, getStyleObj} from './styleHelpers';
-import {graphql} from 'graphql';
-
-const {of, fromPromised} = require('folktale/concurrency/task');
 
 /**
  * Default statuses for Components that don't have any Apollo queries
@@ -61,6 +57,7 @@ export const propLensEqual = v(R.curry((lens, props, nextProps) =>
 
 /**
  * Maps each React element to an curried e function.
+ * TODO deprecated Use e instead
  * @param {(String|Object)} types React element types (e.g. ['div', 'svg', Router, MyComponent])
  * @returns {Function} A list of functions that need just the config and children specified, not the type
  */
@@ -136,7 +133,7 @@ export const mergeActionsForViews = R.curry((viewToActionNames, props) => {
  * the same keys as viewNamesToViewProps and valued by the resolution of the viewNamesToViewProps
  * This allows a Container or Component to efficiently specify which props to give the view
  * used by each sub component. Each props object of viewNamesToViewProps can be a constant value or
- * a unary function that is passed props. Result way, it results in an object keyed by props and
+ * a unary function that is passed props. Either way, it results in an object keyed by props and
  * valued by prop values or a function that accepts props.
  *
  * The functions that accept props can optionally take a second argument (they must be curried) or
@@ -207,15 +204,25 @@ export const mergePropsForViews = R.curry((viewNamesToViewProps, props) => {
 
   // If result matching view props object is a function, wrap them in a function
   // These functions have to accept an item (datum), the props arg has already been given to them
-  const mergeFunctions = (left, right) => R.ifElse(
-    R.any(R.is(Function)),
-    ([l, r]) => {
-      return item => mergeDeep(
-        ...R.map(applyToIfFunction(item), [l, r])
-      );
-    },
-    R.apply(mergeDeep)
-  )([left, right]);
+  const mergeFunctions = (left, right) => R.cond([
+    [
+      R.any(R.is(Function)),
+      ([l, r]) => {
+        return item => mergeDeep(
+          ...R.map(applyToIfFunction(item), [l, r])
+        );
+      }
+    ],
+    [
+      // Merge objects
+      R.all(R.is(Object)),
+      ([l, r]) => R.apply(mergeDeep, [l, r])
+    ],
+    [R.T,
+      // Take left for primitives and arrays
+      ([l, r]) => l
+    ]
+  ])([left, right]);
 
   // Merge a default key for the view if we have an object.
   // This key gets lowest priority, so if key is already defined this is dropped
@@ -275,7 +282,7 @@ export const mergePropsForViews = R.curry((viewNamesToViewProps, props) => {
           // Add a key to the view based on the viewName or datum.key or the viewName plus datum index
           keyView(viewName),
           // If the viewProps are a function, pass props to it
-          // Result way we end up wih an object of prop keys pointing to prop values or prop functions
+          // Either way we end up wih an object of prop keys pointing to prop values or prop functions
           applyToIfFunction(props)
         )(viewPropsObjOrFunction),
         // If the entire viewToPropValuesOrFuncs is a function pass props to it
@@ -400,7 +407,7 @@ export const liftAndExtractItems = (component, propsWithItems) => {
  * view values into the views of the props.
  * @param {Function|Object} viewStyles Result an object mapping of view names to styles, or a function that expects
  * props and returns that object. viewStyles often merge props or apply them to functions.
- * @param props
+ * @param {Function|Object} props Props object or function that returns props when props are passed ot it
  * @return {*}
  */
 export const mergeStylesIntoViews = v(R.curry((viewStyles, props) => {
@@ -572,10 +579,10 @@ export const nameLookup = nameObj =>
  * each contribute to the returned props.views
  * @return {Function} The modified props with view properties added by each of the three functions
  */
-export const composeViews = R.curry((viewActions, viewProps, viewStyles, props) => R.compose(
-  mergeActionsForViews(viewActions),
-  mergePropsForViews(viewProps),
-  mergeStylesIntoViews(viewStyles)
+export const composeViews = R.curry((viewNameToViewActions, viewNameToViewProps, viewNameToViewStyles, props) => R.compose(
+  p => mergeActionsForViews(viewNameToViewActions, p),
+  p => mergePropsForViews(viewNameToViewProps, p),
+  p => mergeStylesIntoViews(viewNameToViewStyles, p)
   )(props)
 );
 
@@ -631,9 +638,8 @@ export const joinComponents = v((separatorComponent, components) =>
  * @return A function expecting props, which renders the loading component
  */
 export const renderLoadingDefault = v(viewName => ({views}) => {
-  const [Div] = eMap(['div']);
   const props = propsFor(views);
-  return Div(props(viewName));
+  return e('div', props(viewName));
 }, [
   ['viewName', PropTypes.string.isRequired]
 ], 'renderLoadingDefault');
@@ -644,10 +650,9 @@ export const renderLoadingDefault = v(viewName => ({views}) => {
  * @return A function expecting props, which renders the error component
  */
 export const renderErrorDefault = v(viewName => ({data, views}) => {
-  const [Div] = eMap(['div']);
   const props = propsFor(views);
   const errors = data.error.graphQLErrors;
-  return Div(props(viewName),
+  return e('div', props(viewName),
     R.join('\n\n',
       R.map(
         error => `Original Error: ${error.originalError.message}\nOriginal Trace ${error.originalError.stack}\nError: ${data.error.message}\nTrace: ${data.error.stack}`,
