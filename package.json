@@ -1,6 +1,6 @@
 {
   "name": "rescape-helpers-component",
-  "version": "1.5.72",
+  "version": "1.5.73",
   "description": "Helpers for working with React components",
   "main": "lib/index.js",
   "module": "esm/index.js",
@@ -82,7 +82,6 @@
     "react": "^16.4.1",
     "react-dev-utils": "^9.0.3",
     "react-dom": "^16.4.1",
-    "rescape-log": "^0.1.13",
     "rollup": "^1.19.4",
     "rollup-plugin-babel": "^4.3.3",
     "rollup-plugin-commonjs": "10.0.2",
@@ -98,6 +97,7 @@
     "graphql": "^0.13.2",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
+    "rescape-log": "^0.1.13",
     "rescape-ramda": ">=1.5.78",
     "rescape-validate": ">=1.2.15"
   },
