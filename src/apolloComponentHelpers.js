@@ -38,44 +38,15 @@ const e = React.createElement;
         )
       }
  */
-export const composeGraphqlQueryDefinitions = R.curry((queryDefinitions, component) => {
+export const composeGraphqlQueryDefinitions = R.curry((apolloContainers, component) => {
   return R.reduce(
     // Use reduce to compose component query/mutation wrapper.
     // The first component query/mutation wrapper is passed the component.
     // That result is passed to the subsequent component, and so on
-    (composedComponent, {requestType, requestKey, requestDefinition}) => {
-      const query = R.prop('query', requestDefinition);
-      const props = R.prop('args', requestDefinition);
-      // Construct the graphql component based on the requestDefinition.query and requestDefinition.args
-      const QueryOrMutation = R.cond([
-        [t => R.equals('query', t), () => Query],
-        [t => R.equals('mutation', t), () => Mutation],
-        [R.T, t => {
-          throw new Error(`String isn't a valid query or mutation ${t}`);
-        }]
-      ])(requestType);
-      return e(
-        QueryOrMutation,
-        R.merge(
-          {
-            query: gql`${query}`,
-            // Default the display name to requestKey if it's not set explicitly in the props
-            displayName: requestKey
-          },
-          props
-        ),
-        composedComponent
-      );
+    (composedComponent, apolloContainer) => {
+      return apolloContainer(composedComponent);
     },
     component,
-    // Creates a flat list [{requestType: 'query'|'mutation', requestKey: key id for request, requestDefinition: {...}}}
-    chainObjToValues((obj, requestType) => {
-        return mapObjToValues((requestDefinition, requestKey) => {
-            return ({requestType, requestKey, requestDefinition});
-          },
-          obj);
-      },
-      queryDefinitions
-    )
+    apolloContainers
   );
 });

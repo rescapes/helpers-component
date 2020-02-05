@@ -160,7 +160,6 @@ class SomeComponent extends Component {
 }
 
 describe('apolloComponentHelpers', () => {
-
   test('composeGraphqlQueryDefinitions', () => {
     const ContainerWithData = composeGraphqlQueryDefinitions(requests)(SomeComponent);
     // Testing this requires running data through the Container, connecting to a graphql schema etc.
