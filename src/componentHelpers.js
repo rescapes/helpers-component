@@ -17,7 +17,7 @@ import {mergeDeep, strPathOr, reqPathThrowing, reqStrPathThrowing, mergeDeepWith
 import {getClassAndStyle, getStyleObj} from './styleHelpers';
 
 /**
- * Default statuses for Components that don't have any Apollo queries
+ * Default statuses for Components that don't have any Apollo requests
  * @type {{loading: boolean, error: boolean}}
  */
 export const loadingCompleteStatus = {

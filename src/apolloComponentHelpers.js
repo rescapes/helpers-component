@@ -11,11 +11,13 @@
 import * as R from 'ramda';
 import gql from 'graphql-tag';
 import {Mutation, Query} from '@apollo/react-components';
-import React from 'react'
+import React from 'react';
+import {chainObjToValues, mapObjToValues} from 'rescape-ramda';
+
 const e = React.createElement;
 
 /**
- * Composes all queries/mutations in queryDefinitions.
+ * Composes all requests/mutations in queryDefinitions.
  * @param {Object} queryDefinitions Object keyed by name and valued by an object containing a query and args.
  * @param {String} queryDefinitions.query The query/mutation string. Not gql wrapped yet
  * @param {Object} queryDefinitions.args Arguments for the query as per the graphql() function
@@ -41,25 +43,24 @@ export const composeGraphqlQueryDefinitions = R.curry((queryDefinitions, compone
     // Use reduce to compose component query/mutation wrapper.
     // The first component query/mutation wrapper is passed the component.
     // That result is passed to the subsequent component, and so on
-    (composedComponent, [queryKey, queryDefinition]) => {
-      const query = R.prop('query', queryDefinition);
-      const props = R.prop('args', queryDefinition);
-      const q = R.compose(R.toLower, R.trim)(query);
-      // Construct the graphql component based on the queryDefinition.query and queryDefinition.args
+    (composedComponent, {requestType, requestKey, requestDefinition}) => {
+      const query = R.prop('query', requestDefinition);
+      const props = R.prop('args', requestDefinition);
+      // Construct the graphql component based on the requestDefinition.query and requestDefinition.args
       const QueryOrMutation = R.cond([
-        [query => R.startsWith('query', query), () => Query],
-        [query => R.startsWith('mutation', query), () => Mutation],
-        [R.T, query => {
-          throw new Error(`String isn't a valid query or mutation ${query}`);
+        [t => R.equals('query', t), () => Query],
+        [t => R.equals('mutation', t), () => Mutation],
+        [R.T, t => {
+          throw new Error(`String isn't a valid query or mutation ${t}`);
         }]
-      ])(q);
+      ])(requestType);
       return e(
         QueryOrMutation,
         R.merge(
           {
             query: gql`${query}`,
-            // Default the display name to queryKey if it's not set explicitly in the props
-            displayName: queryKey
+            // Default the display name to requestKey if it's not set explicitly in the props
+            displayName: requestKey
           },
           props
         ),
@@ -67,6 +68,14 @@ export const composeGraphqlQueryDefinitions = R.curry((queryDefinitions, compone
       );
     },
     component,
-    R.toPairs(queryDefinitions)
+    // Creates a flat list [{requestType: 'query'|'mutation', requestKey: key id for request, requestDefinition: {...}}}
+    chainObjToValues((obj, requestType) => {
+        return mapObjToValues((requestDefinition, requestKey) => {
+            return ({requestType, requestKey, requestDefinition});
+          },
+          obj);
+      },
+      queryDefinitions
+    )
   );
 });

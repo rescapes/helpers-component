@@ -83,68 +83,72 @@ const onViewportChangeMutation = `
 `;
 
 /**
- * All queries used by the container
+ * All requests used by the container
  */
-export const queries = {
+export const requests = {
   /**
    * Expects a region with an id and resolves geojson of the region
    */
-  queryGeojon: {
-    query: geojsonQuery,
-    args: {
-      options: ({data: {region}}) => ({
-        variables: {
-          regionId: region.id
-        },
-        errorPolicy: 'all'
-      }),
-      props: ({data, ownProps}) => {
-        let filteredData = data;
-        if (data.store) {
-          // Who is the user of the region
-          const userRegion = R.find(R.eqProps('id', ownProps.data.region), ownProps.data.user.regions);
-          // Get all selected categories that are marked true
-          const selectedSankeyNodeCategories =
-            R.filter(
-              R.identity,
-              R.defaultTo({}, R.view(R.lensPath(['geojson', 'sankey', 'selected']), userRegion)));
+  query: {
+    queryGeojon: {
+      query: geojsonQuery,
+      args: {
+        options: ({data: {region}}) => ({
+          variables: {
+            regionId: region.id
+          },
+          errorPolicy: 'all'
+        }),
+        props: ({data, ownProps}) => {
+          let filteredData = data;
+          if (data.store) {
+            // Who is the user of the region
+            const userRegion = R.find(R.eqProps('id', ownProps.data.region), ownProps.data.user.regions);
+            // Get all selected categories that are marked true
+            const selectedSankeyNodeCategories =
+              R.filter(
+                R.identity,
+                R.defaultTo({}, R.view(R.lensPath(['geojson', 'sankey', 'selected']), userRegion)));
 
-          // If there are any selected categories, set them deep down in the sankey data
-          filteredData = R.length(selectedSankeyNodeCategories) ?
-            R.over(
-              R.lensPath(['region', 'geojson', 'sankey', 'graph', 'nodes']),
-              nodes => R.map(node => R.merge(
-                node,
-                {
-                  isVisible: R.or(
-                    // Not there
-                    R.compose(R.isNil, R.prop(node.material))(selectedSankeyNodeCategories),
-                    // There and true
-                    R.contains(node.material, R.keys(selectedSankeyNodeCategories))
-                  )
-                }
-              ), nodes || []),
-              data
-            ) : data;
+            // If there are any selected categories, set them deep down in the sankey data
+            filteredData = R.length(selectedSankeyNodeCategories) ?
+              R.over(
+                R.lensPath(['region', 'geojson', 'sankey', 'graph', 'nodes']),
+                nodes => R.map(node => R.merge(
+                  node,
+                  {
+                    isVisible: R.or(
+                      // Not there
+                      R.compose(R.isNil, R.prop(node.material))(selectedSankeyNodeCategories),
+                      // There and true
+                      R.contains(node.material, R.keys(selectedSankeyNodeCategories))
+                    )
+                  }
+                ), nodes || []),
+                data
+              ) : data;
+          }
+          // Merge the work we did with the rest of the props
+          return mergeDeep(
+            ownProps,
+            {data: filteredData}
+          );
         }
-        // Merge the work we did with the rest of the props
-        return mergeDeep(
-          ownProps,
-          {data: filteredData}
-        );
       }
     }
   },
-  filterSankeyNodesMutation: {
-    query: filterSankeyNodesMutation,
-    args: {
-      options: {
-        errorPolicy: 'all'
-      },
-      props: ({mutate}) => ({
-        onSankeyFilterChange:
-          (filterNodeCategory, filterNodeValue) => mutate({variables: {filterNodeCategory, filterNodeValue}})
-      })
+  mutation: {
+    filterSankeyNodesMutation: {
+      query: filterSankeyNodesMutation,
+      args: {
+        options: {
+          errorPolicy: 'all'
+        },
+        props: ({mutate}) => ({
+          onSankeyFilterChange:
+            (filterNodeCategory, filterNodeValue) => mutate({variables: {filterNodeCategory, filterNodeValue}})
+        })
+      }
     }
   }
 };
@@ -158,8 +162,8 @@ class SomeComponent extends Component {
 describe('apolloComponentHelpers', () => {
 
   test('composeGraphqlQueryDefinitions', () => {
-    const ContainerWithData = composeGraphqlQueryDefinitions(queries)(SomeComponent);
+    const ContainerWithData = composeGraphqlQueryDefinitions(requests)(SomeComponent);
     // Testing this requires running data through the Container, connecting to a graphql schema etc.
-    expect(ContainerWithData).toBeTruthy()
-  })
+    expect(ContainerWithData).toBeTruthy();
+  });
 });
