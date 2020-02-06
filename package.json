@@ -1,6 +1,6 @@
 {
   "name": "rescape-helpers-component",
-  "version": "1.5.81",
+  "version": "1.5.82",
   "description": "Helpers for working with React components",
   "main": "lib/index.js",
   "module": "src/index.js",
@@ -39,6 +39,7 @@
     "longjohn": "^0.2.12",
     "prop-types": "^15.6.2",
     "ramda": "^0.26.1",
+    "react-adopt": "^0.6.0",
     "react-apollo": "^3.0.1",
     "react-redux": "^7.1.0",
     "rebass": "^4.0.2",
