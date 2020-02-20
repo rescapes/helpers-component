@@ -17,7 +17,7 @@ import {mergeDeep, strPathOr, reqPathThrowing, reqStrPathThrowing, mergeDeepWith
 import {getClassAndStyle, getStyleObj} from './styleHelpers';
 
 /**
- * Default statuses for Components that don't have any Apollo requests
+ * Default statuses for Components that don't have any Apollo apolloContainers
  * @type {{loading: boolean, error: boolean}}
  */
 export const loadingCompleteStatus = {
@@ -71,25 +71,108 @@ export const eMap = types => R.map(component => React.createElement(component), 
 export const e = React.createElement;
 
 /**
- * Returns a function that expects props containing one of data.loading, data.error or data.networkStatue = 7 (loaded)
- * If error is defined it calls onError. If loading is true it calls onLoading. If data.networkStatue = 7  it calls onData
- * Otherwise an exception is thrown
- * @param onError. Function expecting data and called if data.error is not null
- * @param onLoading Function expecting data and called if data.loading is true
- * @param onData Function expecting data and called if onError and onLoading are not called
+ * Returns a function that expects each described apollo request props to contain
+ * loading, error or networkStatus = 7 (loaded). Whether or not a prop is relevant to one of the 3 statuses is
+ * based on the propConfig.
+ * If any apollo request prop has 'error' and is configured in propConfig, then
+ * funcConfig.onError(props) is called.
+ * Else if any apollo request prop has 'loading' and is configured in propConfig,
+ * then funcConfig.onLoading(props) is called.
+ * Else if any apollo request props has networkStatus=7 and is configured
+ * in propXConfig, then funcConfig.onData(props) is called
+ * @param {Object} funcConfig
+ * @param {Function} funcConfig.onError. Function expecting props
+ * @param {Function} funcConfig.onLoading Function expecting props
+ * @param {Function} funcConfig.onData Function expecting props
+ * @param {Object} propConfig. Keyed by the prop at least one key from Apollo requests that should have an impact
+ * on which of the three functions is called. Each key value is in the form true|false or ['onError', 'onLoading', 'onData']
+ * If true\false the key is applied to evaluating all three conditions if true and none if false. If an array
+ * of strings then only those specified are relevant to this key. Example
+ * {
+ *    queryRegions: true // Apply to determine all three function
+ *    mutateRegions: ['onError'] // ignore the results of this for onData
+ * }
+ * Thus if queryRegions' status is loading and mutateRegions' status is anything, onLoading will be called
+ * If queryRegions' status is ready and mutateRegions' status is loading, onData will be called because
+ * mutateRegions' onLoading status doesn't matter
+ * If queryRegions' status is ready and mutateRegions' status is error, onError will be called because
+ * mutateRegions' onError status matters.
+ *
  * @param props An Object that must have one of data.error|.loading|.store
  * @return {*} The result of the onError, onLoading, onData, or an Exception if none are matched
  */
-export const renderChoicepoint = R.curry((onError, onLoading, onData, props) =>
-  R.cond([
-    [R.view(R.lensPath(['data', 'error'])), onError],
-    [R.view(R.lensPath(['data', 'loading'])), onLoading],
-    [R.compose(R.equals(7), R.view(R.lensPath(['data', 'networkStatus']))), onData],
+export const renderChoicepoint = R.curry(({onError, onLoading, onData}, propConfig, props) => {
+  return R.cond([
+    [
+      () => anyPropKeysMatchStatus('onError', propConfig, props),
+      props => onError(props)
+    ],
+    [
+      () => anyPropKeysMatchStatus('onLoading', propConfig, props),
+      props => onLoading(props)
+    ],
+    [
+      () => anyPropKeysMatchStatus('onData', propConfig, props),
+      props => onData(props)
+    ],
     [R.T, props => {
-      throw new Error(`No error, loading, nor data ready status: ${JSON.stringify(props)}`);
+      throw new Error(`No error, loading, nor data ready status with propConfig: ${JSON.stringify(propConfig)}, props: ${JSON.stringify(props)}`);
     }]
-  ])(props)
-);
+  ])(props);
+});
+
+/**
+ * Returns true if the given object has the conditions of the given status
+ * @param {string} status 'onError', 'onLoading', or 'onData'
+ * @param {Object} obj Result of an Apollo query containing 'error', 'loading' or networkStatus = 7 (ready)
+ * @return {Boolean} True if the obj passes the status' predicate
+ */
+const _mapStatusToFunc = (status, obj) => {
+  const statusLookup = {
+    onError: obj => R.propOr(false, 'error', obj),
+    onLoading: obj => R.propOr(false, 'loading', obj),
+    onData: obj => R.propEq('networkStatus', 7, obj)
+  };
+  return reqStrPathThrowing(status, statusLookup)(obj);
+};
+
+export const anyPropKeysMatchStatus = (status, propConfig, props) => {
+  const relevantPropConfig = R.filter(
+    value => {
+      return R.cond([
+        // If value is a boolean let it determine the prop's relevancy
+        [
+          R.is(Boolean),
+          () => {
+            return value;
+          }
+        ],
+        // If value is an array see if it contains the status we're checking
+        [
+          Array.isArray,
+          value => {
+            return R.includes(status, value);
+          }
+        ],
+        [
+          R.T,
+          value => {
+            throw new Error(`Unknown type for value. Expected boolean or array ${JSON.stringify(value)}`);
+          }
+        ]
+      ])(value);
+    }, propConfig
+  );
+  // Return true if any relevant key has the given status in props
+  return R.any(
+    prop => {
+      // Does props[prop] have a value that matches the status
+      return _mapStatusToFunc(status, R.propOr({}, prop, props));
+    },
+    // Take each relevant keys
+    R.keys(relevantPropConfig)
+  );
+};
 
 /**
  * Copies any needed actions to view containers

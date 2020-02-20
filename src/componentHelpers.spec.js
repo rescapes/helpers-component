@@ -14,7 +14,7 @@ import {
   mergeStylesIntoViews,
   nameLookup, propsFor,
   propsForSansClass, strPath, itemizeProps, applyToIfFunction, keyWith, propsForItem, applyIfFunction, composeViews,
-  composeViewsFromStruct, whenProp, makeTestPropsFunction, e
+  composeViewsFromStruct, whenProp, makeTestPropsFunction, e, anyPropKeysMatchStatus
 } from './componentHelpers';
 import {reqStrPathThrowing, hasStrPath, mergeDeep} from 'rescape-ramda';
 import {
@@ -88,7 +88,7 @@ describe('componentHelpers', () => {
         }
       }
     };
-    expect(mergePropsForViews(viewNamesToViewProps, props)).toEqual(mergeDeep({views: viewNamesToViewProps}, props))
+    expect(mergePropsForViews(viewNamesToViewProps, props)).toEqual(mergeDeep({views: viewNamesToViewProps}, props));
   });
 
   test('mergePropsForViews', () => {
@@ -299,14 +299,38 @@ describe('componentHelpers', () => {
   });
 
   test('renderChoicepoint', () => {
-    const func = renderChoicepoint(
-      p => p.bad,
-      p => p.okay,
-      p => p.good
+    const func = renderChoicepoint({
+        onError: p => p.bad,
+        onLoading: p => p.okay,
+        onData: p => p.good
+      },
+      {
+        queryRegions: true,
+        mutateRegions: ['onError']
+      }
     );
-    expect(func({data: {error: true}, bad: 'bad'})).toEqual('bad');
-    expect(func({data: {loading: true}, okay: 'okay'})).toEqual('okay');
-    expect(func({data: {networkStatus: 7}, good: 'good'})).toEqual('good');
+    expect(func(
+      {
+        queryRegions: {networkStatus: 7},
+        mutateRegions: {error: true},
+        bad: 'bad'
+      }
+    )).toEqual('bad');
+    expect(func(
+      {
+        queryRegions: {loading: true},
+        mutateRegions: {networkStatus: 7},
+        okay: 'okay'
+      }
+    )).toEqual('okay');
+    expect(func(
+      {
+        queryRegions: {networkStatus: 7},
+        // This doesn't matter because of mutateRegions: ['onError']
+        mutateRegions: {loading: true},
+        good: 'good'
+      }
+    )).toEqual('good');
   });
 
   test('propsFor', () => {
@@ -598,4 +622,39 @@ describe('componentHelpers', () => {
     });
   });
 
+  test('anyPropKeysMatchStatus', () => {
+    expect(
+      anyPropKeysMatchStatus('onError', {
+        queryRegions: true,
+        mutateRegions: ['onError']
+      }, {
+        queryRegions: {error: null, loading: null, networkStatus: 7},
+        mutateRegions: {error: null, loading: true},
+        otherProps: 1
+      })
+    ).toBe(false);
+
+    // mutateRegions is loading but we only care if it errors
+    expect(
+      anyPropKeysMatchStatus('onLoading', {
+        queryRegions: true,
+        mutateRegions: ['onError']
+      }, {
+        queryRegions: {error: null, loading: null, networkStatus: 7},
+        mutateRegions: {error: null, loading: true},
+        otherProps: 1
+      })
+    ).toBe(false);
+
+    expect(
+      anyPropKeysMatchStatus('onData', {
+        queryRegions: true,
+        mutateRegions: ['onError']
+      }, {
+        queryRegions: {error: null, loading: null, networkStatus: 7},
+        mutateRegions: {error: null, loading: true},
+        otherProps: 1
+      })
+    ).toBe(true);
+  });
 });

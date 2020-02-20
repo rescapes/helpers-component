@@ -22,6 +22,6 @@ export {
   styleMultiplier
 } from './styleHelpers';
 
-export {composeGraphqlQueryDefinitions} from './apolloComponentHelpers';
+export {composeApolloContainers} from './apolloComponentHelpers';
 
 export {FlexAuto, Grid, Half, Logo, maxedImage, Quarter, Third, ThreeQuarters} from './atoms/atoms';

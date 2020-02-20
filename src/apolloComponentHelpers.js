@@ -9,44 +9,18 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 import * as R from 'ramda';
-import gql from 'graphql-tag';
-import {Mutation, Query} from '@apollo/react-components';
 import React from 'react';
-import {chainObjToValues, mapObjToValues} from 'rescape-ramda';
-
-const e = React.createElement;
+import {adopt} from 'react-adopt';
 
 /**
- * Composes all requests/mutations in queryDefinitions.
- * @param {Object} queryDefinitions Object keyed by name and valued by an object containing a query and args.
- * @param {String} queryDefinitions.query The query/mutation string. Not gql wrapped yet
- * @param {Object} queryDefinitions.args Arguments for the query as per the graphql() function
- * @param {Object|Function} queryDefinitions.args.options Query options like errorPolicy: 'all'. Can also be a function
- * to set create query variables. Example:
- * options: ({data: {region}}) => ({
-        variables: {
-          regionId: region.id
-        },
-        // Pass through error so we can handle it in the component
-        errorPolicy: 'all'
-      }),
- * @param {Object|Function} queryDefinitions.args.prop Prop function that merge the Apollo data object with ownProps. Example:
- props: ({data, ownProps}) => {
-        return mergeDeep(
-          ownProps,
-          {data}
-        )
-      }
+ * Composes all apolloContainers/mutations in queryDefinitions.
+ * @param {Object} apolloContainers Object keyed by 'query' and/or 'mutation', valued by a list of such containers
+ * @param {[Object]} queryDefinitions.query Apollo Query containers
+ * @param {[Object]} queryDefinitions.mutation Apollo Mutation containers
+ * @returns {Object} The composed containers
  */
-export const composeGraphqlQueryDefinitions = R.curry((apolloContainers, component) => {
-  return R.reduce(
-    // Use reduce to compose component query/mutation wrapper.
-    // The first component query/mutation wrapper is passed the component.
-    // That result is passed to the subsequent component, and so on
-    (composedComponent, apolloContainer) => {
-      return apolloContainer(composedComponent);
-    },
-    component,
-    apolloContainers
-  );
+
+export const composeApolloContainers = R.curry((apolloContainers, component) => {
+  const Composed = adopt(apolloContainers)
+  return (component)
 });
