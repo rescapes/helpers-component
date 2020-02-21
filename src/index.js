@@ -9,7 +9,7 @@ export {
   nameLookup,
   propLensEqual, propsAndStyle, propsFor,
   propsForItem, propsForSansClass,
-  renderChoicepoint, renderErrorDefault, renderLoadingDefault, makeTestPropsFunction
+  renderChoicepoint, renderErrorDefault, renderLoadingDefault, makeTestPropsFunction, keysMatchingStatus
 } from './componentHelpers';
 
 export {

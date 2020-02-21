@@ -13,7 +13,7 @@ import React from 'react';
 import * as R from 'ramda';
 import {v} from 'rescape-validate';
 import PropTypes from 'prop-types';
-import {mergeDeep, strPathOr, reqPathThrowing, reqStrPathThrowing, mergeDeepWith, memoized} from 'rescape-ramda';
+import {compact, mergeDeep, mergeDeepWith, reqPathThrowing, reqStrPathThrowing, strPathOr} from 'rescape-ramda';
 import {getClassAndStyle, getStyleObj} from './styleHelpers';
 
 /**
@@ -104,15 +104,15 @@ export const e = React.createElement;
 export const renderChoicepoint = R.curry(({onError, onLoading, onData}, propConfig, props) => {
   return R.cond([
     [
-      () => anyPropKeysMatchStatus('onError', propConfig, props),
+      () => keysMatchingStatus('onError', propConfig, props),
       props => onError(props)
     ],
     [
-      () => anyPropKeysMatchStatus('onLoading', propConfig, props),
+      () => keysMatchingStatus('onLoading', propConfig, props),
       props => onLoading(props)
     ],
     [
-      () => anyPropKeysMatchStatus('onData', propConfig, props),
+      () => keysMatchingStatus('onData', propConfig, props),
       props => onData(props)
     ],
     [R.T, props => {
@@ -136,7 +136,15 @@ const _mapStatusToFunc = (status, obj) => {
   return reqStrPathThrowing(status, statusLookup)(obj);
 };
 
-export const anyPropKeysMatchStatus = (status, propConfig, props) => {
+/**
+ * Returns the keys matching the given status based on the propConfig. If any are keys are returned the
+ * status should be considered matched by at least one apollo request or mutation
+ * @param status
+ * @param propConfig
+ * @param props
+ * @return {f1}
+ */
+export const keysMatchingStatus = (status, propConfig, props) => {
   const relevantPropConfig = R.filter(
     value => {
       return R.cond([
@@ -163,15 +171,15 @@ export const anyPropKeysMatchStatus = (status, propConfig, props) => {
       ])(value);
     }, propConfig
   );
-  // Return true if any relevant key has the given status in props
-  return R.any(
+  // Return matching keys. Compact out failures
+  return compact(R.map(
     prop => {
-      // Does props[prop] have a value that matches the status
-      return _mapStatusToFunc(status, R.propOr({}, prop, props));
+      // Does props[prop] have a value that matches the status. If so return the prop
+      return _mapStatusToFunc(status, R.propOr({}, prop, props)) ? prop : null;
     },
     // Take each relevant keys
     R.keys(relevantPropConfig)
-  );
+  ));
 };
 
 /**

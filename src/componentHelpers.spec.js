@@ -14,7 +14,7 @@ import {
   mergeStylesIntoViews,
   nameLookup, propsFor,
   propsForSansClass, strPath, itemizeProps, applyToIfFunction, keyWith, propsForItem, applyIfFunction, composeViews,
-  composeViewsFromStruct, whenProp, makeTestPropsFunction, e, anyPropKeysMatchStatus
+  composeViewsFromStruct, whenProp, makeTestPropsFunction, e, keysMatchingStatus
 } from './componentHelpers';
 import {reqStrPathThrowing, hasStrPath, mergeDeep} from 'rescape-ramda';
 import {
@@ -624,7 +624,7 @@ describe('componentHelpers', () => {
 
   test('anyPropKeysMatchStatus', () => {
     expect(
-      anyPropKeysMatchStatus('onError', {
+      keysMatchingStatus('onError', {
         queryRegions: true,
         mutateRegions: ['onError']
       }, {
@@ -632,11 +632,11 @@ describe('componentHelpers', () => {
         mutateRegions: {error: null, loading: true},
         otherProps: 1
       })
-    ).toBe(false);
+    ).toEqual([]);
 
     // mutateRegions is loading but we only care if it errors
     expect(
-      anyPropKeysMatchStatus('onLoading', {
+      keysMatchingStatus('onLoading', {
         queryRegions: true,
         mutateRegions: ['onError']
       }, {
@@ -644,10 +644,10 @@ describe('componentHelpers', () => {
         mutateRegions: {error: null, loading: true},
         otherProps: 1
       })
-    ).toBe(false);
+    ).toEqual([]);
 
     expect(
-      anyPropKeysMatchStatus('onData', {
+      keysMatchingStatus('onData', {
         queryRegions: true,
         mutateRegions: ['onError']
       }, {
@@ -655,6 +655,6 @@ describe('componentHelpers', () => {
         mutateRegions: {error: null, loading: true},
         otherProps: 1
       })
-    ).toBe(true);
+    ).toEqual(['queryRegions']);
   });
 });
