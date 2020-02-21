@@ -13,7 +13,7 @@ import React from 'react';
 import * as R from 'ramda';
 import {v} from 'rescape-validate';
 import PropTypes from 'prop-types';
-import {compact, mergeDeep, filterWithKeys, mergeDeepWith, reqPathThrowing, reqStrPathThrowing, strPathOr} from 'rescape-ramda';
+import {compact, mergeDeep, chainObjToValues, filterWithKeys, mergeDeepWith, reqPathThrowing, reqStrPathThrowing, strPathOr} from 'rescape-ramda';
 import {getClassAndStyle, getStyleObj} from './styleHelpers';
 
 /**
@@ -749,8 +749,12 @@ export const renderErrorDefault = v(viewName => (keysWithErrors, {views, ...requ
   );
   return e('div', props(viewName),
     R.join('\n\n',
-      R.mapObjIndexed(
-        (error, key) => `Error for request ${key}: Original Error: ${error.originalError.message}\nOriginal Trace ${error.originalError.stack}\nError: ${data.error.message}\nTrace: ${data.error.stack}`,
+      chainObjToValues(
+        (errors, key) => {
+          return R.map(
+          error => `Error for request ${key}: Original Error: ${error.originalError.message}\nOriginal Trace ${error.originalError.stack}\nError: ${data.error.message}\nTrace: ${data.error.stack}`,
+          errors)
+        },
         keyToErrors
       )
     )
@@ -774,4 +778,4 @@ export const makeTestPropsFunction = (mapStateToProps, mapDispatchToProps) =>
   (sampleState, sampleOwnProps) => R.merge(
     mapStateToProps(sampleState, sampleOwnProps),
     mapDispatchToProps(R.identity, sampleOwnProps)
-  );
+  nO);
