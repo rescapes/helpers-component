@@ -13,7 +13,7 @@ import React from 'react';
 import * as R from 'ramda';
 import {v} from 'rescape-validate';
 import PropTypes from 'prop-types';
-import {compact, mergeDeep, mergeDeepWith, reqPathThrowing, reqStrPathThrowing, strPathOr} from 'rescape-ramda';
+import {compact, mergeDeep, filterWithKeys, mergeDeepWith, reqPathThrowing, reqStrPathThrowing, strPathOr} from 'rescape-ramda';
 import {getClassAndStyle, getStyleObj} from './styleHelpers';
 
 /**
@@ -102,10 +102,11 @@ export const e = React.createElement;
  * @return {*} The result of the onError, onLoading, onData, or an Exception if none are matched
  */
 export const renderChoicepoint = R.curry(({onError, onLoading, onData}, propConfig, props) => {
+  let keys
   return R.cond([
     [
-      () => keysMatchingStatus('onError', propConfig, props),
-      props => onError(props)
+      () => {keys = keysMatchingStatus('onError', propConfig, props)},
+      props => onError(keys, props)
     ],
     [
       () => keysMatchingStatus('onLoading', propConfig, props),
@@ -737,17 +738,20 @@ export const renderLoadingDefault = v(viewName => ({views}) => {
 
 /**
  * A default error React component, which is passed the props in props.views.viewName
- * @param viewName The viewname with which to resolve the props
+ * @param viewName The view name with which to resolve the props
  * @return A function expecting props, which renders the error component
  */
-export const renderErrorDefault = v(viewName => ({data, views}) => {
+export const renderErrorDefault = v(viewName => (keysWithErrors, {views, ...requestProps}) => {
   const props = propsFor(views);
-  const errors = data.error.graphQLErrors;
+  const keyToErrors = R.map(
+    requestPropValue => strPathOr(null, 'error.graphQLErrors',  requestPropValue),
+    filterWithKeys((value, requestProp) => R.includes(requestProp, keysWithErrors), requestProps)
+  );
   return e('div', props(viewName),
     R.join('\n\n',
-      R.map(
-        error => `Original Error: ${error.originalError.message}\nOriginal Trace ${error.originalError.stack}\nError: ${data.error.message}\nTrace: ${data.error.stack}`,
-        errors
+      R.mapObjIndexed(
+        (error, key) => `Error for request ${key}: Original Error: ${error.originalError.message}\nOriginal Trace ${error.originalError.stack}\nError: ${data.error.message}\nTrace: ${data.error.stack}`,
+        keyToErrors
       )
     )
   );
