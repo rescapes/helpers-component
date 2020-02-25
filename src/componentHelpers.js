@@ -13,7 +13,17 @@ import React from 'react';
 import * as R from 'ramda';
 import {v} from 'rescape-validate';
 import PropTypes from 'prop-types';
-import {compact, mergeDeep, chainObjToValues, filterWithKeys, mergeDeepWith, reqPathThrowing, reqStrPathThrowing, strPathOr} from 'rescape-ramda';
+import {
+  compact,
+  mergeDeep,
+  chainObjToValues,
+  filterWithKeys,
+  mergeDeepWith,
+  reqPathThrowing,
+  reqStrPathThrowing,
+  strPathOr,
+  stringifyError
+} from 'rescape-ramda';
 import {getClassAndStyle, getStyleObj} from './styleHelpers';
 
 /**
@@ -102,10 +112,13 @@ export const e = React.createElement;
  * @return {*} The result of the onError, onLoading, onData, or an Exception if none are matched
  */
 export const renderChoicepoint = R.curry(({onError, onLoading, onData}, propConfig, props) => {
-  let keys
+  let keys;
   return R.cond([
     [
-      () => {keys = keysMatchingStatus('onError', propConfig, props)},
+      () => {
+        keys = keysMatchingStatus('onError', propConfig, props);
+        return R.length(keys);
+      },
       props => onError(keys, props)
     ],
     [
@@ -743,19 +756,19 @@ export const renderLoadingDefault = v(viewName => ({views}) => {
  */
 export const renderErrorDefault = v(viewName => (keysWithErrors, {views, ...requestProps}) => {
   const props = propsFor(views);
-  const keyToErrors = R.map(
-    requestPropValue => strPathOr(null, 'error.graphQLErrors',  requestPropValue),
+  const keyToError = R.map(
+    requestPropValue => strPathOr(null, 'error', requestPropValue),
     filterWithKeys((value, requestProp) => R.includes(requestProp, keysWithErrors), requestProps)
   );
   return e('div', props(viewName),
     R.join('\n\n',
       chainObjToValues(
         (errors, key) => {
-          return R.map(
-          error => `Error for request ${key}: Original Error: ${error.originalError.message}\nOriginal Trace ${error.originalError.stack}\nError: ${data.error.message}\nTrace: ${data.error.stack}`,
-          errors)
+          return `Error for request ${key}: Original Error: ${
+            stringifyError(error)
+          }`
         },
-        keyToErrors
+        keyToError
       )
     )
   );
@@ -774,8 +787,9 @@ export const renderErrorDefault = v(viewName => (keysWithErrors, {views, ...requ
  * @returns {Function} A function that expects a sample state and sample ownProps and returns a complete
  * sample props according to the functions of the container
  */
-export const makeTestPropsFunction = (mapStateToProps, mapDispatchToProps) =>
+export const makeTestPropsFunction = (mapStateToProps, mapDispatchToProps) => {
   (sampleState, sampleOwnProps) => R.merge(
     mapStateToProps(sampleState, sampleOwnProps),
     mapDispatchToProps(R.identity, sampleOwnProps)
-  nO);
+  );
+};

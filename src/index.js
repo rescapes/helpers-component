@@ -1,3 +1,5 @@
+import {mergeAndApplyMatchingStyles} from './styleHelpers';
+
 export {
   applyIfFunction,
   applyToIfFunction, composeViews, composeViewsFromStruct,
@@ -19,7 +21,8 @@ export {
 export {
   applyStyleFunctionOrDefault,
   createScaledPropertyGetter, getClass, getClassAndStyle, getStyleObj, styleArithmetic,
-  styleMultiplier
+  styleMultiplier,
+  mergeAndApplyMatchingStyles, applyMatchingStyles
 } from './styleHelpers';
 
 export {composeApolloContainers} from './apolloComponentHelpers';

@@ -1,4 +1,10 @@
-import {styleMultiplier, createScaledPropertyGetter, getClass} from './styleHelpers';
+import {
+  styleMultiplier,
+  createScaledPropertyGetter,
+  getClass,
+  mergeAndApplyMatchingStyles,
+  applyMatchingStyles
+} from './styleHelpers';
 import {applyStyleFunctionOrDefault, getClassAndStyle, getStyleObj, styleArithmetic} from './styleHelpers';
 import * as R from 'ramda';
 
@@ -7,14 +13,14 @@ describe('styles', () => {
     expect(getClass('chicken', 'outsidePen')).toEqual('chicken-outside-pen');
   });
   test('getClassAndStyle', () => {
-    const viewObj =  {
+    const viewObj = {
       chickenOutsidePen: {
         className: 'foo bar',
         style: {
           border: 'coop'
-        },
+        }
       }
-    }
+    };
     expect(getClassAndStyle('chickenOutsidePen', viewObj)).toEqual({
       className: 'chicken-outside-pen foo bar',
       style: {
@@ -33,14 +39,13 @@ describe('styles', () => {
         }
       },
       sheepGoToHeaven: {}
-    }
+    };
     expect(getStyleObj('chickenOutsidePen', viewObj)).toEqual({
       style: {
         border: 'coop'
       }
     });
-    expect(getStyleObj('sheepGotoHeaven', viewObj)).toEqual({
-    });
+    expect(getStyleObj('sheepGotoHeaven', viewObj)).toEqual({});
   });
 
   test('styleArithmetic', () => {
@@ -60,7 +65,46 @@ describe('styles', () => {
   });
 
   test('applyStyleFunctionOrDefault', () => {
-    expect(applyStyleFunctionOrDefault(11, 'width', R.add(1))({width: 5})).toEqual(6)
-    expect(applyStyleFunctionOrDefault(11, 'width', R.add(1))({height: 5})).toEqual(11)
-  })
+    expect(applyStyleFunctionOrDefault(11, 'width', R.add(1))({width: 5})).toEqual(6);
+    expect(applyStyleFunctionOrDefault(11, 'width', R.add(1))({height: 5})).toEqual(11);
+  });
+
+
+  test('mergeAndApplyMatchingStyles', () => {
+    expect(mergeAndApplyMatchingStyles({
+      cow: 1,
+      bird: 2,
+      width: 2,
+      height: 2
+    }, {
+      bird: 3,
+      position: 'absolute',
+      width: value => value * 2,
+      height: value => value * 3
+    })).toEqual({
+      cow: 1,
+      bird: 3,
+      position: 'absolute',
+      width: 4,
+      height: 6
+    });
+  });
+
+  test('applyMatchingStyles', () => {
+    expect(applyMatchingStyles({
+      cow: 1,
+      width: 2,
+      height: 2
+    }, {
+      position: 'absolute',
+      cow: 2,
+      width: value => value * 2,
+      height: value => value * 3
+    }, ['sankeyFiltererItem'])).toEqual({
+      position: 'absolute',
+      cow: 2,
+      width: 4,
+      height: 6
+    });
+  });
 });
