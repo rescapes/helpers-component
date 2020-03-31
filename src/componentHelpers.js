@@ -122,11 +122,17 @@ export const renderChoicepoint = R.curry(({onError, onLoading, onData}, propConf
       props => onError(keys, props)
     ],
     [
-      () => keysMatchingStatus('onLoading', propConfig, props),
+      () => {
+        keys = keysMatchingStatus('onLoading', propConfig, props);
+        return R.length(keys);
+      },
       props => onLoading(props)
     ],
     [
-      () => keysMatchingStatus('onData', propConfig, props),
+      () => {
+        keys = keysMatchingStatus('onData', propConfig, props);
+        return R.length(keys);
+      },
       props => onData(props)
     ],
     [R.T, props => {
@@ -156,7 +162,7 @@ const _mapStatusToFunc = (status, obj) => {
  * @param status
  * @param propConfig
  * @param props
- * @return {f1}
+ * @return {[String]} The matching keys or an empty array
  */
 export const keysMatchingStatus = (status, propConfig, props) => {
   const relevantPropConfig = R.filter(
@@ -766,7 +772,7 @@ export const renderErrorDefault = v(viewName => (keysWithErrors, {views, ...requ
         (errors, key) => {
           return `Error for request ${key}: Original Error: ${
             stringifyError(error)
-          }`
+          }`;
         },
         keyToError
       )
