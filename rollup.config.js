@@ -10,7 +10,6 @@ const config = {
   input: [
     'src/index.js',
     'src/atoms/atoms.js',
-    'src/apolloComponentHelpers.js',
     'src/componentHelpers.js',
     'src/styleHelpers',
     'src/svgComponentHelpers'
