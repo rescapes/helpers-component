@@ -9,6 +9,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import {inspect} from 'util';
 import React from 'react';
 import * as R from 'ramda';
 import {v} from 'rescape-validate';
@@ -136,7 +137,7 @@ export const renderChoicepoint = R.curry(({onError, onLoading, onData}, propConf
       props => onData(props)
     ],
     [R.T, props => {
-      throw new Error(`No error, loading, nor data ready status with propConfig: ${JSON.stringify(propConfig)}, props: ${JSON.stringify(props)}`);
+      throw new Error(`No error, loading, nor data ready status with propConfig: ${inspect(propConfig)}, props: ${inspect(props)}`);
     }]
   ])(props);
 });
@@ -769,7 +770,7 @@ export const renderErrorDefault = v(viewName => (keysWithErrors, {views, ...requ
   return e('div', props(viewName),
     R.join('\n\n',
       chainObjToValues(
-        (errors, key) => {
+        (error, key) => {
           return `Error for request ${key}: Original Error: ${
             stringifyError(error)
           }`;
