@@ -25,6 +25,4 @@ export {
   mergeAndApplyMatchingStyles, applyMatchingStyles
 } from './styleHelpers';
 
-export {composeApolloContainers} from './apolloComponentHelpers';
-
 export {FlexAuto, Grid, Half, Logo, maxedImage, Quarter, Third, ThreeQuarters} from './atoms/atoms';

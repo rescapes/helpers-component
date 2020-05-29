@@ -92,7 +92,8 @@ export const e = React.createElement;
  * Else if any apollo request props has networkStatus=7 and is configured
  * in propXConfig, then funcConfig.onData(props) is called
  * @param {Object} funcConfig
- * @param {Function} funcConfig.onError. Function expecting props
+ * @param {Function} funcConfig.onError. Function expecting BOTH the keys of the requests that triggered the errors and
+ * the props. onError needs the keys in order to know how to respond to the order
  * @param {Function} funcConfig.onLoading Function expecting props
  * @param {Function} funcConfig.onData Function expecting props
  * @param {Object} propConfig. Keyed by the prop at least one key from Apollo requests that should have an impact

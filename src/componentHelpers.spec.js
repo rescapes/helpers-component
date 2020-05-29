@@ -186,35 +186,6 @@ describe('componentHelpers', () => {
     );
   });
 
-  test('makeTestPropsFunction', () => {
-    // Construct a sample state, props, dispatches, etc
-    const sampleState = ({a: 1, views: {aComponent: {stuff: 1}, bComponent: {moreStuff: 2}}});
-    const sampleOwnProps = {junk: 99, style: {width: 100}};
-    const mapStateToProps = (state, {style}) => R.merge(state, {style});
-    const dispatchResults = ownProps => ({
-      action1: R.identity,
-      action2: R.identity,
-      action3: R.identity,
-      // This would normally be a function embedding something from props. Leave as a value for easy test comparison
-      action4: ownProps.junk
-    });
-    const mapDispatchToProps = (dispatch, ownProps) => dispatchResults(ownProps);
-    // given mapStateToProps, mapDispatchToProps, and mergeProps we get a function back
-    // that then takes sample state and ownProps. The result is a merged object based on container methods
-    // and sample data
-    expect(makeTestPropsFunction(mapStateToProps, mapDispatchToProps)(sampleState, sampleOwnProps))
-      .toEqual(
-        R.merge({
-          a: 1,
-          style: {width: 100},
-          views: {
-            aComponent: {stuff: 1},
-            bComponent: {moreStuff: 2}
-          }
-        }, dispatchResults({junk: 99}))
-      );
-  });
-
   test('liftAndExtract', () => {
     // Pretend R.identity is a component function
     expect(
@@ -300,7 +271,7 @@ describe('componentHelpers', () => {
 
   test('renderChoicepoint', () => {
     const func = renderChoicepoint({
-        onError: p => p.bad,
+        onError: (keys, p) => p.bad,
         onLoading: p => p.okay,
         onData: p => p.good
       },
@@ -316,6 +287,7 @@ describe('componentHelpers', () => {
         bad: 'bad'
       }
     )).toEqual('bad');
+
     expect(func(
       {
         queryRegions: {loading: true},
@@ -323,6 +295,7 @@ describe('componentHelpers', () => {
         okay: 'okay'
       }
     )).toEqual('okay');
+
     expect(func(
       {
         queryRegions: {networkStatus: 7},
@@ -331,6 +304,7 @@ describe('componentHelpers', () => {
         good: 'good'
       }
     )).toEqual('good');
+
   });
 
   test('propsFor', () => {
