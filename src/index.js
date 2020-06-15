@@ -11,7 +11,8 @@ export {
   nameLookup,
   propLensEqual, propsAndStyle, propsFor,
   propsForItem, propsForSansClass,
-  renderChoicepoint, renderErrorDefault, renderLoadingDefault, makeTestPropsFunction, keysMatchingStatus
+  renderChoicepoint, renderErrorDefault, renderLoadingDefault, makeTestPropsFunction, keysMatchingStatus,
+  keyApolloResultWithOrLoadError
 } from './componentHelpers';
 
 export {

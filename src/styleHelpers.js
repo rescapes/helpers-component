@@ -173,11 +173,14 @@ export const mergeAndApplyMatchingStyles = (parentStyle, style) => mergeDeepWith
 export const applyMatchingStyles = (parentStyle, style) => {
   // If any value in style is a function and doesn't have a corresponding key
   // in parentStyle, throw an error. There must be a value in parent in order to resolve the function
-  const badKeyValues = filterWithKeys((value, key) =>
-    R.both(
-      () => R.complement(R.has)(key, parentStyle),
-      R.is(Function)
-    )(value), style);
+  const badKeyValues = filterWithKeys((value, key) => {
+      return R.both(
+        () => R.complement(R.has)(key, parentStyle),
+        R.is(Function)
+      )(value);
+    },
+    style
+  );
   if (R.length(R.keys(badKeyValues))) {
     throw Error(`Some style keys with function values don't have corresponding parentStyle values: ${JSON.stringify(badKeyValues)} of
     style keys ${R.join(', ', R.keys(style))} and

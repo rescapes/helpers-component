@@ -97,7 +97,9 @@ export const e = React.createElement;
  * @param {Function} funcConfig.onLoading Function expecting props
  * @param {Function} funcConfig.onData Function expecting props
  * @param {Object} propConfig. Keyed by the prop at least one key from Apollo requests that should have an impact
- * on which of the three functions is called. Each key value is in the form true|false or ['onError', 'onLoading', 'onData']
+ * on which of the three functions is called. If this is empty then onData will always be called
+ *
+ * Each key value is in the form true|false or ['onError', 'onLoading', 'onData']
  * If true\false the key is applied to evaluating all three conditions if true and none if false. If an array
  * of strings then only those specified are relevant to this key. Example
  * {
@@ -115,6 +117,9 @@ export const e = React.createElement;
  */
 export const renderChoicepoint = R.curry(({onError, onLoading, onData}, propConfig, props) => {
   let keys;
+  if (R.isEmpty(propConfig)) {
+    return onData(props)
+  }
   return R.cond([
     [
       () => {
@@ -436,6 +441,25 @@ export const keyWithOr = (defaultValue, keyStr, viewProps) => R.merge(viewProps,
 });
 
 /**
+ * Returns the string path of the apolloResult.value if apolloResult is a Result.Ok, meaning data is ready
+ * or returns 'loading' or 'error' if there is a Result.Error representing one of those statuses
+ * @param keyStr
+ * @param apolloResult
+ * @return {*}
+ */
+export const keyApolloResultWithOrLoadError = (keyStr, apolloResult) => {
+  return apolloResult.matchWith({
+    Ok: ({value}) => {
+      return reqStrPathThrowing(keyStr, value)
+    },
+    Error: ({value}) => {
+      // Return 'loading' or 'error' as the key
+      return R.find(status => R.propOr(false, status, value), ['loading', 'error'])
+    }
+  })
+};
+
+/**
  * Adds a 'key' to the viewProps for React iteration, where the key is property of the given datum d.
  * @param {String} keyStr Any key or key string (e.g. 'foo.bar') of d that generates a unique value
  * @param {Object} d The datum containing key, which has a unique value among the data
@@ -523,7 +547,7 @@ export const liftAndExtractItems = (component, propsWithItems) => {
  * @param {Function|Object} props Props object or function that returns props when props are passed ot it
  * @return {*}
  */
-export const mergeStylesIntoViews = v(R.curry((viewStyles, props) => {
+export const mergeStylesIntoViews = v(R.curry((viewStyles, {views, ...props}) => {
     // viewStyles can be an object or unary function that returns an object
     const viewObjs = applyToIfFunction(props, viewStyles);
 

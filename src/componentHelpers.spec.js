@@ -270,6 +270,21 @@ describe('componentHelpers', () => {
   });
 
   test('renderChoicepoint', () => {
+
+    // No configured apollo responses case, just call onData
+    const identityFunc = renderChoicepoint({
+        onError: (keys, p) => p.bad,
+        onLoading: p => p.okay,
+        onData: p => p.good
+      },
+      {}
+    );
+    expect(identityFunc(
+      {
+        good: 'good'
+      }
+    )).toEqual('good');
+
     const func = renderChoicepoint({
         onError: (keys, p) => p.bad,
         onLoading: p => p.okay,
