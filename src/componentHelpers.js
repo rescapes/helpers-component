@@ -118,7 +118,7 @@ export const e = React.createElement;
 export const renderChoicepoint = R.curry(({onError, onLoading, onData}, propConfig, props) => {
   let keys;
   if (R.isEmpty(propConfig)) {
-    return onData(props)
+    return onData(props);
   }
   return R.cond([
     [
@@ -450,13 +450,13 @@ export const keyWithOr = (defaultValue, keyStr, viewProps) => R.merge(viewProps,
 export const keyApolloResultWithOrLoadError = (keyStr, apolloResult) => {
   return apolloResult.matchWith({
     Ok: ({value}) => {
-      return reqStrPathThrowing(keyStr, value)
+      return reqStrPathThrowing(keyStr, value);
     },
     Error: ({value}) => {
       // Return 'loading' or 'error' as the key
-      return R.find(status => R.propOr(false, status, value), ['loading', 'error'])
+      return R.find(status => R.propOr(false, status, value), ['loading', 'error']);
     }
-  })
+  });
 };
 
 /**
@@ -568,7 +568,7 @@ export const mergeStylesIntoViews = v(R.curry((viewStyles, {views, ...props}) =>
     return R.over(
       R.lensProp('views'),
       views => mergeDeep(views, viewToStyle),
-      props
+      {views, ...props}
     );
   }),
   [
@@ -580,7 +580,8 @@ export const mergeStylesIntoViews = v(R.curry((viewStyles, {views, ...props}) =>
  * Given viewProps keyed by by view names, find the one that matches name.
  * Then create the class and style props from the name and style props and merge it with the other props
  * If no matches props are found, {className: decamelized name} is returned
- * The resolved props obj can also be a function accepting an item for iteration views
+ * The resolved props obj can also be a function accepting an item for iteration views.
+ * The function also adds key=name to help prevent unkeyed components. This can be overridden by an explicity key
  * Example: name = 'fooOuterDiv'
  * viewProps: {
  *  fooView: {
@@ -619,8 +620,8 @@ export const propsFor = v((views, name) => {
     // If the resulting propsForView is a function, wrap the merge as a function expecting an item
     return R.ifElse(
       R.is(Function),
-      f => item => R.merge(f(item), classAndStyle),
-      obj => R.merge(obj, classAndStyle)
+      f => item => R.mergeAll([{key: name}, f(item), classAndStyle]),
+      obj => R.mergeAll([{key: name}, obj, classAndStyle])
     )(propsForView);
   },
   [
@@ -636,10 +637,11 @@ export const propsFor = v((views, name) => {
  */
 export const propsForSansClass = v((views, name) => {
     const propsForView = R.defaultTo({}, R.view(R.lensProp(name), views));
-    return R.merge(
+    return R.mergeAll([
+      {key: name},
       propsForView,
       getStyleObj(name, views)
-    );
+    ]);
   },
   [
     ['views', PropTypes.shape().isRequired],

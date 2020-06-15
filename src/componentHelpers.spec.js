@@ -333,6 +333,7 @@ describe('componentHelpers', () => {
     };
     expect(propsFor(viewProps, 'fooProps')).toEqual(
       {
+        key: 'fooProps',
         className: 'foo-props',
         style: {
           color: 'red'
@@ -341,7 +342,7 @@ describe('componentHelpers', () => {
       }
     );
     expect(propsFor(viewProps, 'bermudaProps')).toEqual(
-      {className: 'bermuda-props'}
+      {key: 'bermudaProps', className: 'bermuda-props'}
     );
   });
 
@@ -359,11 +360,12 @@ describe('componentHelpers', () => {
         style: {
           color: 'red'
         },
-        bar: 1
+        bar: 1,
+        key: 'fooProps'
       }
     );
     expect(propsForSansClass(viewProps, 'bermudaProps')).toEqual(
-      {}
+      {key: 'bermudaProps'}
     );
   });
 
@@ -435,6 +437,7 @@ describe('componentHelpers', () => {
       }
     )).toEqual(
       {
+        key: 'someView',
         className: 'some-view',
         style: {
           color: 'puce'
