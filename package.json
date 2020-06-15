@@ -1,6 +1,6 @@
 {
   "name": "rescape-helpers-component",
-  "version": "1.5.98",
+  "version": "1.5.99",
   "description": "Helpers for working with React components",
   "main": "lib/index.js",
   "module": "src/index.js",
@@ -98,6 +98,7 @@
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
     "rescape-log": "^0.1.13",
+    "rescape-place": "^0.0.140",
     "rescape-ramda": ">=1.5.78",
     "rescape-validate": ">=1.2.15"
   },
