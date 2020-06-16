@@ -301,7 +301,7 @@ describe('componentHelpers', () => {
       },
       {
         queryRegions: true,
-        mutateRegions: ['onError', 'onReady']
+        mutateRegions: ['onError', 'onReady', 'onLoading']
       }
     );
     expect(func(
@@ -323,8 +323,17 @@ describe('componentHelpers', () => {
     expect(func(
       {
         queryRegions: {networkStatus: 7},
-        // This doesn't matter because of mutateRegions: ['onError']
+        // This matters because we're loading
         mutateRegions: {skip: false, result: {loading: true}},
+        okay: 'okay'
+      }
+    )).toEqual('okay');
+
+    expect(func(
+      {
+        queryRegions: {networkStatus: 7},
+        // This matters because ['onReady'] means skip has to be false
+        mutateRegions: {skip: false, result: {loading: false}},
         good: 'good'
       }
     )).toEqual('good');
@@ -332,16 +341,7 @@ describe('componentHelpers', () => {
     expect(func(
       {
         queryRegions: {networkStatus: 7},
-        // This matters because ['onReady'] means skip has to be true
-        mutateRegions: {skip: false, result: {loading: true}},
-        good: 'good'
-      }
-    )).toEqual('good');
-
-    expect(func(
-      {
-        queryRegions: {networkStatus: 7},
-        // This matters because ['onReady'] means skip has to be true
+        // This matters because ['onReady'] means skip has to be false
         mutateRegions: {skip: true, result: {loading: true}},
         okay: 'okay'
       }
@@ -408,7 +408,6 @@ describe('componentHelpers', () => {
       {key: 4, a: 3}
     ]);
   });
-  ;
 
   test('itemizeProps', () => {
     expect(itemizeProps({
