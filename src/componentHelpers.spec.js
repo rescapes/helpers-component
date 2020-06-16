@@ -301,13 +301,13 @@ describe('componentHelpers', () => {
       },
       {
         queryRegions: true,
-        mutateRegions: ['onError']
+        mutateRegions: ['onError', 'onReady']
       }
     );
     expect(func(
       {
         queryRegions: {networkStatus: 7},
-        mutateRegions: {error: true},
+        mutateRegions: {result: {error: true}},
         bad: 'bad'
       }
     )).toEqual('bad');
@@ -315,7 +315,7 @@ describe('componentHelpers', () => {
     expect(func(
       {
         queryRegions: {loading: true},
-        mutateRegions: {networkStatus: 7},
+        mutateRegions: {result: {networkStatus: 7}},
         okay: 'okay'
       }
     )).toEqual('okay');
@@ -324,11 +324,28 @@ describe('componentHelpers', () => {
       {
         queryRegions: {networkStatus: 7},
         // This doesn't matter because of mutateRegions: ['onError']
-        mutateRegions: {loading: true},
+        mutateRegions: {skip: false, result: {loading: true}},
         good: 'good'
       }
     )).toEqual('good');
 
+    expect(func(
+      {
+        queryRegions: {networkStatus: 7},
+        // This matters because ['onReady'] means skip has to be true
+        mutateRegions: {skip: false, result: {loading: true}},
+        good: 'good'
+      }
+    )).toEqual('good');
+
+    expect(func(
+      {
+        queryRegions: {networkStatus: 7},
+        // This matters because ['onReady'] means skip has to be true
+        mutateRegions: {skip: true, result: {loading: true}},
+        okay: 'okay'
+      }
+    )).toEqual('okay');
   });
 
   test('propsFor', () => {

@@ -112,8 +112,12 @@ export const e = React.createElement;
  * If queryRegions' status is ready and mutateRegions' status is error, onError will be called because
  * mutateRegions' onError status matters.
  *
+ * Note that mutations return a structure {mutation: the function, skip: true means the function isn't ready,
+ * result: the mutation call response}. So mutations have an additional value to check which is onReady,
+ * meaning that the skip is false. This is useful for mutations that are built up from queries and might not be ready
+ *
  * @param props An Object that must have one of data.error|.loading|.store
- * @return {*} The result of the onError, onLoading, onData, or an Exception if none are matched
+ * @return {*} The result of the onError, onLoading, onData/onReady, or an Exception if none are matched
  */
 export const renderChoicepoint = R.curry(({onError, onLoading, onData}, propConfig, props) => {
   let keys;
@@ -124,6 +128,7 @@ export const renderChoicepoint = R.curry(({onError, onLoading, onData}, propConf
     [
       () => {
         keys = keysMatchingStatus('onError', propConfig, props);
+        // If any error we are in error state
         return R.length(keys);
       },
       props => onError(keys, props)
@@ -131,14 +136,31 @@ export const renderChoicepoint = R.curry(({onError, onLoading, onData}, propConf
     [
       () => {
         keys = keysMatchingStatus('onLoading', propConfig, props);
+        // If any loading we are in loading state
         return R.length(keys);
       },
       props => onLoading(props)
     ],
     [
       () => {
-        keys = keysMatchingStatus('onData', propConfig, props);
+        keys = relevantKeyNotMatchingStatus('onReady', propConfig, props);
+        // If any not onReady that need to be
         return R.length(keys);
+      },
+      props => onLoading(props)
+    ],
+    [
+      () => {
+        keys = R.uniq(R.concat(
+          keysMatchingStatus('onData', propConfig, props),
+          keysMatchingStatus('onReady', propConfig, props)
+        ));
+        const relevantKeys = R.uniq(R.keys(R.merge(
+          _relevantPropConfig('onData', propConfig),
+          _relevantPropConfig('onReady', propConfig),
+        )))
+        // If all onData or onReady we can call onData
+        return R.equals(R.length(keys), R.length(relevantKeys))
       },
       props => onData(props)
     ],
@@ -159,13 +181,16 @@ export const renderChoicepoint = R.curry(({onError, onLoading, onData}, propConf
  */
 const _mapStatusToFunc = (status, obj) => {
   const statusLookup = {
-    onError: obj => R.propOr(false, 'error', obj),
+    onError: obj => R.either(
+      obj => R.propOr(false, 'error', R.propOr({}, 'result', obj)),
+      obj => R.propOr(false, 'error', obj)
+    )(obj),
     onLoading: obj => R.either(
       obj => R.propOr(false, 'loading', R.propOr({}, 'result', obj)),
       obj => R.propOr(false, 'loading', obj)
     )(obj),
     // Status only for mutations that are ready to run
-    onReady: obj => R.propOr(false, 'skip', obj),
+    onReady: obj => R.not(R.propOr(false, 'skip', obj)),
     onData: obj => R.either(
       // If mutation check that either it has not been called or it has been called as is ready
       obj => R.either(
@@ -193,14 +218,47 @@ const _mapStatusToFunc = (status, obj) => {
  * @return {[String]} The matching keys or an empty array
  */
 export const keysMatchingStatus = (status, propConfig, props) => {
-  const relevantPropConfig = R.filter(
+  const relevantPropConfig = _relevantPropConfig(status, propConfig)
+  // Return matching keys. Compact out failures
+  return compact(R.map(
+    prop => {
+      // Does props[prop] have a value that matches the status. If so return the prop
+      return _mapStatusToFunc(status, R.propOr({}, prop, props)) ? prop : null;
+    },
+    // Take each relevant keys
+    R.keys(relevantPropConfig)
+  ));
+};
+export const relevantKeyNotMatchingStatus = (status, propConfig, props) => {
+  const relevantPropConfig = _relevantPropConfig(status, propConfig, true)
+  // Return non-matching keys. Compact out success
+  return compact(R.map(
+    prop => {
+      // Does props[prop] have a value that matches the status. If so return the prop
+      return _mapStatusToFunc(status, R.propOr({}, prop, props)) ? null: prop;
+    },
+    // Take each relevant keys
+    R.keys(relevantPropConfig)
+  ));
+};
+
+/**
+ * Finds the propConfig props relevant to the given status
+ * @param status
+ * @param propConfig
+ * @param {Boolean} [noBool] Default false, only for negative tests
+ * @return {*}
+ * @private
+ */
+const _relevantPropConfig = (status, propConfig, noBool=false) => {
+  return R.filter(
     value => {
       return R.cond([
         // If value is a boolean let it determine the prop's relevancy
         [
           R.is(Boolean),
           () => {
-            return value;
+            return !noBool && value;
           }
         ],
         // If value is an array see if it contains the status we're checking
@@ -217,18 +275,10 @@ export const keysMatchingStatus = (status, propConfig, props) => {
           }
         ]
       ])(value);
-    }, propConfig
-  );
-  // Return matching keys. Compact out failures
-  return compact(R.map(
-    prop => {
-      // Does props[prop] have a value that matches the status. If so return the prop
-      return _mapStatusToFunc(status, R.propOr({}, prop, props)) ? prop : null;
     },
-    // Take each relevant keys
-    R.keys(relevantPropConfig)
-  ));
-};
+    propConfig
+  );
+}
 
 /**
  * Copies any needed actions to view containers
