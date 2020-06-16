@@ -150,22 +150,43 @@ export const renderChoicepoint = R.curry(({onError, onLoading, onData}, propConf
 
 /**
  * Returns true if the given object has the conditions of the given status
- * @param {string} status 'onError', 'onLoading', or 'onData'
- * @param {Object} obj Result of an Apollo query containing 'error', 'loading' or networkStatus = 7 (ready)
+ * Note that mutation components return a {mutation, skip, response: {called, loading, status}},
+ * so we have to look at the response to check statuses, except for the special status onReady.
+ * onReady indicates that the mutation component is ready to run, that skip=false
+ * @param {string} status 'onError', 'onLoading', 'onData', or 'onReady' (mutations only)
+ * @param {Object|Function} obj Result of an Apollo query containing 'error', 'loading' or networkStatus = 7 (ready)
  * @return {Boolean} True if the obj passes the status' predicate
  */
 const _mapStatusToFunc = (status, obj) => {
   const statusLookup = {
     onError: obj => R.propOr(false, 'error', obj),
-    onLoading: obj => R.propOr(false, 'loading', obj),
-    onData: obj => R.propEq('networkStatus', 7, obj)
+    onLoading: obj => R.either(
+      obj => R.propOr(false, 'loading', R.propOr({}, 'result', obj)),
+      obj => R.propOr(false, 'loading', obj)
+    )(obj),
+    // Status only for mutations that are ready to run
+    onReady: obj => R.propOr(false, 'skip', obj),
+    onData: obj => R.either(
+      // If mutation check that either it has not been called or it has been called as is ready
+      obj => R.either(
+        R.propEq('called', false),
+        R.propEq('networkStatus', 7)
+      )(R.propOr({}, 'result', obj)),
+      // If mutation check the result
+      R.propEq('networkStatus', 7)
+    )(obj)
   };
   return reqStrPathThrowing(status, statusLookup)(obj);
 };
 
 /**
- * Returns the keys matching the given status based on the propConfig. If any are keys are returned the
- * status should be considered matched by at least one apollo request or mutation
+ * Returns the keys matching the given status based on the propConfig.
+ * For queries we check whether the status matches. When mutations are ready to run they return a
+ * {mutation: function, skip: (true means mutation not ready to run), response: {...loading mutation}}
+ * so returning a function is considered equivalent to onData. If the mutation is not ready it can
+ * return the response of the depending query, which can itself be examined for loading or error status.
+ * There is a fourth status called onReady for mutations which indicates skip: false, meaning the mutation
+ * has the variables it needs to run
  * @param status
  * @param propConfig
  * @param props

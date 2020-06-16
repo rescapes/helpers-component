@@ -10,16 +10,25 @@
  */
 import * as R from 'ramda';
 import {
-  propLensEqual, mergeActionsForViews, liftAndExtract,
+  applyIfFunction,
+  applyToIfFunction,
+  composeViews,
+  composeViewsFromStruct,
+  e,
+  itemizeProps,
+  keysMatchingStatus,
+  keyWith,
+  liftAndExtract,
+  mergeActionsForViews,
   mergeStylesIntoViews,
-  nameLookup, propsFor,
-  propsForSansClass, strPath, itemizeProps, applyToIfFunction, keyWith, propsForItem, applyIfFunction, composeViews,
-  composeViewsFromStruct, whenProp, makeTestPropsFunction, e, keysMatchingStatus
+  nameLookup,
+  propLensEqual,
+  propsFor,
+  propsForItem,
+  propsForSansClass
 } from './componentHelpers';
-import {reqStrPathThrowing, hasStrPath, mergeDeep} from 'rescape-ramda';
-import {
-  joinComponents, keyWithDatum, mergePropsForViews, renderChoicepoint
-} from 'componentHelpers';
+import {mergeDeep, reqStrPathThrowing} from 'rescape-ramda';
+import {joinComponents, keyWithDatum, mergePropsForViews, renderChoicepoint} from 'componentHelpers';
 import * as React from 'react';
 
 let i = 0;
@@ -615,13 +624,15 @@ describe('componentHelpers', () => {
   });
 
   test('anyPropKeysMatchStatus', () => {
+    // Nobody matches on error
     expect(
       keysMatchingStatus('onError', {
         queryRegions: true,
         mutateRegions: ['onError']
       }, {
         queryRegions: {error: null, loading: null, networkStatus: 7},
-        mutateRegions: {error: null, loading: true},
+        // Mutation function that is ready and has run
+        mutateRegions: {mutation: R.identity, skip: false, result: {called: true, loading: false}},
         otherProps: 1
       })
     ).toEqual([]);
@@ -630,13 +641,14 @@ describe('componentHelpers', () => {
     expect(
       keysMatchingStatus('onLoading', {
         queryRegions: true,
-        mutateRegions: ['onError']
+        mutateRegions: ['onLoading']
       }, {
         queryRegions: {error: null, loading: null, networkStatus: 7},
-        mutateRegions: {error: null, loading: true},
+        // Mutation function that is ready and the mutation is loading
+        mutateRegions: {mutation: R.identity, skip: false, result: {called: true, loading: true}},
         otherProps: 1
       })
-    ).toEqual([]);
+    ).toEqual(['mutateRegions']);
 
     expect(
       keysMatchingStatus('onData', {
@@ -644,9 +656,22 @@ describe('componentHelpers', () => {
         mutateRegions: ['onError']
       }, {
         queryRegions: {error: null, loading: null, networkStatus: 7},
-        mutateRegions: {error: null, loading: true},
+        // Mutation function that is ready and the mutation is loading
+        mutateRegions: {mutation: R.identity, skip: false, result: {called: true, loading: true}},
         otherProps: 1
       })
     ).toEqual(['queryRegions']);
+
+    expect(
+      keysMatchingStatus('onReady', {
+        queryRegions: true,
+        mutateRegions: ['onReady']
+      }, {
+        queryRegions: {error: null, loading: null, networkStatus: 7},
+        // Mutation function that is not ready
+        mutateRegions: {mutation: R.identity, skip: true, result: {called: false, loading: false}},
+        otherProps: 1
+      })
+    ).toEqual(['mutateRegions']);
   });
 });
