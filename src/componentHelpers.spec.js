@@ -331,7 +331,7 @@ describe('componentHelpers', () => {
 
     expect(func(
       {
-        queryRegions: {networkStatus: 7},
+        queryRegions: {networkStatus: 7, data: {}},
         // This matters because ['onReady'] means skip has to be false
         mutateRegions: {skip: false, result: {loading: false}},
         good: 'good'
@@ -646,7 +646,7 @@ describe('componentHelpers', () => {
         queryRegions: true,
         mutateRegions: ['onError']
       }, {
-        queryRegions: {error: null, loading: null, networkStatus: 7},
+        queryRegions: {error: null, loading: null, networkStatus: 7, data: {}},
         // Mutation function that is ready and has run
         mutateRegions: {mutation: R.identity, skip: false, result: {called: true, loading: false}},
         otherProps: 1
@@ -659,7 +659,7 @@ describe('componentHelpers', () => {
         queryRegions: true,
         mutateRegions: ['onLoading']
       }, {
-        queryRegions: {error: null, loading: null, networkStatus: 7},
+        queryRegions: {error: null, loading: null, networkStatus: 7, data: {}},
         // Mutation function that is ready and the mutation is loading
         mutateRegions: {mutation: R.identity, skip: false, result: {called: true, loading: true}},
         otherProps: 1
@@ -671,7 +671,7 @@ describe('componentHelpers', () => {
         queryRegions: true,
         mutateRegions: ['onError']
       }, {
-        queryRegions: {error: null, loading: null, networkStatus: 7},
+        queryRegions: {error: null, loading: null, networkStatus: 7, data: {}},
         // Mutation function that is ready and the mutation is loading
         mutateRegions: {mutation: R.identity, skip: false, result: {called: true, loading: true}},
         otherProps: 1
@@ -683,11 +683,11 @@ describe('componentHelpers', () => {
         queryRegions: true,
         mutateRegions: ['onReady']
       }, {
-        queryRegions: {error: null, loading: null, networkStatus: 7},
+        queryRegions: {error: null, loading: null, networkStatus: 7, data: {}},
         // Mutation function that is not ready
         mutateRegions: {mutation: R.identity, skip: true, result: {called: false, loading: false}},
         otherProps: 1
       })
-    ).toEqual(['mutateRegions']);
+    ).toEqual([]);
   });
 });

@@ -157,10 +157,10 @@ export const renderChoicepoint = R.curry(({onError, onLoading, onData}, propConf
         ));
         const relevantKeys = R.uniq(R.keys(R.merge(
           _relevantPropConfig('onData', propConfig),
-          _relevantPropConfig('onReady', propConfig),
-        )))
+          _relevantPropConfig('onReady', propConfig)
+        )));
         // If all onData or onReady we can call onData
-        return R.equals(R.length(keys), R.length(relevantKeys))
+        return R.equals(R.length(keys), R.length(relevantKeys));
       },
       props => onData(props)
     ],
@@ -182,14 +182,28 @@ export const renderChoicepoint = R.curry(({onError, onLoading, onData}, propConf
 const _mapStatusToFunc = (status, obj) => {
   const statusLookup = {
     onError: obj => R.either(
+      // Mutations
       obj => R.propOr(false, 'error', R.propOr({}, 'result', obj)),
+      // Queries
       obj => R.propOr(false, 'error', obj)
     )(obj),
     onLoading: obj => R.either(
+      // Check for loading=true or data=null (the latter is the skip=true case or not queried yet)
+      // Mutations
       obj => R.propOr(false, 'loading', R.propOr({}, 'result', obj)),
-      obj => R.propOr(false, 'loading', obj)
+      // Queries
+      obj => R.both(
+        // Not a mutation
+        obj => R.complement(R.propOr)(false, 'result', obj),
+        obj => R.either(
+          // Explicitly loading
+          obj => R.propOr(false, 'loading', obj),
+          // Skip or "hasn't started loading"? means loading
+          obj => typeof obj.data === 'undefined'
+        )(obj)
+      )(obj)
     )(obj),
-    // Status only for mutations that are ready to run
+    // Status only for mutations that are ready to run if not loading or error
     onReady: obj => R.not(R.propOr(false, 'skip', obj)),
     onData: obj => R.either(
       // If mutation check that either it has not been called or it has been called as is ready
@@ -197,7 +211,7 @@ const _mapStatusToFunc = (status, obj) => {
         R.propEq('called', false),
         R.propEq('networkStatus', 7)
       )(R.propOr({}, 'result', obj)),
-      // If mutation check the result
+      // If query check the result
       R.propEq('networkStatus', 7)
     )(obj)
   };
@@ -218,7 +232,8 @@ const _mapStatusToFunc = (status, obj) => {
  * @return {[String]} The matching keys or an empty array
  */
 export const keysMatchingStatus = (status, propConfig, props) => {
-  const relevantPropConfig = _relevantPropConfig(status, propConfig)
+  // Find the relevant prop configs for this status.
+  const relevantPropConfig = _relevantPropConfig(status, propConfig);
   // Return matching keys. Compact out failures
   return compact(R.map(
     prop => {
@@ -229,13 +244,14 @@ export const keysMatchingStatus = (status, propConfig, props) => {
     R.keys(relevantPropConfig)
   ));
 };
+
 export const relevantKeyNotMatchingStatus = (status, propConfig, props) => {
-  const relevantPropConfig = _relevantPropConfig(status, propConfig, true)
+  const relevantPropConfig = _relevantPropConfig(status, propConfig, true);
   // Return non-matching keys. Compact out success
   return compact(R.map(
     prop => {
       // Does props[prop] have a value that matches the status. If so return the prop
-      return _mapStatusToFunc(status, R.propOr({}, prop, props)) ? null: prop;
+      return _mapStatusToFunc(status, R.propOr({}, prop, props)) ? null : prop;
     },
     // Take each relevant keys
     R.keys(relevantPropConfig)
@@ -243,14 +259,17 @@ export const relevantKeyNotMatchingStatus = (status, propConfig, props) => {
 };
 
 /**
- * Finds the propConfig props relevant to the given status
- * @param status
- * @param propConfig
+ * Finds the propConfig props relevant to the given status.
+ * @param {String} status one of onLoading, onError, onReady, onData
+ * @param {Object} propConfig keyed by mutation or query name and valued by boolean to indicate it applies to all or no
+ * statuses (exception is onReady, which can't be used with a boolean). Can also be valued by a list of
+ * statuses that the request is relevant too. E.g. if queryRegions: ['onData', 'onLoading'] means that queryRegions'
+ * status matters if the given status is one of those two.
  * @param {Boolean} [noBool] Default false, only for negative tests
- * @return {*}
+ * @return {Object} The propConfig with non-relevant key/values filtered out
  * @private
  */
-const _relevantPropConfig = (status, propConfig, noBool=false) => {
+const _relevantPropConfig = (status, propConfig, noBool = false) => {
   return R.filter(
     value => {
       return R.cond([
@@ -258,7 +277,8 @@ const _relevantPropConfig = (status, propConfig, noBool=false) => {
         [
           R.is(Boolean),
           () => {
-            return !noBool && value;
+            // If boolean return the value unless noBool is true or status is onReady, which doesn't work with bools
+            return !noBool && R.not(R.equals('onReady', status)) && value;
           }
         ],
         // If value is an array see if it contains the status we're checking
@@ -278,7 +298,7 @@ const _relevantPropConfig = (status, propConfig, noBool=false) => {
     },
     propConfig
   );
-}
+};
 
 /**
  * Copies any needed actions to view containers
