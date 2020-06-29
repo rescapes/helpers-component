@@ -270,15 +270,15 @@ export const relevantKeyNotMatchingStatus = (status, propConfig, props) => {
  * @private
  */
 const _relevantPropConfig = (status, propConfig, noBool = false) => {
-  return R.filter(
-    value => {
+  return filterWithKeys(
+    (value, name) => {
       return R.cond([
         // If value is a boolean let it determine the prop's relevancy
         [
           R.is(Boolean),
           () => {
-            // If boolean return the value unless noBool is true or status is onReady, which doesn't work with bools
-            return !noBool && R.not(R.equals('onReady', status)) && value;
+            // If boolean return the value unless noBool is true or status is onReady and not mutation
+            return !noBool && R.not(R.equals('onReady', status) && R.includes('query', name)) && value;
           }
         ],
         // If value is an array see if it contains the status we're checking
