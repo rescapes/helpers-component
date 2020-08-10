@@ -483,16 +483,17 @@ export const mergePropsForViews = R.curry((viewNamesToViewProps, props) => {
       R.mapObjIndexed(
         (viewPropsObjOrFunction, viewName) => R.compose(
           // If anything is still a function, an item function, make sure our key property is an item function
-          keyViewIfAnyFunctionsRemain(viewName),
-          R.map(
+          obj => keyViewIfAnyFunctionsRemain(viewName)(obj),
+          obj => R.map(
             // If any individual prop value is a function, pass props to it.
-            applyToIfFunction(props)
+            o => applyToIfFunction(props, o),
+            obj
           ),
           // Add a key to the view based on the viewName or datum.key or the viewName plus datum index
-          keyView(viewName),
+          obj => keyView(viewName)(obj),
           // If the viewProps are a function, pass props to it
           // Either way we end up wih an object of prop keys pointing to prop values or prop functions
-          applyToIfFunction(props)
+          objOrFunc => applyToIfFunction(props, objOrFunc)
         )(viewPropsObjOrFunction),
         // If the entire viewToPropValuesOrFuncs is a function pass props to it
         applyToIfFunction(props, viewNamesToViewProps)
