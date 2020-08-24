@@ -203,13 +203,18 @@ const _mapStatusToFunc = (status, obj) => {
         )(obj)
       )(obj)
     )(obj),
-    // Status only for mutations that are ready to run if not loading or error
+    // Status only for mutations that are ready to run if not skipped because they lack needed parameters
     onReady: obj => R.not(R.propOr(false, 'skip', obj)),
     onData: obj => R.either(
       // If mutation check that either it has not been called or it has been called as is ready
-      obj => R.either(
-        R.propEq('called', false),
-        R.propEq('networkStatus', 7)
+      obj => R.both(
+        // Mutations must not be skipped. Skipped means they are lacking parameters needed for the mutation
+        // This never matter for queries, because skipped queries also don't have data ready
+        obj => R.not(R.propOr(false, 'skip', obj)),
+        obj => R.either(
+          R.propEq('called', false),
+          R.propEq('networkStatus', 7)
+        )(obj)
       )(R.propOr({}, 'result', obj)),
       // If query check the result
       R.propEq('networkStatus', 7)
