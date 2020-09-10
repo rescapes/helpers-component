@@ -9,9 +9,12 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 import * as R from 'ramda';
+import styled from 'styled-components';
+import renderer from 'react-test-renderer';
+import toJson from 'enzyme-to-json';
 import {
   applyIfFunction,
-  applyToIfFunction,
+  applyToIfFunction, componentAndPropsFor,
   composeViews,
   composeViewsFromStruct,
   e,
@@ -30,6 +33,7 @@ import {
 import {mergeDeep, reqStrPathThrowing} from 'rescape-ramda';
 import {joinComponents, keyWithDatum, mergePropsForViews, renderChoicepoint} from 'componentHelpers';
 import * as React from 'react';
+import {mount} from 'enzyme';
 
 let i = 0;
 
@@ -207,7 +211,7 @@ describe('componentHelpers', () => {
   test('mergeStylesIntoViews', () => {
     const props = {
       style: {
-        styleFromProps: 'blue'
+        'background-color': 'blue'
       },
       views: {
         // Some existing property foo that we don't care about
@@ -216,12 +220,12 @@ describe('componentHelpers', () => {
     };
     const expected = {
       style: {
-        styleFromProps: 'blue'
+        'background-color': 'blue'
       },
       views: {
         someView: {
           style: {
-            styleFromProps: 'blue',
+            'background-color': 'blue',
             color: 'red'
           },
           foo: 1
@@ -235,7 +239,7 @@ describe('componentHelpers', () => {
           // If we want these styles in our view
           someView: {
             color: 'red',
-            styleFromProps: 'blue'
+            'background-color': 'blue'
           }
         },
         props
@@ -255,13 +259,13 @@ describe('componentHelpers', () => {
       )
     ).toEqual(expected);
 
-    // Should work with styles as a function expecting props
+    // Should work with a classname
     expect(
       mergeStylesIntoViews({
           someView: {
             style: {
               color: 'red',
-              styleFromProps: 'blue'
+              'background-color': 'blue'
             },
             className: 'foo bar'
           }
@@ -270,6 +274,25 @@ describe('componentHelpers', () => {
       )
     ).toEqual(R.set(R.lensPath(['views', 'someView', 'className']), 'foo bar', expected));
 
+    // Should work with styled components
+    const Button = styled.button`
+              color: red;
+`;
+    const tree = renderer.create(
+      e(
+        mergeStylesIntoViews(
+          p => {
+            return {
+              // If we want these styles in our view, one of which is from props.style
+              someView: styled(Button)`${p.style}`
+            };
+          },
+          props
+        ).views.someView.style, props
+      )
+    ).toJSON();
+    expect(tree).toHaveStyleRule('color', 'red');
+    expect(tree).toHaveStyleRule('background-color', 'blue');
   });
 
   test('nameLookup', () => {
@@ -394,6 +417,25 @@ describe('componentHelpers', () => {
       {key: 'bermudaProps'}
     );
   });
+
+  test('componentAndPropsFor', () => {
+    // Should work with styled components
+    const Button = styled.button`
+              color: red;
+`;
+    const views = {
+      fooView: {
+        style: Button,
+        bar: 1
+      }
+    };
+    expect(componentAndPropsFor(views, 'fooView')).toEqual(
+      [
+        Button,
+        {className: 'foo-view', key: 'fooView', bar: 1}
+      ]
+    )
+  })
 
   test('joinComponents', () => {
     expect(joinComponents(key => ({key, separate: 'me'}), [

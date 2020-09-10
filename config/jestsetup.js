@@ -10,13 +10,17 @@
  */
 // Makes localStorage available in node to Apollo
 import {rescapeDefaultTransports} from 'rescape-log';
+import enzyme from 'enzyme';
 import "core-js/stable";
 import "regenerator-runtime/runtime";
+import 'jest-enzyme';
+import Adapter from 'enzyme-adapter-react-16';
+import 'jest-styled-components'
 
 // Make Enzyme Rx available in all test files without importing
 // Enzyme setup
-import enzyme from 'enzyme';
-import Adapter from 'enzyme-adapter-react-16';
+require('jsdom-global')();
+enzyme.configure({adapter: new Adapter()});
 
 // Set the loggers to debug level
 rescapeDefaultTransports.fileCombined.level = 'debug';

@@ -583,7 +583,7 @@ export const applyToIfFunction = R.curry((obj, maybeFunc) =>
   R.ifElse(
     R.is(Function),
     // if it is function, call with props and expect a value back
-    R.applyTo(obj),
+    mf => R.applyTo(obj, mf),
     // otherwise assume it's already a resolved value
     R.identity
   )(maybeFunc)
@@ -749,6 +749,30 @@ export const propsAndStyle = (name, viewProps) => R.merge(
   getStyleObj(name, R.propOr({name: {style: {}}}, name, viewProps)),
   R.omit(['style'], viewProps)
 );
+
+export const componentAndPropsFor = v((views, name) => {
+    const propsForView = R.defaultTo(
+      {},
+      R.view(R.lensProp(name), views)
+    );
+    // TODO I don't know if we'd ever need separate classnames with a styled component, but pass it anyway
+    const {className, style: styledComponent} = getClassAndStyle(
+      name,
+      views
+    );
+
+    // If the resulting propsForView is a function, wrap the merge as a function expecting an item
+    // Returns an pair, the styledComponents and it's props
+    return [styledComponent, R.ifElse(
+      R.is(Function),
+      f => item => R.mergeAll([{key: name}, f(item), {className}]),
+      obj => R.mergeAll([{key: name}, obj, {className}])
+    )(R.omit(['style'], propsForView))];
+  },
+  [
+    ['views', PropTypes.shape().isRequired],
+    ['name', PropTypes.string.isRequired]
+  ], 'componentAndPropsFor');
 
 /**
  * Applies an item to props that have unary functional values.
