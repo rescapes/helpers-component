@@ -305,6 +305,25 @@ const _relevantPropConfig = (status, propConfig, noBool = false) => {
   );
 };
 
+const renderPropKeys = ['render', 'children'];
+/**
+ * Avoids applying props to a render prop function named render or children
+ * Render props are called by then component itself. We never want to call them.
+ * @param {String} propName name of the prop of the view being processed
+ * @param {Object} props The props
+ * @param {Object|Function} viewPropsOrFunction If an object or a function whose propName is render or children,
+ * then it is returned. If otherwise a function, props is applied to it
+ * @returns {Object} viewPropsOrFunction or viewPropsOrFunction with props applied
+ */
+const applyToIfNonRenderFunction = (propName, props, viewPropsOrFunction) => {
+  // Never apply props to a render prop function
+  if (R.includes(propName, renderPropKeys)) {
+    return viewPropsOrFunction;
+  }
+  // If viewPropsOrFunction is a function meant to take props, pass props to it
+  return applyToIfFunction(props, viewPropsOrFunction);
+};
+
 /**
  * Copies any needed actions to view containers
  * Also removes ownProps from the return value since we already incorporated theses into stateProps
@@ -418,43 +437,47 @@ export const mergePropsForViews = R.curry((viewNamesToViewProps, props) => {
 
   // If result matching view props object is a function, wrap them in a function
   // These functions have to accept an item (datum), the props arg has already been given to them
-  const mergeFunctions = (left, right) => R.cond([
-    [
-      R.any(R.is(Function)),
-      ([l, r]) => {
-        return item => mergeDeep(
-          ...R.map(applyToIfFunction(item), [l, r])
-        );
-      }
-    ],
-    [
-      // Merge objects
-      R.all(R.is(Object)),
-      ([l, r]) => R.apply(mergeDeep, [l, r])
-    ],
-    [R.T,
-      // Take left for primitives and arrays
-      ([l, r]) => l
-    ]
-  ])([left, right]);
+  const mergeFunctions = (left, right) => {
+    return R.cond([
+      [
+        R.any(R.is(Function)),
+        ([l, r]) => {
+          return item => mergeDeep(
+            ...R.map(applyToIfFunction(item), [l, r])
+          );
+        }
+      ],
+      [
+        // Merge objects
+        R.all(R.is(Object)),
+        ([l, r]) => R.apply(mergeDeep, [l, r])
+      ],
+      [R.T,
+        // Take left for primitives and arrays
+        ([l, r]) => l
+      ]
+    ])([left, right]);
+  };
 
   // Merge a default key for the view if we have an object.
   // This key gets lowest priority, so if key is already defined this is dropped
-  const keyView = viewName => R.ifElse(
+  const keyView = viewName => objOrFunc => R.ifElse(
     R.is(Function),
     // If we have a function compose the merge and make the key a function taking a datum
     f => {
       let i = 0;
-      return d => R.compose(
-        R.merge({
-          key: R.propOr(R.concat(viewName, (++i).toString()), 'key', d)
-        }),
-        f
-      )(d);
+      return d => {
+        return R.compose(
+          R.merge({
+            key: R.propOr(R.concat(viewName, (++i).toString()), 'key', d)
+          }),
+          f
+        )(d);
+      };
     },
     // Just merge the key
-    R.merge({key: viewName})
-  );
+    obj => R.merge({key: viewName}, obj)
+  )(objOrFunc);
 
   // If any item is still a function, we have to assume that items are being applied, so convert
   // our key value to a function if needed
@@ -488,14 +511,19 @@ export const mergePropsForViews = R.curry((viewNamesToViewProps, props) => {
       R.mapObjIndexed(
         (viewPropsObjOrFunction, viewName) => R.compose(
           // If anything is still a function, an item function, make sure our key property is an item function
-          obj => keyViewIfAnyFunctionsRemain(viewName)(obj),
-          obj => R.map(
-            // If any individual prop value is a function, pass props to it.
-            o => applyToIfFunction(props, o),
-            obj
-          ),
+          objOrFunc => {
+            return keyViewIfAnyFunctionsRemain(viewName)(objOrFunc);
+          },
+          objOrFunc => R.unless(
+            R.is(Function),
+            objOrFunc => R.mapObjIndexed(
+              // If any individual prop value is a function, pass props to it.
+              (o, propName) => applyToIfNonRenderFunction(propName, props, o),
+              objOrFunc
+            )
+          )(objOrFunc),
           // Add a key to the view based on the viewName or datum.key or the viewName plus datum index
-          obj => keyView(viewName)(obj),
+          objOrFunc => keyView(viewName)(objOrFunc),
           // If the viewProps are a function, pass props to it
           // Either way we end up wih an object of prop keys pointing to prop values or prop functions
           objOrFunc => applyToIfFunction(props, objOrFunc)

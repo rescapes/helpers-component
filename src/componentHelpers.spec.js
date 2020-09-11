@@ -11,10 +11,10 @@
 import * as R from 'ramda';
 import styled from 'styled-components';
 import renderer from 'react-test-renderer';
-import toJson from 'enzyme-to-json';
 import {
   applyIfFunction,
-  applyToIfFunction, componentAndPropsFor,
+  applyToIfFunction,
+  componentAndPropsFor,
   composeViews,
   composeViewsFromStruct,
   e,
@@ -33,7 +33,6 @@ import {
 import {mergeDeep, reqStrPathThrowing} from 'rescape-ramda';
 import {joinComponents, keyWithDatum, mergePropsForViews, renderChoicepoint} from 'componentHelpers';
 import * as React from 'react';
-import {mount} from 'enzyme';
 
 let i = 0;
 
@@ -106,29 +105,32 @@ describe('componentHelpers', () => {
 
   test('mergePropsForViews', () => {
 
-    const mergeProps = mergePropsForViews(props => ({
-      aComponent: {
-        foo: 1,
-        bar: reqStrPathThrowing('data.store.bar')
-      },
-      bComponent: R.merge(
-        {
-          bar: reqStrPathThrowing('data.store.bar'),
-          // say we need width in bComponent's props, not just its props.styles
-          width: reqStrPathThrowing('views.bComponent.styles.width')
+    const mergeProps = mergePropsForViews(
+      props => ({
+        aComponent: {
+          foo: 1,
+          bar: reqStrPathThrowing('data.store.bar')
         },
-        // This returns multiple prop/values
-        reqStrPathThrowing('data.someExtraProps', props)
-      ),
-      // This entire view expects an item
-      itemComponent: R.curry((props, item) => ({
-        title: R.toLower(item.title)
-      })),
-      anotherItemComponent: {
-        boo: props => item => `${props.data.a}${item.name}`
-        // This will get a per item number key assignment
-      }
-    }));
+        bComponent: R.merge(
+          {
+            bar: reqStrPathThrowing('data.store.bar'),
+            // say we need width in bComponent's props, not just its props.styles
+            width: reqStrPathThrowing('views.bComponent.styles.width')
+          },
+          // This returns multiple prop/values
+          reqStrPathThrowing('data.someExtraProps', props)
+        ),
+        // This entire view expects an item
+        itemComponent: R.curry((props, item) => {
+          return {
+            title: R.toLower(item.title)
+          };
+        }),
+        anotherItemComponent: {
+          boo: props => item => `${props.data.a}${item.name}`
+          // This will get a per item number key assignment
+        }
+      }));
     const props = {
       views: {
         aComponent: {stuff: 1},
@@ -167,10 +169,11 @@ describe('componentHelpers', () => {
           [{name: 'a'}, {name: 'b'}]
         )
       ),
-      R.over(
+      p => R.over(
         R.lensPath(['views', 'itemComponent']),
         // viewFunc already resolved the props in mergeProps, now it just needs an item
-        viewFunc => R.map(viewFunc, [{key: 'a', title: 'A'}, {key: 'b', title: 'B'}])
+        viewFunc => R.map(viewFunc, [{key: 'a', title: 'A'}, {key: 'b', title: 'B'}]),
+        p
       )
     )(mostlyResolvedProps);
 
@@ -429,13 +432,13 @@ describe('componentHelpers', () => {
         bar: 1
       }
     };
-    expect(componentAndPropsFor(views, 'fooView')).toEqual(
+    expect(componentAndPropsFor(views)('fooView')).toEqual(
       [
         Button,
         {className: 'foo-view', key: 'fooView', bar: 1}
       ]
-    )
-  })
+    );
+  });
 
   test('joinComponents', () => {
     expect(joinComponents(key => ({key, separate: 'me'}), [
