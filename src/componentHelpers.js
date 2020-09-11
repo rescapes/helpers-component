@@ -703,9 +703,10 @@ export const mergeStylesIntoViews = v(R.curry((viewStyles, {views, ...props}) =>
  *  }
  * }
  *
- * @param views
- * @param name
- * @return {*}
+ * @param {Object} views Contains a key name that contains {props: props for the component, style: style for
+ * the component, className: optional list of classnames for the component}.
+ * @param {String} name The key for the component props and style to find
+ * @return {Object} The props including style and className attributes
  */
 export const propsFor = v((views, name) => {
     const propsForView = R.defaultTo({}, R.view(R.lensProp(name), views));
@@ -727,10 +728,13 @@ export const propsFor = v((views, name) => {
   ], 'propsFor');
 
 /**
- * Like propsFor but doesn't generate a className since non-trivial components ignore it
- * @param views
- * @param name
- * @return {*}
+ * Like propsFor but doesn't generate a className since non-trivial components ignore it.
+ * This might not be used in the future since we are using StyledComponents instead
+ * @param {Object} views Contains a key name that contains {props: props for the component, style: style for
+ * the component, className: optional list of classnames for the component}. className is not used here
+ * since we don't want the component to get classNames
+ * @param {String} name The key for the component props and style to find
+ * @return {Object} The props including the style attribute, but not className
  */
 export const propsForSansClass = v((views, name) => {
     const propsForView = R.defaultTo({}, R.view(R.lensProp(name), views));
@@ -750,6 +754,11 @@ export const propsAndStyle = (name, viewProps) => R.merge(
   R.omit(['style'], viewProps)
 );
 
+/**
+ * A version of props for that expects the views[name].style object to be a StyledComponent rather than
+ * a style object. This returns a two item of array of the StyledComponent and its props
+ * @type {function(): *}
+ */
 export const componentAndPropsFor = v((views, name) => {
     const propsForView = R.defaultTo(
       {},

@@ -12,7 +12,8 @@ export {
   propLensEqual, propsAndStyle, propsFor,
   propsForItem, propsForSansClass,
   renderChoicepoint, renderErrorDefault, renderLoadingDefault, makeTestPropsFunction, keysMatchingStatus,
-  keyApolloResultWithOrLoadError
+  keyApolloResultWithOrLoadError,
+  componentAndPropsFor
 } from './componentHelpers';
 
 export {
