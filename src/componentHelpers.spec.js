@@ -30,7 +30,7 @@ import {
   propsForItem,
   propsForSansClass
 } from './componentHelpers';
-import {mergeDeep, reqStrPathThrowing} from 'rescape-ramda';
+import {mergeDeep, reqStrPathThrowing, strPathOr} from 'rescape-ramda';
 import {joinComponents, keyWithDatum, mergePropsForViews, renderChoicepoint} from 'componentHelpers';
 import * as React from 'react';
 
@@ -402,8 +402,12 @@ describe('componentHelpers', () => {
         onData: p => p.login
       },
       {
-        isAuthenticated: ({onData}, propConfig, props) => {
-          return reqStrPathThrowing('isAuthenticated', props) ? false : onData;
+        isAuthenticated: ({onError, onLoading, onData}, props) => {
+          return R.ifElse(
+            reqStrPathThrowing('isAuthenticated'),
+            () => null,
+            () => onData
+          )(props);
         },
         queryRegions: true,
         mutateRegions: ['onError', 'onReady', 'onLoading']
