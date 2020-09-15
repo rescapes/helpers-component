@@ -124,7 +124,16 @@ export const renderChoicepoint = R.curry(({onError, onLoading, onData}, propConf
   if (R.isEmpty(propConfig)) {
     return onData(props);
   }
+  // Is there an authentication result that instructs bypassing to onData or onError
+  const bypass = authenticationBypass({onError, onLoading, onData}, propConfig, props);
+
   return R.cond([
+    [
+      () => {
+        return bypass;
+      },
+      props => bypass(props)
+    ],
     [
       () => {
         keys = keysMatchingStatus('onError', propConfig, props);
@@ -249,6 +258,31 @@ export const keysMatchingStatus = (status, propConfig, props) => {
     R.keys(relevantPropConfig)
   ));
 };
+
+/**
+ * If a propConfig value is a function, it means we might want to bypass other propsConfig
+ * configurations and simply call one of our render methods. This is used for an unauthenticated
+ * cache/query result that tells us to render onData (with a login) or onError without waiting
+ * for other queries to load (since the queries wouldn't have the authentication they need)
+ * @param {Object} render
+ * @param {Function} render.onError
+ * @param {Function} render.onLoading
+ * @param {Function} render.onData
+ * @param {Object} propConfig
+ * @param {Object} props
+ * @returns {any}
+ */
+export const authenticationBypass = ({onError, onLoading, onData}, propConfig, props) => {
+  // If any propConfig value is function, call it and return the first truthy value, a function
+  // such as onData or onError.
+  const relevantPropConfig = R.filter(R.is(Function), propConfig)
+  return R.head(compact(R.map(
+    func => {
+      return func({onError, onLoading, onData}, propConfig, props)
+    },
+    R.values(relevantPropConfig)
+  )));
+}
 
 export const relevantKeyNotMatchingStatus = (status, propConfig, props) => {
   const relevantPropConfig = _relevantPropConfig(status, propConfig, true);
