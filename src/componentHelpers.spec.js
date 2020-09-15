@@ -373,6 +373,7 @@ describe('componentHelpers', () => {
       }
     )).toEqual('okay');
 
+    // Since we aren't authenticated, we call onData to get the login form
     expect(renderChoicepoint({
         onError: (keys, p) => p.bad,
         onLoading: p => p.okay,
@@ -393,6 +394,29 @@ describe('componentHelpers', () => {
         login: 'login'
       }
     )).toEqual('login');
+
+    // Since we are authenticated, we'll call onLoading here because mutateRegions is loading
+    expect(renderChoicepoint({
+        onError: (keys, p) => p.bad,
+        onLoading: p => p.okay,
+        onData: p => p.login
+      },
+      {
+        isAuthenticated: ({onData}, propConfig, props) => {
+          return reqStrPathThrowing('isAuthenticated', props) ? false : onData;
+        },
+        queryRegions: true,
+        mutateRegions: ['onError', 'onReady', 'onLoading']
+      },
+      {
+        isAuthenticated: true,
+        queryRegions: {networkStatus: 7},
+        // This matters because ['onReady'] means skip has to be false
+        mutateRegions: {skip: true, result: {loading: true}},
+        okay: 'okay',
+        login: 'login'
+      }
+    )).toEqual('okay');
   });
 
   test('propsFor', () => {

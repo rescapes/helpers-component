@@ -125,7 +125,7 @@ export const renderChoicepoint = R.curry(({onError, onLoading, onData}, propConf
     return onData(props);
   }
   // Is there an authentication result that instructs bypassing to onData or onError
-  const bypass = authenticationBypass({onError, onLoading, onData}, propConfig, props);
+  const bypass = _authenticationBypass({onError, onLoading, onData}, propConfig, props);
 
   return R.cond([
     [
@@ -272,7 +272,7 @@ export const keysMatchingStatus = (status, propConfig, props) => {
  * @param {Object} props
  * @returns {any}
  */
-export const authenticationBypass = ({onError, onLoading, onData}, propConfig, props) => {
+export const _authenticationBypass = ({onError, onLoading, onData}, propConfig, props) => {
   // If any propConfig value is function, call it and return the first truthy value, a function
   // such as onData or onError.
   const relevantPropConfig = R.filter(R.is(Function), propConfig)
@@ -312,6 +312,11 @@ const _relevantPropConfig = (status, propConfig, noBool = false) => {
   return filterWithKeys(
     (value, name) => {
       return R.cond([
+        [
+          // SKip propConfig values that are functions, this is only _authenticationBypass
+          R.is(Function),
+          () => false
+        ],
         // If value is a boolean let it determine the prop's relevancy
         [
           R.is(Boolean),
