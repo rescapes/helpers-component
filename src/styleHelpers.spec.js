@@ -1,12 +1,15 @@
+import styled from 'styled-components';
 import {
   styleMultiplier,
   createScaledPropertyGetter,
   getClass,
   mergeAndApplyMatchingStyles,
-  applyMatchingStyles
+  applyMatchingStyles, getComponentAndClassName
 } from './styleHelpers';
 import {applyStyleFunctionOrDefault, getClassAndStyle, getStyleObj, styleArithmetic} from './styleHelpers';
 import * as R from 'ramda';
+import renderer from 'react-test-renderer';
+import {e} from './componentHelpers';
 
 describe('styles', () => {
   test('getClass', () => {
@@ -31,6 +34,30 @@ describe('styles', () => {
       className: 'sheep-goto-heaven'
     });
   });
+  test('getComponentClassAndStyle', () => {
+    // Should work with styled components
+    const Button = styled.button`
+              color: red;
+`;
+    const viewObj = {
+      chickenOutsidePen: {
+        component: Button,
+        className: 'foo bar',
+        style: {
+          'background-color': 'blue'
+        }
+      }
+    };
+    const {component, className} = getComponentAndClassName('chickenOutsidePen', viewObj);
+    const renderedComponent = renderer.create(e(component, {className})).toJSON();
+    expect(renderedComponent).toHaveStyleRule('color', 'red');
+    expect(renderedComponent).toHaveStyleRule('background-color', 'blue');
+
+    expect({className}).toEqual({
+      className: 'chicken-outside-pen foo bar'
+    });
+  });
+
   test('getStyleObj', () => {
     const viewObj = {
       chickenOutsidePen: {

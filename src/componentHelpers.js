@@ -9,6 +9,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import styled, {isStyledComponent} from 'styled-components';
 import {inspect} from 'util';
 import React from 'react';
 import * as R from 'ramda';
@@ -25,7 +26,7 @@ import {
   strPathOr,
   stringifyError
 } from 'rescape-ramda';
-import {getClassAndStyle, getStyleObj} from './styleHelpers';
+import {getClassAndStyle, getComponentAndClassName, getStyleObj} from './styleHelpers';
 
 /**
  * Default statuses for Components that don't have any Apollo apolloContainers
@@ -275,14 +276,14 @@ export const keysMatchingStatus = (status, propConfig, props) => {
 export const _authenticationBypass = ({onError, onLoading, onData}, propConfig, props) => {
   // If any propConfig value is function, call it and return the first truthy value, a function
   // such as onData or onError.
-  const relevantPropConfig = R.filter(R.is(Function), propConfig)
+  const relevantPropConfig = R.filter(R.is(Function), propConfig);
   return R.head(compact(R.map(
     func => {
-      return func({onError, onLoading, onData}, propConfig, props)
+      return func({onError, onLoading, onData}, propConfig, props);
     },
     R.values(relevantPropConfig)
   )));
-}
+};
 
 export const relevantKeyNotMatchingStatus = (status, propConfig, props) => {
   const relevantPropConfig = _relevantPropConfig(status, propConfig, true);
@@ -719,13 +720,23 @@ export const mergeStylesIntoViews = v(R.curry((viewStyles, {views, ...props}) =>
     // shape {style: {...}, className: 'extra class names'}. Otherwise it means
     // that it is just style props because no extra className was needed
     const viewToStyle = R.map(
-      viewObj => R.ifElse(
-        R.has('style'),
-        // Done
-        R.identity,
-        // Wrap it in a style key
-        style => ({style})
-      )(viewObj),
+      viewObj => R.cond([
+        [
+          R.either(R.hasIn('style'), R.hasIn('component')),
+          // Done, viewStyles function has already set up an object with one of {[style], [component]}
+          R.identity
+        ],
+        // Wrap it in a style key. If it is a styled component, create {component: Styled Component}
+        [
+          obj => isStyledComponent(obj),
+          component => ({component})
+        ],
+        // By default assume it's a style object
+        [
+          R.T,
+          style => ({style})
+        ]
+      ])(viewObj),
       viewObjs);
 
     // Deep props.views with viewStyles and return entire props
@@ -832,7 +843,7 @@ export const componentAndPropsFor = v((views, name) => {
       R.view(R.lensProp(name), views)
     );
     // TODO I don't know if we'd ever need separate classnames with a styled component, but pass it anyway
-    const {className, style: styledComponent} = getClassAndStyle(
+    const {className, component: styledComponent} = getComponentAndClassName(
       name,
       views
     );
@@ -843,7 +854,7 @@ export const componentAndPropsFor = v((views, name) => {
       R.is(Function),
       f => item => R.mergeAll([{key: name}, f(item), {className}]),
       obj => R.mergeAll([{key: name}, obj, {className}])
-    )(R.omit(['style'], propsForView))];
+    )(R.omit(['component'], propsForView))];
   },
   [
     ['views', PropTypes.shape().isRequired],

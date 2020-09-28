@@ -12,8 +12,9 @@
 import * as R from 'ramda';
 import PropTypes from 'prop-types';
 import {v} from 'rescape-validate';
-import {compact, filterWithKeys} from 'rescape-ramda';
+import {compact, filterWithKeys, reqPathThrowing, reqStrPathThrowing} from 'rescape-ramda';
 import decamelize from 'decamelize';
+import styled from 'styled-components';
 
 /**
  * Creates a class name from a root name and a suffix. The given root and suffix will be decamelized
@@ -57,6 +58,44 @@ export const getClassAndStyle = (name, views) =>
       getStyleObj(name, views))
     )
   );
+
+/**
+ * Given a name and views, generates a component, className and style. This is most useful for style
+ * components where we need to build the styling into the component. Usually style will be empty
+ * unless we want to augment a styled component
+ * If views[name].className exists, it is added
+ * to the generated className. E.g. if the generated className is 'region-outer' and views[name].class =
+ * 'foo bar', the className will be 'region-outer foo bar'
+ * @param {String} name Name to use for the className. You can pass a camelized name and it will decamelize
+ * (e.g. outerRegionDiv is converted to outer-region-div) for the actual className
+ * @param {Object} views Contains a key matching name containing a style object.
+ * e.g. if name is 'region' views must have {region: {style: {border: 'red', ...}}}
+ * @returns {Object} An object with a component (usually a styled-component), className key and corresponding values
+ */
+export const getComponentAndClassName = (name, views) => {
+  const component = reqPathThrowing([name, 'component'], views);
+  const {style} = getStyleObj(name, views);
+  return R.mergeWith(
+    // This can only be called on className
+    (l, r) => {
+      return R.join(' ', [l, r]);
+    },
+    {
+      // component is required
+      component: R.when(
+        () => style,
+        component => {
+          return styled(component)`${style}`;
+        }
+      )(component),
+      // Default classname , concatted with those explicitly defined
+      className: getClass(name)
+    },
+    compact({
+      className: R.view(R.lensPath([name, 'className']), views)
+    })
+  )
+};
 
 /**
  * Given a name, generates a style object with the matching object in views, i.e. views[name].style

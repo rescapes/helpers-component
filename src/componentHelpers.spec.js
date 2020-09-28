@@ -9,7 +9,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 import * as R from 'ramda';
-import styled from 'styled-components';
+import styled, {isStyledComponent} from 'styled-components';
 import renderer from 'react-test-renderer';
 import {
   applyIfFunction,
@@ -277,25 +277,59 @@ describe('componentHelpers', () => {
       )
     ).toEqual(R.set(R.lensPath(['views', 'someView', 'className']), 'foo bar', expected));
 
-    // Should work with styled components
+  });
+
+  test('mergeStylesIntoViewsForStyledComponent', () => {
+    const props = {
+      style: {
+        'background-color': 'blue'
+      },
+      views: {
+        // Some existing property foo that we don't care about
+        someView: {foo: 1}
+      }
+    };
+    // Should work with styled-components
     const Button = styled.button`
               color: red;
 `;
+
+    // if mergeStylesIntoViews encounters a styled component instead of a style object,
+    // it sticks it at 'component' in the view
+    const view =
+      mergeStylesIntoViews(
+        p => {
+          return {
+            // If we want these styles in our view, one of which is from props.style
+            someView: styled(Button)`${p.style}`
+          };
+        },
+        props
+      ).views.someView
+    expect(isStyledComponent(view.component)).toBeTruthy()
     const tree = renderer.create(
-      e(
-        mergeStylesIntoViews(
-          p => {
-            return {
-              // If we want these styles in our view, one of which is from props.style
-              someView: styled(Button)`${p.style}`
-            };
-          },
-          props
-        ).views.someView.style, props
-      )
+      e(view.component, props)
     ).toJSON();
     expect(tree).toHaveStyleRule('color', 'red');
     expect(tree).toHaveStyleRule('background-color', 'blue');
+
+    // if mergeStylesIntoViews encounters a styled component instead of a style object,
+    // it sticks it at 'component' in the view
+    const anuddaView =
+      mergeStylesIntoViews(
+        p => {
+          return {
+            // If we want these styles in our view, one of which is from props.style
+            someView: {component: Button, style: p.style}
+          };
+        },
+        props
+      ).views.someView
+    expect(isStyledComponent(anuddaView.component)).toBeTruthy()
+    const annuddaTree = renderer.create(
+      e(anuddaView.component, props)
+    ).toJSON();
+    expect(annuddaTree).toHaveStyleRule('color', 'red');
   });
 
   test('nameLookup', () => {
@@ -477,7 +511,7 @@ describe('componentHelpers', () => {
 `;
     const views = {
       fooView: {
-        style: Button,
+        component: Button,
         bar: 1
       }
     };
