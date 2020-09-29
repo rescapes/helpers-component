@@ -521,24 +521,35 @@ export const mergePropsForViews = R.curry((viewNamesToViewProps, props) => {
 
   // If any item is still a function, we have to assume that items are being applied, so convert
   // our key value to a function if needed
-  const keyViewIfAnyFunctionsRemain = viewName => R.when(
-    R.allPass([
-      R.complement(R.is)(Function),
-      // Any key is a function
-      R.compose(R.any(R.is(Function)), R.values),
-      // key value is not already a function
-      x => R.compose(R.complement(R.is)(Function), R.prop('key'))(x)
-    ]),
-    obj => {
-      let i = 0;
-      return R.merge(
-        obj,
-        {
-          key: d => R.propOr(R.concat(viewName, (++i).toString()), 'key', d)
+  const keyViewIfAnyFunctionsRemain = (viewName, objOrFunc) => {
+    return R.when(
+      R.allPass([
+        // objOrFunc is not already a function
+        R.complement(R.is)(Function),
+        // Any non-render key is a function
+        obj => {
+          return R.compose(
+            R.any(R.is(Function)),
+            R.values,
+            R.omit(renderPropKeys)
+          )(obj);
+        },
+        // key value is not already a function
+        obj => {
+          return R.compose(R.complement(R.is)(Function), R.prop('key'))(obj);
         }
-      );
-    }
-  );
+      ]),
+      obj => {
+        let i = 0;
+        return R.merge(
+          obj,
+          {
+            key: d => R.propOr(R.concat(viewName, (++i).toString()), 'key', d)
+          }
+        );
+      }
+    )(objOrFunc);
+  };
 
   return R.over(
     R.lensProp('views'),
@@ -550,9 +561,9 @@ export const mergePropsForViews = R.curry((viewNamesToViewProps, props) => {
       // Map each propPath to the value in props or undefined
       R.mapObjIndexed(
         (viewPropsObjOrFunction, viewName) => R.compose(
-          // If anything is still a function, an item function, make sure our key property is an item function
+          // If anything non render props is still a function, an item function, make sure our key property is an item function
           objOrFunc => {
-            return keyViewIfAnyFunctionsRemain(viewName)(objOrFunc);
+            return keyViewIfAnyFunctionsRemain(viewName, objOrFunc);
           },
           objOrFunc => R.unless(
             R.is(Function),
