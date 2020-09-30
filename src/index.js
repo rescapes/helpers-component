@@ -13,7 +13,8 @@ export {
   propsForItem, propsForSansClass,
   renderChoicepoint, renderErrorDefault, renderLoadingDefault, makeTestPropsFunction, keysMatchingStatus,
   keyApolloResultWithOrLoadError,
-  componentAndPropsFor
+  componentAndPropsFor,
+  apolloContainerComponent
 } from './componentHelpers';
 
 export {

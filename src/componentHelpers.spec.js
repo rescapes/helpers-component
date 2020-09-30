@@ -508,17 +508,23 @@ describe('componentHelpers', () => {
     // Should work with styled components
     const Button = styled.button`
               color: red;
+              ${({style}) => style}
 `;
     const views = {
       fooView: {
         component: Button,
-        bar: 1
+        bar: 1,
+        style: {'background-color': 'red'}
       }
     };
-    expect(componentAndPropsFor(views)('fooView')).toEqual(
+    const [component, props] = componentAndPropsFor(views)('fooView')
+    const renderedComponent = renderer.create(e(component, props)).toJSON();
+    expect(renderedComponent).toHaveStyleRule('color', 'red');
+    expect(renderedComponent).toHaveStyleRule('background-color', 'red');
+    expect([component, props]).toEqual(
       [
         Button,
-        {className: 'foo-view', key: 'fooView', bar: 1}
+        {className: 'foo-view', style: {'background-color': 'red'}, key: 'fooView', bar: 1}
       ]
     );
   });

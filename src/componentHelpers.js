@@ -1046,3 +1046,34 @@ export const makeTestPropsFunction = (mapStateToProps, mapDispatchToProps) => {
     mapDispatchToProps(R.identity, sampleOwnProps)
   );
 };
+
+
+import {e} from 'rescape-helpers-component';
+import * as R from 'ramda';
+
+/***
+ * Creates a container which that has a render function for its children prop. This render function creates
+ * a component element
+ * The component receives as props the merges of the render function props and the props given here.
+ * This is used for Apollo containers that produce Apollo response results to give to the component.
+ * However it could be used by any container that calls a children render function
+ * @param {Object|Function} container The container. A component that expects props. The container must return
+ * a call to children and pass whatever props it produces. It need not pass the props given to it, since
+ * these are merged with the props it passes to the children function.
+ * @param {Object|Function} component The component. A component that is passed to createElement.
+ * @returns {Function<Object>} Where the argument is the props.
+ */
+export const apolloContainerComponent = (container, component) => {
+  return props => {
+    return e(
+      container,
+      props,
+      // These props contains the results of the Apollo queries and the mutation functions
+      // Merge them with the original props, which can return values unrelated to the apollo requests
+      responseProps => e(
+        component,
+        R.merge(props, responseProps)
+      )
+    );
+  };
+};

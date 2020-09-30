@@ -9,7 +9,7 @@ import {
 import {applyStyleFunctionOrDefault, getClassAndStyle, getStyleObj, styleArithmetic} from './styleHelpers';
 import * as R from 'ramda';
 import renderer from 'react-test-renderer';
-import {e} from './componentHelpers';
+import {e, propsFor} from './componentHelpers';
 
 describe('styles', () => {
   test('getClass', () => {
@@ -36,8 +36,10 @@ describe('styles', () => {
   });
   test('getComponentClassAndStyle', () => {
     // Should work with styled components
+    // style object has to be passed via props. We can't extend with style because it would happen during rendering
     const Button = styled.button`
               color: red;
+              ${({style}) => style}
 `;
     const viewObj = {
       chickenOutsidePen: {
@@ -48,8 +50,9 @@ describe('styles', () => {
         }
       }
     };
+
     const {component, className} = getComponentAndClassName('chickenOutsidePen', viewObj);
-    const renderedComponent = renderer.create(e(component, {className})).toJSON();
+    const renderedComponent = renderer.create(e(component,  propsFor(viewObj, 'chickenOutsidePen'))).toJSON();
     expect(renderedComponent).toHaveStyleRule('color', 'red');
     expect(renderedComponent).toHaveStyleRule('background-color', 'blue');
 

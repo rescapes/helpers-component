@@ -82,12 +82,7 @@ export const getComponentAndClassName = (name, views) => {
     },
     {
       // component is required
-      component: R.when(
-        () => style,
-        component => {
-          return styled(component)`${style}`;
-        }
-      )(component),
+      component,
       // Default classname , concatted with those explicitly defined
       className: getClass(name)
     },
