@@ -14,7 +14,9 @@ export {
   renderChoicepoint, renderErrorDefault, renderLoadingDefault, makeTestPropsFunction, keysMatchingStatus,
   keyApolloResultWithOrLoadError,
   componentAndPropsFor,
-  apolloContainerComponent
+  apolloContainerComponent,
+  relevantKeyNotMatchingStatus,
+  bypassToDataIfUnauthenticated
 } from './componentHelpers';
 
 export {

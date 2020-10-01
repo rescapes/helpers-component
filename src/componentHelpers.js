@@ -290,7 +290,7 @@ export const relevantKeyNotMatchingStatus = (status, propConfig, props) => {
   // Return non-matching keys. Compact out success
   return compact(R.map(
     prop => {
-      // Does props[prop] have a value that matches the status. If so return the prop
+      // Does props[prop] have a value that matches the status. If not return the prop
       return _mapStatusToFunc(status, R.propOr({}, prop, props)) ? null : prop;
     },
     // Take each relevant keys
@@ -1041,15 +1041,13 @@ export const renderErrorDefault = v(viewName => (keysWithErrors, {views, ...requ
  * sample props according to the functions of the container
  */
 export const makeTestPropsFunction = (mapStateToProps, mapDispatchToProps) => {
-  (sampleState, sampleOwnProps) => R.merge(
-    mapStateToProps(sampleState, sampleOwnProps),
-    mapDispatchToProps(R.identity, sampleOwnProps)
-  );
+  (sampleState, sampleOwnProps) => {
+    return R.merge(
+      mapStateToProps(sampleState, sampleOwnProps),
+      mapDispatchToProps(R.identity, sampleOwnProps)
+    );
+  };
 };
-
-
-import {e} from 'rescape-helpers-component';
-import * as R from 'ramda';
 
 /***
  * Creates a container which that has a render function for its children prop. This render function creates
@@ -1077,3 +1075,25 @@ export const apolloContainerComponent = (container, component) => {
     );
   };
 };
+
+
+/**
+ * Checks to see if the query/cache result at authenticationQueryPath is null. If null,
+ * onData is returned to indicate the user is not authenticated and we should skip other Apollo request
+ * chocks and render onData.
+ * TODO it might be prudent to define something other than onData for components that want to
+ * call a different function when not authenticated. But normally this is handled by a router in onData
+ * @param authenticationQueryPath
+ * @returns {function({onError: *, onLoading: *, onData: *}, *, *=): *}
+ */
+export const bypassToDataIfUnauthenticated = authenticationQueryPath => ({onError, onLoading, onData}, propConfig, props) => {
+  return R.ifElse(
+    props => {
+      return strPathOr(false, authenticationQueryPath, props);
+    },
+    () => null,
+    () => {
+      return onData
+    }
+  )(props);
+}
