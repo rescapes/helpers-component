@@ -27,6 +27,9 @@ import {
   stringifyError
 } from 'rescape-ramda';
 import {getClassAndStyle, getComponentAndClassName, getStyleObj} from './styleHelpers';
+import {loggers} from 'rescape-log';
+
+const log = loggers.get('rescapeDefault');
 
 /**
  * Default statuses for Components that don't have any Apollo apolloContainers
@@ -97,6 +100,9 @@ export const e = React.createElement;
  * the props. onError needs the keys in order to know how to respond to the order
  * @param {Function} funcConfig.onLoading Function expecting props
  * @param {Function} funcConfig.onData Function expecting props
+ * @param {String} [funcConfig.componentName] Only for debugging. Used to log the name of the component.
+ * Note that no debug logging will occur without out this name specified, since it would be hard to know
+ * what component was reporting it's status
  * @param {Object} propConfig. Keyed by the prop at least one key from Apollo requests that should have an impact
  * on which of the three functions is called. If this is empty then onData will always be called
  *
@@ -120,7 +126,7 @@ export const e = React.createElement;
  * @param props An Object that must have one of data.error|.loading|.store
  * @return {*} The result of the onError, onLoading, onData/onReady, or an Exception if none are matched
  */
-export const renderChoicepoint = R.curry(({onError, onLoading, onData}, propConfig, props) => {
+export const renderChoicepoint = R.curry(({onError, onLoading, onData, componentName}, propConfig, props) => {
   let keys;
   if (R.isEmpty(propConfig)) {
     return onData(props);
@@ -133,7 +139,10 @@ export const renderChoicepoint = R.curry(({onError, onLoading, onData}, propConf
       () => {
         return bypass;
       },
-      props => bypass(props)
+      props => {
+        componentName && log.debug(`Choicepoint: ${componentName} is bypassing due to authentication`);
+        return bypass(props);
+      }
     ],
     [
       () => {
@@ -141,7 +150,10 @@ export const renderChoicepoint = R.curry(({onError, onLoading, onData}, propConf
         // If any error we are in error state
         return R.length(keys);
       },
-      props => onError(keys, props)
+      props => {
+        componentName && log.debug(`Choicepoint: ${componentName} ERROR state due to keys ${R.join(', ', keys)}`);
+        return onError(keys, props);
+      }
     ],
     [
       () => {
@@ -149,7 +161,10 @@ export const renderChoicepoint = R.curry(({onError, onLoading, onData}, propConf
         // If any loading we are in loading state
         return R.length(keys);
       },
-      props => onLoading(props)
+      props => {
+        componentName && log.debug(`Choicepoint: ${componentName} LOADING state due to keys ${R.join(', ', keys)}`);
+        return onLoading(props);
+      }
     ],
     [
       () => {
@@ -157,7 +172,10 @@ export const renderChoicepoint = R.curry(({onError, onLoading, onData}, propConf
         // If any not onReady that need to be
         return R.length(keys);
       },
-      props => onLoading(props)
+      props => {
+        componentName && log.debug(`Choicepoint: ${componentName} NOT READY state due to mutation keys ${R.join(', ', keys)}`);
+        return onLoading(props);
+      }
     ],
     [
       () => {
@@ -172,7 +190,10 @@ export const renderChoicepoint = R.curry(({onError, onLoading, onData}, propConf
         // If all onData or onReady we can call onData
         return R.equals(R.length(keys), R.length(relevantKeys));
       },
-      props => onData(props)
+      props => {
+        componentName && log.debug(`Choicepoint: ${componentName} DATA state due to keys ${R.join(', ', keys)}`);
+        return onData(props)
+      }
     ],
     [R.T, props => {
       throw new Error(`No error, loading, nor data ready status with propConfig: ${inspect(propConfig)}, props: ${inspect(props)}`);
@@ -1093,7 +1114,7 @@ export const bypassToDataIfUnauthenticated = authenticationQueryPath => ({onErro
     },
     () => null,
     () => {
-      return onData
+      return onData;
     }
   )(props);
-}
+};

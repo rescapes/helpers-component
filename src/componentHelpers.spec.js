@@ -344,7 +344,8 @@ describe('componentHelpers', () => {
     const identityFunc = renderChoicepoint({
         onError: (keys, p) => p.bad,
         onLoading: p => p.okay,
-        onData: p => p.good
+        onData: p => p.good,
+        componentName: 'testComponent',
       },
       {}
     );
@@ -357,7 +358,8 @@ describe('componentHelpers', () => {
     const func = renderChoicepoint({
         onError: (keys, p) => p.bad,
         onLoading: p => p.okay,
-        onData: p => p.good
+        onData: p => p.good,
+        componentName: 'testComponent',
       },
       {
         queryRegions: true,
@@ -411,7 +413,8 @@ describe('componentHelpers', () => {
     expect(renderChoicepoint({
         onError: (keys, p) => p.bad,
         onLoading: p => p.okay,
-        onData: p => p.login
+        onData: p => p.login,
+        componentName: 'testComponent',
       },
       {
         isAuthenticated: ({onData}, propConfig, props) => {
@@ -433,7 +436,8 @@ describe('componentHelpers', () => {
     expect(renderChoicepoint({
         onError: (keys, p) => p.bad,
         onLoading: p => p.okay,
-        onData: p => p.login
+        onData: p => p.login,
+        componentName: 'testComponent',
       },
       {
         isAuthenticated: ({onError, onLoading, onData}, props) => {
