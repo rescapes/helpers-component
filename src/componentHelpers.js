@@ -417,8 +417,8 @@ export const mergeEventHandlersForViews = R.curry((viewToActionNames, props) => 
                   }
                 )(eventHandlerOrPropFunctionPath);
                 if (R.is(Function)) {
-                  // Call the event handler
-                  return func();
+                  // Return the event handler
+                  return func;
                 } else {
                   log.warning(`Expected event handler function or path that leads to function: ${eventHandlerOrPropFunctionPath} in props ${inspect(props)}`);
                 }

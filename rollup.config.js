@@ -12,7 +12,8 @@ const config = {
     'src/atoms/atoms.js',
     'src/componentHelpers.js',
     'src/styleHelpers',
-    'src/svgComponentHelpers'
+    'src/svgComponentHelpers',
+    'src/testHelpers'
   ],
   plugins: []
 };
