@@ -378,7 +378,7 @@ const renderPropKeys = ['render', 'children'];
  */
 const applyToIfNonRenderFunction = (propName, props, viewPropsOrFunction) => {
   // Never apply props to a render prop function
-  if (R.includes(propName, renderPropKeys)) {
+  if (R.any(renderPropKey => R.startsWith(renderPropKey, propName), renderPropKeys)) {
     return viewPropsOrFunction;
   }
   // If viewPropsOrFunction is a function meant to take props, pass props to it
