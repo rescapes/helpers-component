@@ -22,7 +22,7 @@ import {
   keysMatchingStatus,
   keyWith,
   liftAndExtract,
-  mergeActionsForViews,
+  mergeEventHandlersForViews,
   mergeStylesIntoViews,
   nameLookup,
   propLensEqual,
@@ -63,8 +63,12 @@ describe('componentHelpers', () => {
     )).toEqual(false);
   });
 
-  test('mergeActionsForViews', () => {
-    const mergeProps = mergeActionsForViews({aComponent: ['action1', 'action2'], bComponent: ['action2', 'action3']});
+  test('mergeEventHandlersForViews', () => {
+    const mergeProps = mergeEventHandlersForViews({
+      aComponent: {onClick: 'action1', onTick: 'action2'},
+      bComponent: {onFlick: 'action2', onGleek: 'action3'},
+      cComponent: {onLeek: R.identity}
+    });
     const stateProps = {a: 1, views: {aComponent: {stuff: 1}, bComponent: {moreStuff: 2}}};
     const dispatchProps = {
       action1: R.identity,
@@ -72,20 +76,20 @@ describe('componentHelpers', () => {
       action3: R.identity
     };
     // mergeProps should merge stateProps and dispatchProps but copy the actions to stateProps.views according
-    // to the mapping given to mergeActionsForViews
+    // to the mapping given to mergeEventHandlersForViews
     expect(mergeProps(R.merge(stateProps, dispatchProps))).toEqual(
       R.merge({
         a: 1,
         views: {
-          aComponent: {stuff: 1, action1: R.identity, action2: R.identity},
-          bComponent: {moreStuff: 2, action2: R.identity, action3: R.identity}
+          aComponent: {stuff: 1, onClick: R.identity, onTick: R.identity},
+          bComponent: {moreStuff: 2, onFlick: R.identity, onGleek: R.identity},
+          cComponent: {onLeek: R.identity()}
         }
       }, dispatchProps)
     );
   });
 
-
-  test('mergePropsForViewsProplem', () => {
+  test('mergePropsForViewsProblem', () => {
     const viewNamesToViewProps = {
       sankeySvgLinks: {
         links: []
@@ -149,7 +153,7 @@ describe('componentHelpers', () => {
     };
 
     // mergeProps should merge stateProps and dispatchProps but copy the actions to stateProps.views according
-    // to the mapping given to mergeActionsForViews
+    // to the mapping given to mergeEventHandlersForViews
     // At this point we still have unary functions expecting items
     const mostlyResolvedProps = mergeProps(props);
 
@@ -305,8 +309,8 @@ describe('componentHelpers', () => {
           };
         },
         props
-      ).views.someView
-    expect(isStyledComponent(view.component)).toBeTruthy()
+      ).views.someView;
+    expect(isStyledComponent(view.component)).toBeTruthy();
     const tree = renderer.create(
       e(view.component, props)
     ).toJSON();
@@ -324,8 +328,8 @@ describe('componentHelpers', () => {
           };
         },
         props
-      ).views.someView
-    expect(isStyledComponent(anuddaView.component)).toBeTruthy()
+      ).views.someView;
+    expect(isStyledComponent(anuddaView.component)).toBeTruthy();
     const annuddaTree = renderer.create(
       e(anuddaView.component, props)
     ).toJSON();
@@ -345,7 +349,7 @@ describe('componentHelpers', () => {
         onError: (keys, p) => p.bad,
         onLoading: p => p.okay,
         onData: p => p.good,
-        componentName: 'testComponent',
+        componentName: 'testComponent'
       },
       {}
     );
@@ -359,7 +363,7 @@ describe('componentHelpers', () => {
         onError: (keys, p) => p.bad,
         onLoading: p => p.okay,
         onData: p => p.good,
-        componentName: 'testComponent',
+        componentName: 'testComponent'
       },
       {
         queryRegions: true,
@@ -414,7 +418,7 @@ describe('componentHelpers', () => {
         onError: (keys, p) => p.bad,
         onLoading: p => p.okay,
         onData: p => p.login,
-        componentName: 'testComponent',
+        componentName: 'testComponent'
       },
       {
         isAuthenticated: ({onData}, propConfig, props) => {
@@ -437,7 +441,7 @@ describe('componentHelpers', () => {
         onError: (keys, p) => p.bad,
         onLoading: p => p.okay,
         onData: p => p.login,
-        componentName: 'testComponent',
+        componentName: 'testComponent'
       },
       {
         isAuthenticated: ({onError, onLoading, onData}, props) => {
@@ -521,7 +525,7 @@ describe('componentHelpers', () => {
         style: {'background-color': 'red'}
       }
     };
-    const [component, props] = componentAndPropsFor(views)('fooView')
+    const [component, props] = componentAndPropsFor(views)('fooView');
     const renderedComponent = renderer.create(e(component, props)).toJSON();
     expect(renderedComponent).toHaveStyleRule('color', 'red');
     expect(renderedComponent).toHaveStyleRule('background-color', 'red');
@@ -660,8 +664,8 @@ describe('componentHelpers', () => {
   test('composeViews', () => {
     expect(
       composeViews(
-        ({
-          aView: ['someAction']
+        props => ({
+          aView: {onClick: 'someAction'}
         }),
         props => ({
           aView: {
@@ -678,21 +682,21 @@ describe('componentHelpers', () => {
           }
         }),
         {
-          someAction: 'someAction',
+          someAction: R.identity,
           data: {
             parentProp: 1
           }
         }
       )
     ).toEqual({
-      someAction: 'someAction',
+      someAction: R.identity,
       data: {
         parentProp: 1
       },
       views: {
         aView: {
           key: 'aView',
-          someAction: 'someAction',
+          onClick: R.identity,
           someProp: 'foo',
           parentProp: 1,
           style: {
@@ -731,7 +735,7 @@ describe('componentHelpers', () => {
     expect(
       composeViewsFromStruct({
           actions: {
-            aView: ['someAction']
+            aView: {onClick: 'someAction.mutate'}
           },
           props: props => ({
             aView: {
@@ -749,20 +753,20 @@ describe('componentHelpers', () => {
           })
         },
         {
-          someAction: 'someAction',
+          someAction: {mutate: R.identity},
           data: {
             parentProp: 1
           }
         })
     ).toEqual({
-      someAction: 'someAction',
+      someAction: {mutate: R.identity},
       data: {
         parentProp: 1
       },
       views: {
         aView: {
           key: 'aView',
-          someAction: 'someAction',
+          onClick: R.identity,
           someProp: 'foo',
           parentProp: 1,
           style: {

@@ -192,7 +192,7 @@ export const renderChoicepoint = R.curry(({onError, onLoading, onData, component
       },
       props => {
         componentName && log.debug(`Choicepoint: ${componentName} DATA state due to keys ${R.join(', ', keys)}`);
-        return onData(props)
+        return onData(props);
       }
     ],
     [R.T, props => {
@@ -386,14 +386,16 @@ const applyToIfNonRenderFunction = (propName, props, viewPropsOrFunction) => {
 };
 
 /**
- * Copies any needed actions to view containers
+ * Copies any needed eventHandlers to view containers
  * Also removes ownProps from the return value since we already incorporated theses into stateProps
- * @props {Object} viewToActionNames An object keyed by view that is in stateProps.views and valued by
- * an array of action names.
+ * @props {Object} viewToEventHandler An object keyed by view that is in stateProps.views and valued by
+ * an object with even name and event handler or prop string path. Prop string path must point
+ * at a function in the props, e.g. 'mutateTokenAuth.mutate'.
+ * If using a Apollo mutation make sure that the component is disabled if the  mutation is not ready to run.
  * @props {Object} props Props from a parent component
  * @returns {Function} A mergeProps function that expects props (e.g. A merge stateProps and dispatchProps)
  */
-export const mergeActionsForViews = R.curry((viewToActionNames, props) => {
+export const mergeEventHandlersForViews = R.curry((viewToActionNames, props) => {
   return R.over(
     R.lensProp('views'),
     views =>
@@ -404,15 +406,26 @@ export const mergeActionsForViews = R.curry((viewToActionNames, props) => {
         // This transforms {viewName: {propName: 'pathInPropsToPropName (e.g. store.propName)', ...}
         // This results in {viewName: {propName: propValue, ...}}
         R.map(
-          actionNames =>
-            R.fromPairs(R.map(
-              // Create a pair [actionName, action func]
-              actionName => [
-                actionName,
-                R.view(R.lensProp(actionName), props)
-              ],
-              // Within each view, map each actinoName
-              actionNames)),
+          eventToEventHandlerOrPropFunctionPath => {
+            return R.map(
+              eventHandlerOrPropFunctionPath => {
+                // If a string path
+                const func = R.when(
+                  R.is(String),
+                  strPath => {
+                    return reqStrPathThrowing(strPath, props);
+                  }
+                )(eventHandlerOrPropFunctionPath);
+                if (R.is(Function)) {
+                  // Call the event handler
+                  return func();
+                } else {
+                  log.warning(`Expected event handler function or path that leads to function: ${eventHandlerOrPropFunctionPath} in props ${inspect(props)}`);
+                }
+              },
+              eventToEventHandlerOrPropFunctionPath
+            );
+          },
           // Map each view
           applyToIfFunction(props, viewToActionNames)
         )
@@ -948,7 +961,7 @@ export const nameLookup = nameObj =>
 
 /**
  * Convenience method to call mergeActionsForView, mergePropsForView, and mergeStylesIntoViews
- * @param {Object} viewActions Argument to mergeActionsForView. See mergeActionsForViews
+ * @param {Object} viewActions Argument to mergeActionsForView. See mergeEventHandlersForViews
  * @param {Object|Function} viewProps Argument to mergePropsForViews. See mergePropsForViews
  * @param {Object|Function} viewStyles Argument to mergeStylesIntoViews. See mergeStylesIntoViews
  * @param {Object} props Props that are used for the composition. Each of the three functions
@@ -959,7 +972,7 @@ export const nameLookup = nameObj =>
  * @return {Function} The modified props with view properties added by each of the three functions
  */
 export const composeViews = R.curry((viewNameToViewActions, viewNameToViewProps, viewNameToViewStyles, props) => R.compose(
-  p => mergeActionsForViews(viewNameToViewActions, p),
+  p => mergeEventHandlersForViews(viewNameToViewActions, p),
   p => mergePropsForViews(viewNameToViewProps, p),
   p => mergeStylesIntoViews(viewNameToViewStyles, p)
   )(props)
@@ -976,7 +989,7 @@ export const composeViews = R.curry((viewNameToViewActions, viewNameToViewProps,
 export const composeViewsFromStruct = R.curry((viewStruct, props) => {
     const propFor = R.prop(R.__, viewStruct);
     return R.compose(
-      R.when(R.always(propFor('actions')), mergeActionsForViews(propFor('actions'))),
+      R.when(R.always(propFor('actions')), mergeEventHandlersForViews(propFor('actions'))),
       R.when(R.always(propFor('props')), mergePropsForViews(propFor('props'))),
       R.when(R.always(propFor('styles')), mergeStylesIntoViews(propFor('styles')))
     )(props);

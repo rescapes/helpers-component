@@ -5,7 +5,7 @@ export {
   applyToIfFunction, composeViews, composeViewsFromStruct,
   e, eMap, itemizeProps, joinComponents, keyWith, keyWithOr, keyWithDatum, liftAndExtract, liftAndExtractItems, loadingCompleteStatus,
   apolloStatuses,
-  mergeActionsForViews,
+  mergeEventHandlersForViews,
   mergePropsForViews,
   mergeStylesIntoViews,
   nameLookup,
