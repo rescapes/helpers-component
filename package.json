@@ -1,9 +1,10 @@
 {
   "name": "rescape-helpers-component",
-  "version": "1.5.128",
+  "version": "1.5.129",
   "description": "Helpers for working with React components",
-  "main": "lib/index.js",
-  "module": "src/index.js",
+  "main": "src/index.mjs",
+  "module": "src/index.mjs",
+  "type": "module",
   "files": [
     "lib",
     "src"
@@ -20,62 +21,49 @@
   "scripts": {
     "clean": "rimraf lib dist es coverage",
     "lint": "eslint src",
-    "test": "cross-env BABEL_ENV=commonjs jest",
-    "test:watch": "yarn test -- --watch",
-    "test:cov": "yarn test -- --coverage",
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
     "build": "rollup -c",
-    "prepare": "yarn run install-peers -f && cross-env ENABLE_INTEGRATION_TESTS=false yarn run clean && yarn run lint && yarn run build",
+    "prepare": "cross-env ENABLE_INTEGRATION_TESTS=false yarn run clean && yarn run build",
     "build-publish-patch": "yarn run build && yarn run publish-patch",
     "build-publish-minor": "yarn run build && yarn run publish-minor",
     "publish-patch": "yarn version --patch && yarn publish --non-interactive",
     "publish-minor": "yarn version --minor && yarn publish --non-interactive"
   },
   "dependencies": {
+    "@chakra-ui/core": "1.0.0-rc.8",
+    "@emotion/react": "^11.0.0",
+    "@emotion/styled": "^11.0.0",
     "apollo-client": "^2.6.4",
     "decamelize": "4.0.0",
     "folktale": "^2.1.0",
+    "framer-motion": "^2.9.4",
     "graphql-tag": "^2.10.0",
     "graphql-tools": "^7.0.1",
-    "longjohn": "^0.2.12",
     "prop-types": "^15.6.2",
     "ramda": "^0.27.1",
     "react-adopt": "^0.6.0",
     "react-apollo": "^3.0.1",
     "react-router-dom": "^5.2.0",
-    "rebass": "^4.0.7",
-    "styled-components": "^5.2.0",
     "util": "^0.12.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.5.5",
-    "@babel/node": "^7.5.5",
-    "@babel/plugin-proposal-object-rest-spread": "^7.5.5",
-    "@babel/plugin-transform-runtime": "^7.5.5",
-    "@babel/polyfill": "^7.0.0-beta.51",
-    "@babel/preset-env": "^7.5.5",
-    "@babel/runtime": "^7.5.5",
     "@types/jest": "^26.0.15",
-    "babel-eslint": "^10.0.2",
-    "babel-jest": "^26.6.1",
-    "babel-plugin-transform-es2015-modules-commonjs-simple": "^6.7.4",
     "babelrc-rollup": "^3.0.0",
-    "core-js": "^3.2.1",
+    "core-js": "^3.7.0",
     "cross-env": "^7.0.2",
     "dotenv": "8.2.0",
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",
     "enzyme-to-json": "^3.3.4",
     "enzyme-wait": "^1.0.9",
-    "eslint": "7.12.1",
+    "eslint": "7.13.0",
     "eslint-loader": "4.0.2",
     "eslint-plugin-import": "2.22.1",
     "graphql": ">=0.13.2",
     "install": "^0.13.0",
-    "install-peers-cli": "^2.1.1",
-    "jest": "26.6.1",
-    "jest-cli": "^26.6.1",
+    "jest": "26.6.3",
+    "jest-cli": "^26.6.3",
     "jest-enzyme": "^7.1.2",
-    "jest-styled-components": "^7.0.3",
     "jsdoc-babel": "^0.5.0",
     "jsdom": "^16.4.0",
     "jsdom-global": "^3.0.2",
@@ -83,7 +71,10 @@
     "react-dev-utils": "^11.0.0",
     "react-dom": ">=16.4.1",
     "react-test-renderer": "^17.0.1",
-    "rollup": "^2.32.1",
+    "rescape-log": ">=0.1.21",
+    "rescape-ramda": ">=1.5.78",
+    "rescape-validate": ">=1.2.15",
+    "rollup": "^2.33.1",
     "rollup-plugin-babel": "^4.3.3",
     "rollup-plugin-commonjs": "10.1.0",
     "rollup-plugin-json": "^4.0.0",
@@ -95,11 +86,7 @@
     "rollup-watch": "4.3.1"
   },
   "peerDependencies": {
-    "graphql": ">=0.13.2",
-    "react": ">=16.4.1",
-    "react-dom": ">=16.4.1",
     "rescape-log": ">=0.1.13",
-    "rescape-place": ">=0.0.140",
     "rescape-ramda": ">=1.5.78",
     "rescape-validate": ">=1.2.15"
   },
@@ -117,12 +104,9 @@
       "<rootDir>/src/**/__tests__/**/*.{js,jsx,mjs}",
       "<rootDir>/src/**/?(*.)(spec|test).{js,jsx,mjs}"
     ],
-    "testEnvironment": "node",
+    "testEnvironment": "jest-environment-node",
     "testURL": "http://localhost",
-    "transform": {
-      "^.+\\.(js|jsx|mjs)$": "<rootDir>/node_modules/babel-jest",
-      "^(?!.*\\.(js|jsx|mjs|css|json)$)": "<rootDir>/config/jest/fileTransform.js"
-    },
+    "transform": {},
     "transformIgnorePatterns": [
       "[/\\\\]node_modules[/\\\\].+\\.(js|jsx|mjs)$"
     ],
@@ -137,31 +121,5 @@
       "jsx",
       "node"
     ]
-  },
-  "babel": {
-    "sourceMaps": "inline",
-    "presets": [
-      "@babel/preset-env"
-    ],
-    "env": {
-      "test": {
-        "plugins": [
-          [
-            "transform-es2015-modules-commonjs-simple",
-            {
-              "noMangle": true
-            }
-          ]
-        ]
-      }
-    }
-  },
-  "eslintConfig": {
-    "parser": "babel-eslint"
-  },
-  "private": false,
-  "homepage": "https://github.com/StateOfPlace/sop-config#readme",
-  "directories": {
-    "lib": "lib"
   }
 }
