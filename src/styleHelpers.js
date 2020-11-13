@@ -14,7 +14,6 @@ import PropTypes from 'prop-types';
 import {v} from 'rescape-validate';
 import {compact, filterWithKeys, reqPathThrowing, reqStrPathThrowing} from 'rescape-ramda';
 import decamelize from 'decamelize';
-import styled from 'styled-components';
 
 /**
  * Creates a class name from a root name and a suffix. The given root and suffix will be decamelized

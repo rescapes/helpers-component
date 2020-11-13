@@ -1,4 +1,3 @@
-import styled from 'styled-components';
 import {
   styleMultiplier,
   createScaledPropertyGetter,
@@ -10,6 +9,9 @@ import {applyStyleFunctionOrDefault, getClassAndStyle, getStyleObj, styleArithme
 import * as R from 'ramda';
 import renderer from 'react-test-renderer';
 import {e, propsFor} from './componentHelpers';
+import chakra from "@chakra-ui/core";
+
+const {Button} = chakra;
 
 describe('styles', () => {
   test('getClass', () => {
@@ -37,10 +39,9 @@ describe('styles', () => {
   test('getComponentClassAndStyle', () => {
     // Should work with styled components
     // style object has to be passed via props. We can't extend with style because it would happen during rendering
-    const Button = styled.button`
-              color: red;
-              ${({style}) => style}
-`;
+
+    // color: red;
+    //${({style}) => style}
     const viewObj = {
       chickenOutsidePen: {
         component: Button,
@@ -52,7 +53,7 @@ describe('styles', () => {
     };
 
     const {component, className} = getComponentAndClassName('chickenOutsidePen', viewObj);
-    const renderedComponent = renderer.create(e(component,  propsFor(viewObj, 'chickenOutsidePen'))).toJSON();
+    const renderedComponent = renderer.create(e(component, propsFor(viewObj, 'chickenOutsidePen'))).toJSON();
     expect(renderedComponent).toHaveStyleRule('color', 'red');
     expect(renderedComponent).toHaveStyleRule('background-color', 'blue');
 

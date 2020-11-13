@@ -9,7 +9,9 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 import * as R from 'ramda';
-import styled, {isStyledComponent} from 'styled-components';
+import chakra from "@chakra-ui/core";
+
+const {Button} = chakra;
 import renderer from 'react-test-renderer';
 import {
   applyIfFunction,
@@ -32,7 +34,7 @@ import {
 } from './componentHelpers';
 import {mergeDeep, reqStrPathThrowing, strPathOr} from 'rescape-ramda';
 import {joinComponents, keyWithDatum, mergePropsForViews, renderChoicepoint} from 'componentHelpers';
-import * as React from 'react';
+import React from 'react';
 
 let i = 0;
 
@@ -293,10 +295,11 @@ describe('componentHelpers', () => {
         someView: {foo: 1}
       }
     };
+    // TODO replace with chakra
     // Should work with styled-components
-    const Button = styled.button`
-              color: red;
-`;
+    //const Button = styled.button`
+    //         color: red;
+//`;
 
     // if mergeStylesIntoViews encounters a styled component instead of a style object,
     // it sticks it at 'component' in the view
@@ -305,12 +308,13 @@ describe('componentHelpers', () => {
         p => {
           return {
             // If we want these styles in our view, one of which is from props.style
-            someView: styled(Button)`${p.style}`
+            someView: Button // TODO replace with chakra styled(Button)`${p.style}`
           };
         },
         props
       ).views.someView;
-    expect(isStyledComponent(view.component)).toBeTruthy();
+    // TODO replace with chakra
+    //expect(isStyledComponent(view.component)).toBeTruthy();
     const tree = renderer.create(
       e(view.component, props)
     ).toJSON();
@@ -514,10 +518,13 @@ describe('componentHelpers', () => {
 
   test('componentAndPropsFor', () => {
     // Should work with styled components
+    // TODO replace with chakra
+    /*
     const Button = styled.button`
               color: red;
               ${({style}) => style}
 `;
+     */
     const views = {
       fooView: {
         component: Button,

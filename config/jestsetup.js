@@ -8,23 +8,12 @@
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-// Makes localStorage available in node to Apollo
-import {rescapeDefaultTransports} from 'rescape-log';
 import enzyme from 'enzyme';
-import "core-js/stable";
-import "regenerator-runtime/runtime";
 import 'jest-enzyme';
 import Adapter from 'enzyme-adapter-react-16';
-import 'jest-styled-components'
 
-// Make Enzyme Rx available in all test files without importing
-// Enzyme setup
-require('jsdom-global')();
 enzyme.configure({adapter: new Adapter()});
 
-// Set the loggers to debug level
-rescapeDefaultTransports.fileCombined.level = 'debug';
-rescapeDefaultTransports.console.level = 'debug';
 Error.stackTraceLimit = Infinity;
 
 

@@ -8,7 +8,7 @@ import * as R from 'ramda';
 
 const config = {
   input: [
-    'src/index.js',
+    'src/index.mjs',
     'src/atoms/atoms.js',
     'src/componentHelpers.js',
     'src/styleHelpers',

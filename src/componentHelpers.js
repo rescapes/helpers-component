@@ -9,7 +9,6 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import styled, {isStyledComponent} from 'styled-components';
 import {inspect} from 'util';
 import React from 'react';
 import * as R from 'ramda';
@@ -773,7 +772,7 @@ export const mergeStylesIntoViews = v(R.curry((viewStyles, {views, ...props}) =>
         ],
         // Wrap it in a style key. If it is a styled component, create {component: Styled Component}
         [
-          obj => isStyledComponent(obj),
+          obj => false, // TODO replace with chakra isStyledComponent(obj),
           component => ({component})
         ],
         // By default assume it's a style object

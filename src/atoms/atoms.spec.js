@@ -10,8 +10,10 @@
  */
 
 import * as atoms from './atoms';
-import {mount, shallow} from 'enzyme';
-import {e} from '../componentHelpers'
+import enzyme from 'enzyme';
+import {e} from '../componentHelpers';
+
+const {mount, shallow} = enzyme;
 
 describe('atoms', () => {
   test('Logo', () => {
