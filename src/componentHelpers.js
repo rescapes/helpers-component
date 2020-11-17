@@ -12,7 +12,7 @@
 import {inspect} from 'util';
 import React from 'react';
 import * as R from 'ramda';
-import {v} from 'rescape-validate';
+import {v} from '@rescapes/validate';
 import PropTypes from 'prop-types';
 import {
   compact,
@@ -24,9 +24,9 @@ import {
   reqStrPathThrowing,
   strPathOr,
   stringifyError
-} from 'rescape-ramda';
+} from '@rescapes/ramda';
 import {getClassAndStyle, getComponentAndClassName, getStyleObj} from './styleHelpers';
-import {loggers} from 'rescape-log';
+import {loggers} from '@rescapes/log';
 
 const log = loggers.get('rescapeDefault');
 

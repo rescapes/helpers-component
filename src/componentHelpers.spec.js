@@ -32,7 +32,7 @@ import {
   propsForItem,
   propsForSansClass
 } from './componentHelpers';
-import {mergeDeep, reqStrPathThrowing, strPathOr} from 'rescape-ramda';
+import {mergeDeep, reqStrPathThrowing, strPathOr} from '@rescapes/ramda';
 import {joinComponents, keyWithDatum, mergePropsForViews, renderChoicepoint} from 'componentHelpers';
 import React from 'react';
 

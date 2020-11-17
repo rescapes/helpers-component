@@ -2014,6 +2014,37 @@
   dependencies:
     tslib "^2.0.0"
 
+"@rescapes/log@>=0.1.21":
+  version "0.1.23"
+  resolved "https://npm.pkg.github.com/download/@rescapes/log/0.1.23/3ff038486a3d8376c96a1096e2ee8ff59653c5d132beacc14356e4e6e0b31ebd#5d4ea03e5ba5ea11e912e0ff5ace85aef0f4ad54"
+  integrity sha512-yC5DrsTCmXz8WuCJAUyAof9HX81D6sZ65tVMnWpfIMWLbhaZ1kl9zyiFsvALD9gyhkvWOHVhkJTaUOW8zgIn0w==
+  dependencies:
+    winston "^3.3.3"
+    winston-transport-browserconsole "^1.0.5"
+
+"@rescapes/ramda@>=1.5.78":
+  version "1.6.163"
+  resolved "https://npm.pkg.github.com/download/@rescapes/ramda/1.6.163/48e430107ce96ff9132f1d6271bde6c3c6038996d72906552a259d1db66d7314#ad716a3be24cb0feac8507beec386ff50c23fdd5"
+  integrity sha512-PRPZ4zrsaT2RkbrYtrBq4NTIfzKzH2b+lXbSAfzhkj09bhnbuVZ6LlNR+Aqb7XlOpv8Gg3nd/u8M7yUDrsLzuQ==
+  dependencies:
+    folktale "^2.3.2"
+    fs-extra "^9.0.1"
+    namedtuplemap "^1.0.0"
+    ramda-fantasy "^0.8.0"
+    ramda-maybe "^0.18.0"
+    util "^0.12.3"
+
+"@rescapes/validate@>=1.2.15":
+  version "1.3.22"
+  resolved "https://npm.pkg.github.com/download/@rescapes/validate/1.3.22/6960a8afe1782689c866e3f6d8857e0aee93d4192e4e009ea17f673734c0f9c2#46bdd0b950f126b7a644763cc20afc6f9c603965"
+  integrity sha512-HZGxJ+pp5BSYWwKIV+1DxKOP3FCf9s03Fwh9VW1ipFzeLc4dHc9zUu2SBYqZWeC6sxpcggWMBHfnrooRRLsbPA==
+  dependencies:
+    folktale "^2.3.2"
+    prop-types "^15.6.2"
+    ramda "^0.27.1"
+    ramda-fantasy "^0.8.0"
+    ramda-fantasy-validation "^0.2.0"
+
 "@sinonjs/commons@^1.7.0":
   version "1.8.1"
   resolved "https://registry.npmjs.org/@sinonjs/commons/-/commons-1.8.1.tgz#e7df00f98a203324f6dc7cc606cad9d4a8ab2217"
@@ -8352,38 +8383,6 @@ require-main-filename@^2.0.0:
 require-relative@0.8.7:
   version "0.8.7"
   resolved "https://registry.yarnpkg.com/require-relative/-/require-relative-0.8.7.tgz#7999539fc9e047a37928fa196f8e1563dabd36de"
-
-rescape-log@>=0.1.21:
-  version "0.1.21"
-  resolved "https://registry.npmjs.org/rescape-log/-/rescape-log-0.1.21.tgz#38bd611001d4e9671eb7b50290962913a2584c43"
-  integrity sha512-oSx0o6ORHtB4M5Y7Q6CeX+dsMshSsMdnGzONUNbeXJNncSrCAW+bUgd8I+Yr8RwfGDWPo6ewzaZPQR5psvtgUw==
-  dependencies:
-    winston "^3.3.3"
-    winston-transport-browserconsole "^1.0.5"
-
-rescape-ramda@>=1.5.78, rescape-ramda@^1.6.161:
-  version "1.6.161"
-  resolved "https://registry.npmjs.org/rescape-ramda/-/rescape-ramda-1.6.161.tgz#b595713d40966829149be047f69e013283a91869"
-  integrity sha512-Prg3FsOr2fqifkzPUAg4B1lQNbbsJO416ztYrnm0T+Fwwy62nnCXz5mFkkYPrAjVqAF7nkyvE3EJ/E/pRUofFQ==
-  dependencies:
-    folktale "^2.3.2"
-    fs-extra "^9.0.1"
-    namedtuplemap "^1.0.0"
-    ramda-fantasy "^0.8.0"
-    ramda-maybe "^0.18.0"
-    util "^0.12.3"
-
-rescape-validate@>=1.2.15:
-  version "1.3.19"
-  resolved "https://registry.npmjs.org/rescape-validate/-/rescape-validate-1.3.19.tgz#d7daf0abb38d1be9798043a8fd66354a554b663c"
-  integrity sha512-TmugDXhliRwF2HPbCXYXjzfvhFgMFZ7wg6TPvlQoStTrFrywMD3swhVYjJbpLWfBac6koG+pNxsACjsmXXtT+w==
-  dependencies:
-    folktale "^2.3.2"
-    prop-types "^15.6.2"
-    ramda "^0.27.1"
-    ramda-fantasy "^0.8.0"
-    ramda-fantasy-validation "^0.2.0"
-    rescape-ramda "^1.6.161"
 
 resolve-cwd@^3.0.0:
   version "3.0.0"

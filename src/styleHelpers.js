@@ -11,8 +11,8 @@
 
 import * as R from 'ramda';
 import PropTypes from 'prop-types';
-import {v} from 'rescape-validate';
-import {compact, filterWithKeys, reqPathThrowing, reqStrPathThrowing} from 'rescape-ramda';
+import {v} from '@rescapes/validate';
+import {compact, filterWithKeys, reqPathThrowing, reqStrPathThrowing} from '@rescapes/ramda';
 import decamelize from 'decamelize';
 
 /**
