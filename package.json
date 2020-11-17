@@ -1,6 +1,6 @@
 {
-  "name": "rescape-helpers-component",
-  "version": "1.5.129",
+  "name": "@rescapes/helpers-component",
+  "version": "1.5.130",
   "description": "Helpers for working with React components",
   "main": "src/index.mjs",
   "module": "src/index.mjs",
@@ -11,11 +11,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/calocan/rescape-helpers-component"
+    "url": "git+https://github.com/rescapes/helpers-component"
   },
   "author": "Andy Likuski andy@likuski.org",
   "bugs": {
-    "url": "https://github.com/calocan/rescape-helpers-component"
+    "url": "https://github.com/rescapes/helpers-component"
   },
   "license": "MIT",
   "scripts": {
@@ -47,6 +47,9 @@
     "util": "^0.12.1"
   },
   "devDependencies": {
+    "@rescapes/log": ">=0.1.21",
+    "@rescapes/ramda": ">=1.5.78",
+    "@rescapes/validate": ">=1.2.15",
     "@types/jest": "^26.0.15",
     "babelrc-rollup": "^3.0.0",
     "core-js": "^3.7.0",
@@ -71,9 +74,6 @@
     "react-dev-utils": "^11.0.0",
     "react-dom": ">=16.4.1",
     "react-test-renderer": "^17.0.1",
-    "rescape-log": ">=0.1.21",
-    "rescape-ramda": ">=1.5.78",
-    "rescape-validate": ">=1.2.15",
     "rollup": "^2.33.1",
     "rollup-plugin-babel": "^4.3.3",
     "rollup-plugin-commonjs": "10.1.0",
@@ -86,9 +86,9 @@
     "rollup-watch": "4.3.1"
   },
   "peerDependencies": {
-    "rescape-log": ">=0.1.13",
-    "rescape-ramda": ">=1.5.78",
-    "rescape-validate": ">=1.2.15"
+    "@rescapes/log": ">=0.1.21",
+    "@rescapes/ramda": ">=1.5.78",
+    "@rescapes/validate": ">=1.2.15"
   },
   "jest": {
     "modulePaths": [
