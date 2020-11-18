@@ -14,7 +14,7 @@ import chakra from '@chakra-ui/core';
 const {Box, Flex, Image} = chakra;
 import * as R from 'ramda';
 import {reqStrPathThrowing} from '@rescapes/ramda';
-import {composeViewsFromStruct, e, nameLookup, propsFor} from '../componentHelpers';
+import {composeViewsFromStruct, e, nameLookup, propsFor} from '../componentHelpers.js';
 
 // Adapted from http://jxnblk.com/writing/posts/patterns-for-style-composition-in-react/
 

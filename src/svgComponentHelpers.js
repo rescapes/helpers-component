@@ -10,7 +10,7 @@
  */
 
 import * as R from 'ramda';
-import {e} from './componentHelpers';
+import {e} from './componentHelpers.js';
 
 
 /**

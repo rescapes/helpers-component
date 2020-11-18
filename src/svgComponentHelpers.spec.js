@@ -10,7 +10,7 @@
  */
 
 import {resolveSvgReact} from 'svgComponentHelpers';
-import {e} from './componentHelpers';
+import {e} from './componentHelpers.js';
 
 test('resolveSvgReact', () => {
   expect(resolveSvgReact(

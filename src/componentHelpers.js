@@ -25,7 +25,7 @@ import {
   strPathOr,
   stringifyError
 } from '@rescapes/ramda';
-import {getClassAndStyle, getComponentAndClassName, getStyleObj} from './styleHelpers';
+import {getClassAndStyle, getComponentAndClassName, getStyleObj} from './styleHelpers.js';
 import {loggers} from '@rescapes/log';
 
 const log = loggers.get('rescapeDefault');

@@ -4,11 +4,11 @@ import {
   getClass,
   mergeAndApplyMatchingStyles,
   applyMatchingStyles, getComponentAndClassName
-} from './styleHelpers';
-import {applyStyleFunctionOrDefault, getClassAndStyle, getStyleObj, styleArithmetic} from './styleHelpers';
+} from './styleHelpers.js';
+import {applyStyleFunctionOrDefault, getClassAndStyle, getStyleObj, styleArithmetic} from './styleHelpers.js';
 import * as R from 'ramda';
 import renderer from 'react-test-renderer';
-import {e, propsFor} from './componentHelpers';
+import {e, propsFor} from './componentHelpers.js';
 import chakra from "@chakra-ui/core";
 
 const {Button} = chakra;

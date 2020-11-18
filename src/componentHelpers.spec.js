@@ -31,7 +31,7 @@ import {
   propsFor,
   propsForItem,
   propsForSansClass
-} from './componentHelpers';
+} from './componentHelpers.js';
 import {mergeDeep, reqStrPathThrowing, strPathOr} from '@rescapes/ramda';
 import {joinComponents, keyWithDatum, mergePropsForViews, renderChoicepoint} from 'componentHelpers';
 import React from 'react';

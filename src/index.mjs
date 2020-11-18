@@ -1,4 +1,4 @@
-import {mergeAndApplyMatchingStyles} from './styleHelpers';
+import {mergeAndApplyMatchingStyles} from './styleHelpers.js';
 
 export {
   applyIfFunction,
@@ -17,17 +17,17 @@ export {
   apolloContainerComponent,
   relevantKeyNotMatchingStatus,
   bypassToDataIfUnauthenticated
-} from './componentHelpers';
+} from './componentHelpers.js';
 
 export {
   resolveSvgReact
-} from './svgComponentHelpers';
+} from './svgComponentHelpers.js';
 
 export {
   applyStyleFunctionOrDefault,
   createScaledPropertyGetter, getClass, getClassAndStyle, getStyleObj, styleArithmetic,
   styleMultiplier,
   mergeAndApplyMatchingStyles, applyMatchingStyles
-} from './styleHelpers';
+} from './styleHelpers.js';
 
-export {FlexAuto, Grid, Half, Logo, maxedImage, Quarter, Third, ThreeQuarters} from './atoms/atoms';
+export {FlexAuto, Grid, Half, Logo, maxedImage, Quarter, Third, ThreeQuarters} from './atoms/atoms.js';
