@@ -9,7 +9,7 @@ import {applyStyleFunctionOrDefault, getClassAndStyle, getStyleObj, styleArithme
 import * as R from 'ramda';
 import renderer from 'react-test-renderer';
 import {e, propsFor} from './componentHelpers.js';
-import chakra from "@chakra-ui/core";
+import * as chakra from "@chakra-ui/core";
 
 const {Button} = chakra;
 
