@@ -970,11 +970,11 @@ export const nameLookup = nameObj =>
  * each contribute to the returned props.views
  * @return {Function} The modified props with view properties added by each of the three functions
  */
-export const composeViews = R.curry((viewNameToViewActions, viewNameToViewProps, viewNameToViewStyles, props) => R.compose(
+export const composeViews = R.curry((viewNameToViewActions, viewNameToViewProps, viewNameToViewStyles, props) => {return  R.compose(
   p => mergeEventHandlersForViews(viewNameToViewActions, p),
   p => mergePropsForViews(viewNameToViewProps, p),
   p => mergeStylesIntoViews(viewNameToViewStyles, p)
-  )(props)
+  )(props)}
 );
 
 /**
