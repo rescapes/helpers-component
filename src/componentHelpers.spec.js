@@ -11,7 +11,6 @@
 import * as R from 'ramda';
 import * as chakra from "@chakra-ui/core";
 
-const {Button} = chakra;
 import renderer from 'react-test-renderer';
 import {
   applyIfFunction,
@@ -32,9 +31,11 @@ import {
   propsForItem,
   propsForSansClass
 } from './componentHelpers.js';
-import {mergeDeep, reqStrPathThrowing, strPathOr} from '@rescapes/ramda';
+import {defaultNode, mergeDeep, reqStrPathThrowing} from '@rescapes/ramda';
 import {joinComponents, keyWithDatum, mergePropsForViews, renderChoicepoint} from 'componentHelpers';
 import React from 'react';
+
+const {Button} = defaultNode(chakra);
 
 let i = 0;
 
