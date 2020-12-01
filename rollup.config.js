@@ -46,6 +46,7 @@ const configs = R.map(c => {
     ])
   },
   // ES
+  /*
   {
     output: {
       dir: 'esm',
@@ -61,7 +62,6 @@ const configs = R.map(c => {
   },
 
   // ES for Browsers
-  /*
   {
     output: {
       dir: 'esm',

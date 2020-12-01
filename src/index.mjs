@@ -30,4 +30,4 @@ export {
   mergeAndApplyMatchingStyles, applyMatchingStyles
 } from './styleHelpers.js';
 
-export {FlexAuto, Grid, Half, Logo, maxedImage, Quarter, Third, ThreeQuarters} from './atoms/atoms.js';
+export {FlexAuto, Half, Logo, maxedImage, Quarter, Third, ThreeQuarters} from './atoms/atoms.js';
