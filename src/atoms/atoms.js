@@ -13,7 +13,8 @@ import * as chakra from '@chakra-ui/core';
 import * as R from 'ramda';
 import {reqStrPathThrowing, defaultNode} from '@rescapes/ramda';
 import {composeViewsFromStruct, e, nameLookup, propsFor} from '../componentHelpers.js';
-const {Box, Flex, Image} = defaultNode(chakra);
+
+const {Box, Flex, Image, Grid} = defaultNode(chakra);
 
 // Adapted from http://jxnblk.com/writing/posts/patterns-for-style-composition-in-react/
 
@@ -25,21 +26,6 @@ styled(Image)`
   max-height: 100%;
 `;
  */
-
-/**
- * Creates a full size Box
- * @param props
- * @constructor
- */
-export const Grid = props =>
-  e(Box, R.merge(props, {
-      style: {
-        display: 'inline-block',
-        verticalAlign: 'top'
-      }
-    })
-  );
-
 
 /**
  * Creates a half-size Grid
@@ -77,11 +63,12 @@ export const Quarter = props =>
     })
   );
 
-export const ThreeQuarters = props =>
-  e(Grid, R.merge(props, {
+export const ThreeQuarters = props => {
+  return e(Grid, R.merge(props, {
       w: 3 / 4
     })
   );
+}
 
 /**
  * Creates a flex Box with automatic sizing
@@ -89,11 +76,16 @@ export const ThreeQuarters = props =>
  * @return {*}
  * @constructor
  */
-export const FlexAuto = props =>
-  e(Flex, R.merge(props, {
-      flex: '1 1 auto'
-    })
+export const FlexAuto = props => {
+  return e(Flex,
+    R.merge(
+      R.omit(['className', 'style'], props),
+      {
+        flex: '1 1 auto'
+      }
+    )
   );
+};
 
 /**
  * Creates a logo component, simply a container and an image inside of it
