@@ -15,8 +15,6 @@ import {defaultNode} from '@rescapes/ramda';
 import {e} from './componentHelpers';
 
 const {ChakraProvider, extendTheme} = defaultNode(chakraReact);
-// Extend the default theme with our extensions
-const theme = extendTheme(themeExtensions);
 
 const {render} = defaultNode(testingLibrary);
 
