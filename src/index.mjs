@@ -31,3 +31,5 @@ export {
 } from './styleHelpers.js';
 
 export {FlexAuto, Half, Logo, maxedImage, Quarter, Third, ThreeQuarters} from './atoms/atoms.js';
+
+export {renderWithThemeForTest, ChakraProviderWrapper} from './themeHelpers.js'
