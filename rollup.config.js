@@ -13,7 +13,8 @@ const config = {
     'src/componentHelpers.js',
     'src/styleHelpers',
     'src/svgComponentHelpers',
-    'src/testHelpers'
+    'src/testHelpers',
+    'src/themeHelpers',
   ],
   plugins: []
 };
