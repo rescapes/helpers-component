@@ -13,7 +13,8 @@ const config = {
     'src/componentHelpers.js',
     'src/styleHelpers',
     'src/svgComponentHelpers',
-    'src/testHelpers'
+    'src/testHelpers',
+    'src/themeHelpers',
   ],
   plugins: []
 };
@@ -46,6 +47,7 @@ const configs = R.map(c => {
     ])
   },
   // ES
+  /*
   {
     output: {
       dir: 'esm',
@@ -61,7 +63,6 @@ const configs = R.map(c => {
   },
 
   // ES for Browsers
-  /*
   {
     output: {
       dir: 'esm',

@@ -10,8 +10,9 @@ import * as R from 'ramda';
 import renderer from 'react-test-renderer';
 import {e, propsFor} from './componentHelpers.js';
 import * as chakra from "@chakra-ui/core";
+import {defaultNode} from '@rescapes/ramda'
 
-const {Button} = chakra;
+const {Button} = defaultNode(chakra);
 
 describe('styles', () => {
   test('getClass', () => {
