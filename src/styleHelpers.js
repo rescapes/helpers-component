@@ -49,7 +49,9 @@ export const getClassAndStyle = (name, views) =>
     // This can only be called on className
     (l, r) => R.join(' ', [l, r]),
     {
-      className: getClass(name)
+      className: getClass(name),
+      // Because testing-library doesn't allow to search by className, use this
+      'data-testid': getClass(name),
     },
     compact(R.merge({
         className: R.view(R.lensPath([name, 'className']), views)
@@ -83,7 +85,9 @@ export const getComponentAndClassName = (name, views) => {
       // component is required
       component,
       // Default classname , concatted with those explicitly defined
-      className: getClass(name)
+      className: getClass(name),
+      // Because testing-library doesn't allow to search by className, use this
+      'data-testid': getClass(name),
     },
     compact({
       className: R.view(R.lensPath([name, 'className']), views)
