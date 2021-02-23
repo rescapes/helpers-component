@@ -887,7 +887,7 @@ export const componentAndPropsFor = v((views, name) => {
       R.view(R.lensProp(name), views)
     );
     // TODO I don't know if we'd ever need separate classnames with a styled component, but pass it anyway
-    const {className, component: styledComponent} = getComponentAndClassName(
+    const {component: styledComponent, ...rest} = getComponentAndClassName(
       name,
       views
     );
@@ -896,8 +896,8 @@ export const componentAndPropsFor = v((views, name) => {
     // Returns an pair, the styledComponents and it's props
     return [styledComponent, R.ifElse(
       R.is(Function),
-      f => item => R.mergeAll([{key: name}, f(item), {className}]),
-      obj => R.mergeAll([{key: name}, obj, {className}])
+      f => item => R.mergeAll([{key: name}, f(item), rest]),
+      obj => R.mergeAll([{key: name}, obj, rest])
     )(R.omit(['component'], propsForView))];
   },
   [
