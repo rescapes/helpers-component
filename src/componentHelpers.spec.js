@@ -9,7 +9,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 import * as R from 'ramda';
-import * as chakra from "@chakra-ui/core";
+import * as chakra from "@chakra-ui/react";
 
 import renderer from 'react-test-renderer';
 import {
@@ -483,6 +483,7 @@ describe('componentHelpers', () => {
       {
         key: 'fooProps',
         className: 'foo-props',
+        'data-testid': 'fooProps',
         style: {
           color: 'red'
         },
@@ -490,7 +491,9 @@ describe('componentHelpers', () => {
       }
     );
     expect(propsFor(viewProps, 'bermudaProps')).toEqual(
-      {key: 'bermudaProps', className: 'bermuda-props'}
+      {key: 'bermudaProps',
+        "data-testid": "bermudaProps",
+        className: 'bermuda-props'}
     );
   });
 
@@ -614,6 +617,7 @@ describe('componentHelpers', () => {
       {
         key: 'someView',
         className: 'some-view',
+        "data-testid": "someView",
         style: {
           color: 'puce'
         },

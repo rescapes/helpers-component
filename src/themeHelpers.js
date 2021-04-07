@@ -12,7 +12,7 @@
 import * as testingLibrary from "@testing-library/react";
 import * as chakraReact from "@chakra-ui/react";
 import {defaultNode} from '@rescapes/ramda';
-import {e} from './componentHelpers';
+import {e} from './componentHelpers.js';
 
 const {ChakraProvider, extendTheme} = defaultNode(chakraReact);
 

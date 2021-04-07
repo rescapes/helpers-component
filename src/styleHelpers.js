@@ -26,8 +26,7 @@ import decamelize from 'decamelize';
 export const getClass = (root, suffix = null) => R.join(
   '-',
   R.map(
-    // flip decamelize so the map arg is separate
-    x => decamelize(x, '-'),
+    x => decamelize(x, {separator: '-'}),
     compact(
       [root, suffix]
     )
@@ -52,7 +51,7 @@ export const getClassAndStyle = (name, views) =>
       className: getClass(name),
       // Because testing-library doesn't allow to search by className, use this for searches
       // This also works with enzyme, using the selector wrapper.find(`[data-testid='${name}']`)
-      'data-testid': name,
+      'data-testid': name
     },
     compact(R.merge({
         className: R.view(R.lensPath([name, 'className']), views)
@@ -88,12 +87,12 @@ export const getComponentAndClassName = (name, views) => {
       // Default classname , concatted with those explicitly defined
       className: getClass(name),
       // Because testing-library doesn't allow to search by className, use this
-      'data-testid': name,
+      'data-testid': name
     },
     compact({
       className: R.view(R.lensPath([name, 'className']), views)
     })
-  )
+  );
 };
 
 /**

@@ -9,7 +9,7 @@ import {applyStyleFunctionOrDefault, getClassAndStyle, getStyleObj, styleArithme
 import * as R from 'ramda';
 import renderer from 'react-test-renderer';
 import {e, propsFor} from './componentHelpers.js';
-import * as chakra from "@chakra-ui/core";
+import * as chakra from "@chakra-ui/react";
 import {defaultNode} from '@rescapes/ramda'
 
 const {Button} = defaultNode(chakra);
@@ -29,12 +29,14 @@ describe('styles', () => {
     };
     expect(getClassAndStyle('chickenOutsidePen', viewObj)).toEqual({
       className: 'chicken-outside-pen foo bar',
+      "data-testid": "chickenOutsidePen",
       style: {
         border: 'coop'
       }
     });
     expect(getClassAndStyle('sheepGotoHeaven', viewObj)).toEqual({
-      className: 'sheep-goto-heaven'
+      className: 'sheep-goto-heaven',
+      "data-testid": "sheepGotoHeaven"
     });
   });
   test('getComponentClassAndStyle', () => {
