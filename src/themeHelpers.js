@@ -36,7 +36,7 @@ export const ChakraProviderWrapper = ({theme, children}) => {
  */
 export const renderWithThemeForTest = (theme, children) => {
   const Wrapper = ({children}) => {
-    return e(ChakraProvider, theme, children);
+    return e(ChakraProvider, {theme}, children);
   };
 
   return render(children, {wrapper: Wrapper});
