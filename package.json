@@ -50,7 +50,6 @@
     "@rescapes/log": ">=0.1.30",
     "@rescapes/ramda": ">=1.6.172",
     "@rescapes/validate": ">=1.3.25",
-    "@testing-library/react": "^11.2.6",
     "@types/jest": "^26.0.22",
     "babelrc-rollup": "^3.0.0",
     "core-js": "^3.10.0",

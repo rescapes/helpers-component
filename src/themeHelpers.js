@@ -1,3 +1,4 @@
+
 /**
  * Created by Andy Likuski on 2020.12.11
  * Copyright (c) 2020 Andy Likuski
@@ -9,14 +10,14 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import * as testingLibrary from "@testing-library/react";
+import enzyme from 'enzyme';
 import * as chakraReact from "@chakra-ui/react";
 import {defaultNode} from '@rescapes/ramda';
 import {e} from './componentHelpers.js';
 
+const {mount, shallow} = enzyme;
 const {ChakraProvider, extendTheme} = defaultNode(chakraReact);
 
-const {render} = defaultNode(testingLibrary);
 
 /**
  * Wraps the component in a ChakaaProvider
@@ -39,5 +40,6 @@ export const renderWithThemeForTest = (theme, children) => {
     return e(ChakraProvider, {theme}, children);
   };
 
-  return render(children, {wrapper: Wrapper});
+  // TODO This was using test-libary, fix to work with enzyme
+  return mount(children, {wrapper: Wrapper});
 };
