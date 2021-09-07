@@ -33,3 +33,5 @@ export {
 export {FlexAuto, Half, Logo, maxedImage, Quarter, Third, ThreeQuarters} from './atoms/atoms.js';
 
 export {renderWithThemeForTest, ChakraProviderWrapper} from './themeHelpers.js'
+export {useWindowDimensions, usePopupState, mergeWithRoute, checkVariation, isAuthenticated, noRequestsApolloContainerComponent, removeRequestProps, renderDataBoolChoicepoint, renderLinkOrPopup} from './effectHelpers.js'
+export {useInput} from './hookHelpers.js';
