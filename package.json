@@ -30,8 +30,6 @@
     "publish-minor": "yarn version --minor && yarn publish --non-interactive"
   },
   "dependencies": {
-    "@chakra-ui/react": "^1.5.0",
-    "@emotion/styled": "^11",
     "apollo-client": "^2.6.4",
     "decamelize": "5.0.0",
     "folktale": "^2.1.0",
@@ -45,7 +43,6 @@
     "util": "^0.12.1"
   },
   "devDependencies": {
-    "@emotion/react": ">=11.4.0",
     "@rescapes/log": ">=0.1.30",
     "@rescapes/ramda": ">=1.6.172",
     "@rescapes/validate": ">=1.3.25",
@@ -86,7 +83,6 @@
     "rollup-watch": "4.3.1"
   },
   "peerDependencies": {
-    "@emotion/react": ">=11.4.0",
     "@rescapes/log": ">=0.1.21",
     "@rescapes/ramda": ">=1.5.78",
     "@rescapes/validate": ">=1.2.15"

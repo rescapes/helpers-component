@@ -9,12 +9,10 @@ import * as R from 'ramda';
 const config = {
   input: [
     'src/index.mjs',
-    'src/atoms/atoms.js',
     'src/componentHelpers.js',
     'src/styleHelpers',
     'src/svgComponentHelpers',
     'src/testHelpers',
-    'src/themeHelpers',
   ],
   plugins: []
 };
