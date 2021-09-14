@@ -16,7 +16,8 @@ export {
   componentAndPropsFor,
   apolloContainerComponent,
   relevantKeyNotMatchingStatus,
-  bypassToDataIfUnauthenticated
+  bypassToDataIfUnauthenticated,
+  componentWithAdoptedContainer
 } from './componentHelpers.js';
 
 export {

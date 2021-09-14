@@ -27,6 +27,7 @@ import {
 } from '@rescapes/ramda';
 import {getClassAndStyle, getComponentAndClassName, getStyleObj} from './styleHelpers.js';
 import {loggers} from '@rescapes/log';
+import {adopt} from 'react-adopt';
 
 const log = loggers.get('rescapeDefault');
 
@@ -970,11 +971,13 @@ export const nameLookup = nameObj =>
  * each contribute to the returned props.views
  * @return {Function} The modified props with view properties added by each of the three functions
  */
-export const composeViews = R.curry((viewNameToViewActions, viewNameToViewProps, viewNameToViewStyles, props) => {return  R.compose(
-  p => mergeEventHandlersForViews(viewNameToViewActions, p),
-  p => mergePropsForViews(viewNameToViewProps, p),
-  p => mergeStylesIntoViews(viewNameToViewStyles, p)
-  )(props)}
+export const composeViews = R.curry((viewNameToViewActions, viewNameToViewProps, viewNameToViewStyles, props) => {
+    return R.compose(
+      p => mergeEventHandlersForViews(viewNameToViewActions, p),
+      p => mergePropsForViews(viewNameToViewProps, p),
+      p => mergeStylesIntoViews(viewNameToViewStyles, p)
+    )(props)
+  }
 );
 
 /**
@@ -1109,7 +1112,19 @@ export const apolloContainerComponent = (container, component) => {
   };
 };
 
-
+/***
+ * Like apolloContainerComponent but called with apolloContainers instead of a container. The apolloContainers
+ * are passed to react-adopt's adopt method to make them each available as props to the component
+ * @param {Object} apolloContainers keyed by query or mutation name, and valued by the Query or Mutation
+ * apollo component. Queries names should begin with 'query' and mutation names with 'mutate' for testing
+ * @param component
+ * @returns {function(*=): *}
+ */
+export const componentWithAdoptedContainer = (apolloContainers, component) => {
+  return props => {
+    return apolloContainerComponent(adopt(apolloContainers), component)(props);
+  }
+};
 /**
  * Checks to see if the query/cache result at authenticationQueryPath is null. If null,
  * onData is returned to indicate the user is not authenticated and we should skip other Apollo request
@@ -1119,7 +1134,11 @@ export const apolloContainerComponent = (container, component) => {
  * @param authenticationQueryPath
  * @returns {function({onError: *, onLoading: *, onData: *}, *, *=): *}
  */
-export const bypassToDataIfUnauthenticated = authenticationQueryPath => ({onError, onLoading, onData}, propConfig, props) => {
+export const bypassToDataIfUnauthenticated = authenticationQueryPath => ({
+                                                                           onError,
+                                                                           onLoading,
+                                                                           onData
+                                                                         }, propConfig, props) => {
   return R.ifElse(
     props => {
       return strPathOr(false, authenticationQueryPath, props);
