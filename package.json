@@ -30,7 +30,6 @@
     "publish-minor": "yarn version --minor && yarn publish --non-interactive"
   },
   "dependencies": {
-    "apollo-client": "^2.6.4",
     "decamelize": "5.0.0",
     "folktale": "^2.1.0",
     "framer-motion": "^4.1.17",
