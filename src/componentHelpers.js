@@ -1125,6 +1125,33 @@ export const componentWithAdoptedContainer = (apolloContainers, component) => {
     return apolloContainerComponent(adopt(apolloContainers), component)(props);
   }
 };
+
+/**
+ * Wraps a component in a container that has the given apolloContainers (query and mutation components).
+ * If USE_MOCKS is in the env variables then don't link the container.
+ * @param {Function} apolloContainers Expects and apolloConfig and returns an object of apollo query and
+ * mutation containers
+ * @param {Object} component The component that expects the adopted apollo queries and mutation responses
+ * to come as props keyed by their object keys.
+ * @returns {Object} The wrapped component at 'component' and the created container at 'container'. The
+ * latter is null if mocking and only needed for tests
+ */
+export const componentAndContainer = ({apolloContainers}, component) => {
+  let _component;
+  export let container
+  if (!process.env.USE_MOCKS) {
+    container = props => {
+      return adopt(apolloContainers())(props)
+    };
+    _component = (props) => {
+      return apolloContainerComponent(container, component)(props);
+    };
+  } else {
+    _component = component
+  }
+  return {component: _component, container}
+}
+
 /**
  * Checks to see if the query/cache result at authenticationQueryPath is null. If null,
  * onData is returned to indicate the user is not authenticated and we should skip other Apollo request
