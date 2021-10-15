@@ -1137,8 +1137,7 @@ export const componentWithAdoptedContainer = (apolloContainers, component) => {
  * latter is null if mocking and only needed for tests
  */
 export const componentAndContainer = ({apolloContainers}, component) => {
-  let _component;
-  export let container
+  let _component, container;
   if (!process.env.USE_MOCKS) {
     container = props => {
       return adopt(apolloContainers())(props)
