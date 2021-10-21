@@ -28,11 +28,6 @@ import {
 import {getClassAndStyle, getComponentAndClassName, getStyleObj} from './styleHelpers.js';
 import {loggers} from '@rescapes/log';
 import {adopt} from 'react-adopt';
-import {apolloContainersExplorationBlock} from "../../../../src/apolloContainers/ExplorationBlockContainer.js";
-import {
-  filterForMutationContainers,
-  filterForQueryContainers
-} from "@rescapes/helpers-test/src/apolloContainerTestHelpers.js";
 
 const log = loggers.get('rescapeDefault');
 
@@ -1180,6 +1175,61 @@ export const bypassToDataIfUnauthenticated = authenticationQueryPath => (
       return onData;
     }
   )(props);
+};
+
+
+/**
+ * Filter for just the query containers of the given apolloContainersLogout
+ * @param {Object} apolloContainers Keyed by request name and valued by apollo request container.
+ * Only those beginning with 'query' are considered
+ * @return {*}
+ */
+export const filterForQueryContainers = apolloContainers => {
+  return filterWithKeys(
+    (_, key) => {
+      return R.includes('query', key);
+    },
+    apolloContainers
+  );
+};
+
+export const filterForMutationContainers = (apolloContainers) => {
+  return filterWithKeys(
+    (_, key) => {
+      return R.includes('mutat', key);
+    },
+    apolloContainers
+  );
+}
+/***
+ * Filter for just the mutation containers of the given apolloContainersLogout
+ * @param {Object} apolloContainers Keyed by request name and valued by apollo request container.
+ * Only those beginning with 'mutat' are considered
+ * @return {[Task]} List of mutation tasks
+ */
+export const filterForMutationContainersWithQueriesRunFirst = apolloContainers => {
+  const queryContainers = filterForQueryContainers(apolloContainers)
+  const mutationContainers = filterForMutationContainers(apolloContainers);
+  return R.map(
+    (mutationContainer) => {
+      // Run all the queries before each mutation if queries exist in case the mutation needs the query results
+      return R.length(R.keys(queryContainers)) ? props => {
+        return composeWithChain([
+          props => {
+            return mutationContainer(props)
+          },
+          // Run all the queries in their original order, assigning the results to their key
+          ...R.reverse(mapObjToValues(
+            (queryContainer, key) => {
+              return mapToNamedResponseAndInputs(key, queryContainer)
+            },
+            queryContainers
+          ))
+        ])(props)
+      } : mutationContainer
+    },
+    mutationContainers
+  )
 };
 
 /**

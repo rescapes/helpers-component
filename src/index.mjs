@@ -19,7 +19,10 @@ export {
   bypassToDataIfUnauthenticated,
   componentWithAdoptedContainer,
   componentAndContainer,
-  mutationsReadyAndQueriesLoadedPropConfig
+  mutationsReadyAndQueriesLoadedPropConfig,
+  filterForQueryContainers,
+  filterForMutationContainers,
+  filterForMutationContainersWithQueriesRunFirst
 } from './componentHelpers.js';
 
 export {
