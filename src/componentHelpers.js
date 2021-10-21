@@ -28,6 +28,11 @@ import {
 import {getClassAndStyle, getComponentAndClassName, getStyleObj} from './styleHelpers.js';
 import {loggers} from '@rescapes/log';
 import {adopt} from 'react-adopt';
+import {apolloContainersExplorationBlock} from "../../../../src/apolloContainers/ExplorationBlockContainer.js";
+import {
+  filterForMutationContainers,
+  filterForQueryContainers
+} from "@rescapes/helpers-test/src/apolloContainerTestHelpers.js";
 
 const log = loggers.get('rescapeDefault');
 
@@ -91,7 +96,7 @@ export const e = React.createElement;
  * based on the propConfig.
  * If any apollo request prop has 'error' and is configured in propConfig, then
  * funcConfig.onError(props) is called.
- * Else if any apollo request prop has 'loading' and is configured in propConfig,
+ * Else if any apollo request prop has 'loading' or skip=true and is configured in propConfig,
  * then funcConfig.onLoading(props) is called.
  * Else if any apollo request props has networkStatus=7 and is configured
  * in propXConfig, then funcConfig.onData(props) is called
@@ -335,7 +340,7 @@ const _relevantPropConfig = (status, propConfig, noBool = false) => {
     (value, name) => {
       return R.cond([
         [
-          // SKip propConfig values that are functions, this is only _authenticationBypass
+          // Skip propConfig values that are functions, this is only _authenticationBypass
           R.is(Function),
           () => false
         ],
@@ -1160,11 +1165,12 @@ export const componentAndContainer = ({apolloContainers}, component) => {
  * @param authenticationQueryPath
  * @returns {function({onError: *, onLoading: *, onData: *}, *, *=): *}
  */
-export const bypassToDataIfUnauthenticated = authenticationQueryPath => ({
-                                                                           onError,
-                                                                           onLoading,
-                                                                           onData
-                                                                         }, propConfig, props) => {
+export const bypassToDataIfUnauthenticated = authenticationQueryPath => (
+  {
+    onError,
+    onLoading,
+    onData
+  }, propConfig, props) => {
   return R.ifElse(
     props => {
       return strPathOr(false, authenticationQueryPath, props);
@@ -1175,3 +1181,18 @@ export const bypassToDataIfUnauthenticated = authenticationQueryPath => ({
     }
   )(props);
 };
+
+/**
+ * The default propConfig for renderChoicepoint is to check that all mutations of the container are ready (not skipped
+ * because supporting queries are loading) and that all queries are loaded
+ * @param {Function} containers A containers function unary function that is called without an argument to get
+ * the names of the mutations and queries
+ * @returns {Object} A lookup from the request name to the propConfig status, ['onReady'] for mutations
+ * and true for queries. See the renderChoicepoint function for more details about statuses
+ */
+export const mutationsReadyAndQueriesLoadedPropConfig = containers => {
+  return R.merge(
+    R.map(() => ['onReady'], filterForMutationContainers(containers())),
+    R.map(() => true, filterForQueryContainers(containers()))
+  )
+}

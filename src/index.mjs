@@ -18,7 +18,8 @@ export {
   relevantKeyNotMatchingStatus,
   bypassToDataIfUnauthenticated,
   componentWithAdoptedContainer,
-  componentAndContainer
+  componentAndContainer,
+  mutationsReadyAndQueriesLoadedPropConfig
 } from './componentHelpers.js';
 
 export {
