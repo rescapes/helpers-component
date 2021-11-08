@@ -1145,6 +1145,7 @@ export const componentAndContainer = ({apolloContainers}, component) => {
     _component = (props) => {
       return apolloContainerComponent(container, component)(props);
     };
+    _component.displayName = `ContainerOf${component.displayName || component.name}`
   } else {
     _component = component
   }
