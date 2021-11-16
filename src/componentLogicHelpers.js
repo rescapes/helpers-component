@@ -10,7 +10,7 @@
  */
 
 import * as R from 'ramda';
-import {filterWithKeys, strPathOr, toArrayIfNot} from '@rescapes/ramda';
+import {strPathOr} from '@rescapes/ramda';
 import React from 'react';
 import {propsFor} from "./componentHelpers.js";
 
@@ -19,56 +19,13 @@ import {propsFor} from "./componentHelpers.js";
  * Normally Apollo requests are composed with react-adopt, but we can't use react-adopt if we don't
  * have any Apollo requests for a container
  * @param {Object} props Ignored, except for props.children
- * @param {Object} props.children A render function to call with no arguments. When used with
+ * @param {Function} props.children A render function to call with no arguments. When used with
  * apolloContainerComponent, the props are passed to the component rendered by children
  * @returns {function(*, ...[*]): *}
  */
 export const noRequestsApolloContainerComponent = ({children, ...props}) => {
   return children({});
 };
-
-const {useState, useEffect} = React;
-
-/**
- * https://stackoverflow.com/questions/36862334/get-viewport-window-height-in-reactjs
- * @returns {{width: number, height: number}}
- */
-const getWindowDimensions = () => {
-  const {innerWidth: width, innerHeight: height} = window;
-  return {
-    width,
-    height
-  };
-};
-
-/**
- * React Effect to respond to browser window dimensions
- * @returns {{width: number, height: number}}
- */
-export function useWindowDimensions() {
-  const [windowDimensions, setWindowDimensions] = useState(getWindowDimensions());
-
-  useEffect(() => {
-    function handleResize() {
-      setWindowDimensions(getWindowDimensions());
-    }
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  return windowDimensions;
-}
-
-/**
- * Simple state holder for whether a popup is open. This could become more complex later
- * @param {Boolean} isOpen pass true if the state is initially open, else false
- * @returns {[]}
- */
-export function usePopupState(isOpen) {
-  const [popupState, setPopupState] = useState(isOpen);
-  return [popupState, setPopupState];
-}
 
 /**
  * Puts routeProps in the routeProps key and merge with the props destined for the component of the given key
@@ -79,6 +36,7 @@ export const mergeWithRoute = views => (key, routeProps) => {
   const propsOf = propsFor(views);
   return R.merge(propsOf(key), {routeProps});
 };
+
 /**
  * Render the data based on whether or not their is an active project or not
  * @param {String} propPath
@@ -110,39 +68,6 @@ export const isAuthenticated = props => {
   return !strPathOr(false, 'mutateDeleteTokenCookie.result.data.deleteTokenCookie', props) && (
     strPathOr(false, 'queryLocalTokenAuthContainer.data.token', props) ||
     strPathOr(false, 'mutateTokenAuth.result.data.tokenAuth', props));
-};
-
-// TODO react-adopt seems to prefer prop keys that already exist, which clashes with our calls
-// above, so don't pass any request props
-export const removeRequestProps = props => filterWithKeys(
-  (value, key) => {
-    return !R.either(R.startsWith('mutate'), R.startsWith('query'))(key);
-  },
-  props
-);
-
-/**
- *
- * @param {String} queryPropKey Prop key of props that resolves to a single query name or list
- * of names that should pass through this filter
- * @param {[String]} queryNames Query names to check
- * @param props
- * @returns {Object} Returns a subset of queryNames with names as keys and true as values, base on
- * which names match props[queryPropKey]
- */
-export const checkVariation = (queryPropKey, queryNames, props) => {
-  // Only pass these through
-  const queryPropKeyValues = toArrayIfNot(R.propOr([], queryPropKey, props));
-  return R.compose(
-    R.fromPairs,
-    queryNames => R.map(s => [s, true], queryNames),
-    queryNames => R.filter(
-      queryName => {
-        return R.includes(queryName, queryPropKeyValues);
-      },
-      queryNames
-    )
-  )(queryNames);
 };
 
 /**

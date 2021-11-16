@@ -37,5 +37,9 @@ export {
 } from './styleHelpers.js';
 
 
-export {useWindowDimensions, usePopupState, mergeWithRoute, checkVariation, isAuthenticated, noRequestsApolloContainerComponent, removeRequestProps, renderDataBoolChoicepoint, renderLinkOrPopup} from './effectHelpers.js'
+export {mergeWithRoute, isAuthenticated, noRequestsApolloContainerComponent, renderDataBoolChoicepoint, renderLinkOrPopup} from './componentLogicHelpers.js'
 export {useInput} from './hookHelpers.js';
+export {checkQueryVariation} from "./queryComponentHelpers.js";
+export {removeRequestProps} from "./queryComponentHelpers.js";
+export {usePopupState} from "./hookHelpers.js";
+export {useWindowDimensions} from "./hookHelpers.js";

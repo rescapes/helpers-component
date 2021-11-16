@@ -10,7 +10,7 @@
  */
 
 import _React from "react";
-const {useState, default: React} = _React
+const {useState, useEffect, default: React} = _React
 
 //https://rangle.io/blog/simplifying-controlled-inputs-with-hooks/
 /**
@@ -30,3 +30,44 @@ export const useInput = initialValue => {
     }
   };
 };
+
+/**
+ * Simple state holder for whether a popup is open. This could become more complex later
+ * @param {Boolean} isOpen pass true if the state is initially open, else false
+ * @returns {[]}
+ */
+export function usePopupState(isOpen) {
+  const [popupState, setPopupState] = useState(isOpen);
+  return [popupState, setPopupState];
+}
+
+/**
+ * https://stackoverflow.com/questions/36862334/get-viewport-window-height-in-reactjs
+ * @returns {{width: number, height: number}}
+ */
+const getWindowDimensions = () => {
+  const {innerWidth: width, innerHeight: height} = window;
+  return {
+    width,
+    height
+  };
+};
+
+/**
+ * React Hook to respond to browser window dimensions
+ * @returns {{width: number, height: number}}
+ */
+export function useWindowDimensions() {
+  const [windowDimensions, setWindowDimensions] = useState(getWindowDimensions());
+
+  useEffect(() => {
+    function handleResize() {
+      setWindowDimensions(getWindowDimensions());
+    }
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return windowDimensions;
+}
