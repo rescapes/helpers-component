@@ -83,7 +83,7 @@ export const eMap = types => R.map(component => React.createElement(component), 
  * @param {String|Function|Object} React element types (e.g. 'div', 'svg', Router, or MyComponent)
  * @returns the factory for the component. Thus you can call e('div')({...props...}, ...child components)
  */
-export const e = React.createElement;
+export {jsx as e} from 'react/jsx-runtime';
 
 /**
  * Returns a function that expects each described apollo request props to contain
