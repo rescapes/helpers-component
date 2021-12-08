@@ -9,10 +9,10 @@ import {applyStyleFunctionOrDefault, getClassAndStyle, getStyleObj, styleArithme
 import * as R from 'ramda';
 import renderer from 'react-test-renderer';
 import {e, propsFor} from './componentHelpers.js';
-import * as chakra from "@chakra-ui/react";
+//import * as chakra from "@chakra-ui/react";
 import {defaultNode} from '@rescapes/ramda'
 
-const {Button} = defaultNode(chakra);
+//const {Button} = defaultNode(chakra);
 
 describe('styles', () => {
   test('getClass', () => {

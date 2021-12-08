@@ -9,7 +9,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 import * as R from 'ramda';
-import * as chakra from "@chakra-ui/react";
+//import * as chakra from "@chakra-ui/react";
 
 import {
   applyIfFunction,
@@ -34,7 +34,7 @@ import {defaultNode, mergeDeep, reqStrPathThrowing} from '@rescapes/ramda';
 import {joinComponents, keyWithDatum, mergePropsForViews, renderChoicepoint} from 'componentHelpers';
 import React from 'react';
 
-const {Button} = defaultNode(chakra);
+//const {Button} = defaultNode(chakra);
 
 let i = 0;
 
@@ -644,6 +644,7 @@ describe('componentHelpers', () => {
         React.createElement('div', {prop: 'me up!'}, React.createElement('div', {prop: 'some child'}))
       );
       expect(e(Joker, {prop: 'ace'})).toEqual(React.createElement(Joker, {prop: 'ace'}));
+      expect(e(Joker, {prop: 'ace', children: 'swom'})).toEqual(React.createElement(Joker, {prop: 'ace'}, 'swom'));
     }
   );
 

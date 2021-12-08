@@ -28,6 +28,7 @@ import {
 import {getClassAndStyle, getComponentAndClassName, getStyleObj} from './styleHelpers.js';
 import {loggers} from '@rescapes/log';
 import {adopt} from 'react-adopt';
+import {jsx} from 'react/jsx-runtime'
 
 const log = loggers.get('rescapeDefault');
 
@@ -79,11 +80,15 @@ export const propLensEqual = v(R.curry((lens, props, nextProps) =>
 export const eMap = types => R.map(component => React.createElement(component), types);
 
 /**
- * Synonym to react create element
- * @param {String|Function|Object} React element types (e.g. 'div', 'svg', Router, or MyComponent)
+ * Creates a react element without JSX syntax
+ * @param {String|Function|Object} component React element types (e.g. 'div', 'svg', Router, or MyComponent)
+ * @param {Object} [props] Default {}, props to pass
+ * @param {Object} [children] Default props.children or null
  * @returns the factory for the component. Thus you can call e('div')({...props...}, ...child components)
  */
-export {jsx as e} from 'react/jsx-runtime';
+export const e = (component, props = {}, children = null) => {
+  return children ? jsx(component, {...props, children}) : jsx(component, props)
+}
 
 /**
  * Returns a function that expects each described apollo request props to contain
