@@ -23,7 +23,7 @@ import {
   reqPathThrowing,
   reqStrPathThrowing,
   strPathOr,
-  stringifyError
+  stringifyError, composeWithChain, mapToNamedResponseAndInputs, mapObjToValues
 } from '@rescapes/ramda';
 import {getClassAndStyle, getComponentAndClassName, getStyleObj} from './styleHelpers.js';
 import {loggers} from '@rescapes/log';
