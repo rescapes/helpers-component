@@ -28,7 +28,7 @@ import {
 import {getClassAndStyle, getComponentAndClassName, getStyleObj} from './styleHelpers.js';
 import {loggers} from '@rescapes/log';
 import {adopt} from 'react-adopt';
-import {jsx} from 'react/jsx-runtime'
+import {jsx} from 'react/jsx-runtime.js'
 
 const log = loggers.get('rescapeDefault');
 
