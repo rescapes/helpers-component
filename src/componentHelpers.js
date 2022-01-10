@@ -252,8 +252,11 @@ const _mapStatusToFunc = (status, obj) => {
           R.propEq('networkStatus', 7)
         )(obj)
       )(R.propOr({}, 'result', obj)),
-      // If query check the result
-      R.propEq('networkStatus', 7)
+      // If query check the result for status 7 or for obj.data non-null. Cache queries don't have a status
+      // so we need the latter check
+      obj => {
+        return R.either(R.propEq('networkStatus', 7), R.propOr(null, 'data'))(obj)
+      }
     )(obj)
   };
   return reqStrPathThrowing(status, statusLookup)(obj);
