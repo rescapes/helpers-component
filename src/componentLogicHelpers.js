@@ -66,7 +66,7 @@ export const renderDataBoolChoicepoint = R.curry((propPath, {onTrue, onFalse}, p
 // is the cache, but I don't know how to get a cache write to trigger dependent queries.
 export const isAuthenticated = props => {
   return !strPathOr(false, 'mutateDeleteTokenCookie.result.data.deleteTokenCookie', props) && (
-    strPathOr(false, 'queryLocalTokenAuthContainer.data.token', props) ||
+    strPathOr(false, 'queryLocalTokenAuthContainer.data.obtainJSONWebToken.token', props) ||
     strPathOr(false, 'mutateTokenAuth.result.data.tokenAuth', props));
 };
 
