@@ -188,7 +188,7 @@ export const renderChoicepoint = R.curry(({onError, onLoading, onData, component
           keysMatchingStatus('onData', propConfig, props),
           keysMatchingStatus('onReady', propConfig, props)
         ));
-        const relevantKeys = R.uniq(R.keys(R.merge(
+        const relevantKeys = R.uniq(R.keys(R.mergeRight(
           _relevantPropConfig('onData', propConfig),
           _relevantPropConfig('onReady', propConfig)
         )));
@@ -550,7 +550,7 @@ export const mergePropsForViews = R.curry((viewNamesToViewProps, props) => {
       let i = 0;
       return d => {
         return R.compose(
-          R.merge({
+          R.mergeRight({
             key: R.propOr(R.concat(viewName, (++i).toString()), 'key', d)
           }),
           f
@@ -558,7 +558,7 @@ export const mergePropsForViews = R.curry((viewNamesToViewProps, props) => {
       };
     },
     // Just merge the key
-    obj => R.merge({key: viewName}, obj)
+    obj => R.mergeRight({key: viewName}, obj)
   )(objOrFunc);
 
   // If any item is still a function, we have to assume that items are being applied, so convert
@@ -583,7 +583,7 @@ export const mergePropsForViews = R.curry((viewNamesToViewProps, props) => {
       ]),
       obj => {
         let i = 0;
-        return R.merge(
+        return R.mergeRight(
           obj,
           {
             key: d => R.propOr(R.concat(viewName, (++i).toString()), 'key', d)
@@ -640,7 +640,7 @@ export const mergePropsForViews = R.curry((viewNamesToViewProps, props) => {
  * key will simply be referred by 'key'
  * @return {*} viewProps with 'key' added, where the value is a string or function
  */
-export const keyWith = (keyStr, viewProps) => R.merge(viewProps, {
+export const keyWith = (keyStr, viewProps) => R.mergeRight(viewProps, {
   key: reqStrPathThrowing(keyStr, viewProps).toString()
 });
 
@@ -654,7 +654,7 @@ export const keyWith = (keyStr, viewProps) => R.merge(viewProps, {
  * key will simply be referred by 'key'
  * @return {*} viewProps with 'key' added, where the value is a string or function or the defaultValue
  */
-export const keyWithOr = (defaultValue, keyStr, viewProps) => R.merge(viewProps, {
+export const keyWithOr = (defaultValue, keyStr, viewProps) => R.mergeRight(viewProps, {
   key: strPathOr(keyStr, viewProps).toString()
 });
 
@@ -687,7 +687,7 @@ export const keyApolloResultWithOrLoadError = (keyStr, apolloResult) => {
  * @return {*} viewProps with a key property added with value d[key]
  */
 export const keyWithDatum = R.curry(
-  (key, d, viewProps) => R.merge(
+  (key, d, viewProps) => R.mergeRight(
     viewProps,
     {key: reqStrPathThrowing(key, d).toString()}
   )
@@ -880,7 +880,7 @@ export const propsForSansClass = v((views, name) => {
     ['name', PropTypes.string.isRequired]
   ], 'propsForSansClass');
 
-export const propsAndStyle = (name, viewProps) => R.merge(
+export const propsAndStyle = (name, viewProps) => R.mergeRight(
   getStyleObj(name, R.propOr({name: {style: {}}}, name, viewProps)),
   R.omit(['style'], viewProps)
 );
@@ -1086,7 +1086,7 @@ export const renderErrorDefault = v(viewName => (keysWithErrors, {views, ...requ
  */
 export const makeTestPropsFunction = (mapStateToProps, mapDispatchToProps) => {
   (sampleState, sampleOwnProps) => {
-    return R.merge(
+    return R.mergeRight(
       mapStateToProps(sampleState, sampleOwnProps),
       mapDispatchToProps(R.identity, sampleOwnProps)
     );
@@ -1114,7 +1114,7 @@ export const apolloContainerComponent = (container, component) => {
       // Merge them with the original props, which can return values unrelated to the apollo requests
       responseProps => e(
         component,
-        R.merge(props, responseProps)
+        R.mergeRight(props, responseProps)
       )
     );
   };
@@ -1250,7 +1250,7 @@ export const filterForMutationContainersWithQueriesRunFirst = apolloContainers =
  * and true for queries. See the renderChoicepoint function for more details about statuses
  */
 export const mutationsReadyAndQueriesLoadedPropConfig = containers => {
-  return R.merge(
+  return R.mergeRight(
     R.map(() => ['onReady'], filterForMutationContainers(containers())),
     R.map(() => true, filterForQueryContainers(containers()))
   )

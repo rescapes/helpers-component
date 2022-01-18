@@ -53,7 +53,7 @@ export const getClassAndStyle = (name, views) =>
       // This also works with enzyme, using the selector wrapper.find(`[data-testid='${name}']`)
       'data-testid': name
     },
-    compact(R.merge({
+    compact(R.mergeRight({
         className: R.view(R.lensPath([name, 'className']), views)
       },
       getStyleObj(name, views))

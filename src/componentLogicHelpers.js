@@ -34,7 +34,7 @@ export const noRequestsApolloContainerComponent = ({children, ...props}) => {
  */
 export const mergeWithRoute = views => (key, routeProps) => {
   const propsOf = propsFor(views);
-  return R.merge(propsOf(key), {routeProps});
+  return R.mergeRight(propsOf(key), {routeProps});
 };
 
 /**

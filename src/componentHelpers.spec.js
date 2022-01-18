@@ -79,8 +79,8 @@ describe('componentHelpers', () => {
     };
     // mergeProps should merge stateProps and dispatchProps but copy the actions to stateProps.views according
     // to the mapping given to mergeEventHandlersForViews
-    expect(mergeProps(R.merge(stateProps, dispatchProps))).toEqual(
-      R.merge({
+    expect(mergeProps(R.mergeRight(stateProps, dispatchProps))).toEqual(
+      R.mergeRight({
         a: 1,
         views: {
           aComponent: {stuff: 1, onClick: R.identity, onTick: R.identity},
@@ -117,7 +117,7 @@ describe('componentHelpers', () => {
           foo: 1,
           bar: reqStrPathThrowing('data.store.bar')
         },
-        bComponent: R.merge(
+        bComponent: R.mergeRight(
           {
             bar: reqStrPathThrowing('data.store.bar'),
             // say we need width in bComponent's props, not just its props.styles
@@ -187,7 +187,7 @@ describe('componentHelpers', () => {
       {
         views: {
           aComponent: {key: 'aComponent', stuff: 1, foo: 1, bar: 2},
-          bComponent: R.merge(
+          bComponent: R.mergeRight(
             {key: 'bComponent', moreStuff: 2, bar: 2, styles: {width: 10}, width: 10},
             props.data.someExtraProps
           ),
@@ -260,7 +260,7 @@ describe('componentHelpers', () => {
       mergeStylesIntoViews(
         p => ({
           // If we want these styles in our view, one of which is from props.style
-          someView: R.merge({
+          someView: R.mergeRight({
             color: 'red'
           }, p.style)
         }),
