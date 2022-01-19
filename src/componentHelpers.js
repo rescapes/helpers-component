@@ -98,8 +98,8 @@ export const e = (component, props = {}, children = null) => {
  * @param {Function} [level] Default log.debug (or log.info if process.env.LOGGING_FORCE_CHOICEPOINT is true)
  * @param {String} message THe message
  */
-const logChoicepoint = ({componentName, level=process?.env?.LOGGING_FORCE_CHOICEPOINT ? log.info : log.debug}, message) => {
-  componentName && level(message)
+const logChoicepoint = ({componentName, level=process?.env?.LOGGING_FORCE_CHOICEPOINT ? 'info' : 'debug'}, message) => {
+  componentName && log[level](message)
 }
 /**
  * Returns a function that expects each described apollo request props to contain
