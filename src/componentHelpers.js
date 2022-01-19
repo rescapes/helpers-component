@@ -91,6 +91,17 @@ export const e = (component, props = {}, children = null) => {
 }
 
 /**
+ * Log renderChoicepoint decision. By default logs at debug level unless process.env.LOGGING_FORCE_CHOICEPOINT
+ * is true
+ * @param {Object} options
+ * @param {String} options.componentName The component name. No logging occurs unless specified
+ * @param {Function} [level] Default log.debug (or log.info if process.env.LOGGING_FORCE_CHOICEPOINT is true)
+ * @param {String} message THe message
+ */
+const logChoicepoint = ({componentName, level=process?.env?.LOGGING_FORCE_CHOICEPOINT ? log.info : log.debug}, message) => {
+  componentName && level(message)
+}
+/**
  * Returns a function that expects each described apollo request props to contain
  * loading, error or networkStatus = 7 (loaded). Whether or not a prop is relevant to one of the 3 statuses is
  * based on the propConfig.
@@ -145,7 +156,7 @@ export const renderChoicepoint = R.curry(({onError, onLoading, onData, component
         return bypass;
       },
       props => {
-        componentName && log.debug(`Choicepoint: ${componentName} is bypassing due to authentication`);
+        logChoicepoint({componentName}, `Choicepoint: ${componentName} is bypassing due to authentication`)
         return bypass(props);
       }
     ],
@@ -156,7 +167,7 @@ export const renderChoicepoint = R.curry(({onError, onLoading, onData, component
         return R.length(keys);
       },
       props => {
-        componentName && log.debug(`Choicepoint: ${componentName} ERROR state due to keys ${R.join(', ', keys)}`);
+        logChoicepoint({componentName}, `Choicepoint: ${componentName} ERROR state due to keys ${R.join(', ', keys)}`)
         return onError(keys, props);
       }
     ],
@@ -167,7 +178,7 @@ export const renderChoicepoint = R.curry(({onError, onLoading, onData, component
         return R.length(keys);
       },
       props => {
-        componentName && log.debug(`Choicepoint: ${componentName} LOADING state due to keys ${R.join(', ', keys)}`);
+        logChoicepoint({componentName}, `Choicepoint: ${componentName} LOADING state due to keys ${R.join(', ', keys)}`)
         return onLoading(props);
       }
     ],
@@ -178,7 +189,7 @@ export const renderChoicepoint = R.curry(({onError, onLoading, onData, component
         return R.length(keys);
       },
       props => {
-        componentName && log.debug(`Choicepoint: ${componentName} NOT READY state due to mutation keys ${R.join(', ', keys)}`);
+        logChoicepoint({componentName}, `Choicepoint: ${componentName} NOT READY state due to mutation keys ${R.join(', ', keys)}`)
         return onLoading(props);
       }
     ],
@@ -196,7 +207,7 @@ export const renderChoicepoint = R.curry(({onError, onLoading, onData, component
         return R.equals(R.length(keys), R.length(relevantKeys));
       },
       props => {
-        componentName && log.debug(`Choicepoint: ${componentName} DATA state due to keys ${R.join(', ', keys)}`);
+        logChoicepoint({componentName}, `Choicepoint: ${componentName} DATA state due to keys ${R.join(', ', keys)}`)
         return onData(props);
       }
     ],
