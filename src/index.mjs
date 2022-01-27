@@ -22,7 +22,8 @@ export {
   mutationsReadyAndQueriesLoadedPropConfig,
   filterForQueryContainers,
   filterForMutationContainers,
-  filterForMutationContainersWithQueriesRunFirst
+  filterForMutationContainersWithQueriesRunFirst,
+  keyViewProps
 } from './componentHelpers.js';
 
 export {

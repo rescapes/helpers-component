@@ -86,9 +86,12 @@ export const eMap = types => R.map(component => React.createElement(component), 
  * @param {Object} [children] Default props.children or null
  * @returns the factory for the component. Thus you can call e('div')({...props...}, ...child components)
  */
+export const e = React.createElement;
+/*
 export const e = (component, props = {}, children = null) => {
   return children ? jsx(component, {...props, children}) : jsx(component, props)
 }
+ */
 
 /**
  * Log renderChoicepoint decision. By default logs at debug level unless process.env.LOGGING_FORCE_CHOICEPOINT
@@ -98,7 +101,10 @@ export const e = (component, props = {}, children = null) => {
  * @param {Function} [level] Default log.debug (or log.info if process.env.LOGGING_FORCE_CHOICEPOINT is true)
  * @param {String} message THe message
  */
-const logChoicepoint = ({componentName, level=process?.env?.LOGGING_FORCE_CHOICEPOINT ? 'info' : 'debug'}, message) => {
+const logChoicepoint = ({
+                          componentName,
+                          level = process?.env?.LOGGING_FORCE_CHOICEPOINT ? 'info' : 'debug'
+                        }, message) => {
   componentName && log[level](message)
 }
 /**
@@ -519,6 +525,9 @@ export const mergeEventHandlersForViews = R.curry((viewToActionNames, props) => 
     bar: 2,
   }
  *
+ * @param {Object} config
+ * @param {Object} [config.ignoreTopLevelFunctions] Default false. If ture, don't pass props to top-level functions.
+ * Assume that they are functional props that don't need props.
  * @param {Function|Object} viewsToPropValuesOrFuncs If an object then as described above.
  * If a funciton it expects props and returns the object as described above. A function is
  * useful for generating multiple key/values
@@ -526,7 +535,7 @@ export const mergeEventHandlersForViews = R.curry((viewToActionNames, props) => 
  * @param {Object} props.data Must be present to search for propPaths
  * @props {Object} props with props added to props.views
  */
-export const mergePropsForViews = R.curry((viewNamesToViewProps, props) => {
+export const mergePropsForViews = R.curry(({ignoreTopLevelFunctions = false}, viewNamesToViewProps, props) => {
 
   // If result matching view props object is a function, wrap them in a function
   // These functions have to accept an item (datum), the props arg has already been given to them
@@ -615,16 +624,20 @@ export const mergePropsForViews = R.curry((viewNamesToViewProps, props) => {
       R.mapObjIndexed(
         (viewPropsObjOrFunction, viewName) => R.compose(
           // If anything non render props is still a function, an item function, make sure our key property is an item function
-          objOrFunc => {
-            return keyViewIfAnyFunctionsRemain(viewName, objOrFunc);
-          },
+          objOrFunc => R.unless(() => ignoreTopLevelFunctions,
+            objOrFunc => {
+              return keyViewIfAnyFunctionsRemain(viewName, objOrFunc);
+            }
+          )(objOrFunc),
           objOrFunc => R.unless(
-            R.is(Function),
-            objOrFunc => R.mapObjIndexed(
-              // If any individual prop value is a function, pass props to it.
-              (o, propName) => applyToIfNonRenderFunction(propName, props, o),
-              objOrFunc
-            )
+            objOrFunc => R.is(Function, objOrFunc),
+            objOrFunc => R.unless(() => ignoreTopLevelFunctions,
+              objOrFunc => R.mapObjIndexed(
+                // If any individual prop value is a function, pass props to it.
+                (o, propName) => applyToIfNonRenderFunction(propName, props, o),
+                objOrFunc
+              )
+            )(objOrFunc)
           )(objOrFunc),
           // Add a key to the view based on the viewName or datum.key or the viewName plus datum index
           objOrFunc => keyView(viewName)(objOrFunc),
@@ -993,11 +1006,20 @@ export const nameLookup = nameObj =>
 export const composeViews = R.curry((viewNameToViewActions, viewNameToViewProps, viewNameToViewStyles, props) => {
     return R.compose(
       p => mergeEventHandlersForViews(viewNameToViewActions, p),
-      p => mergePropsForViews(viewNameToViewProps, p),
+      p => mergePropsForViews({}, viewNameToViewProps, p),
       p => mergeStylesIntoViews(viewNameToViewStyles, p)
     )(props)
   }
 );
+
+/**
+ * Simplified version of composeViews when not using actions and styles. Just adds keys to the viewProps
+ * @param viewNameToViewProps
+ * @param props
+ */
+export const keyViewProps = (viewNameToViewProps, props) => {
+  return mergePropsForViews({ignoreTopLevelFunctions: true}, viewNameToViewProps, props)
+}
 
 /**
  * Like composeViews but takes a viewStruct as input for smaller component
@@ -1011,7 +1033,7 @@ export const composeViewsFromStruct = R.curry((viewStruct, props) => {
     const propFor = R.prop(R.__, viewStruct);
     return R.compose(
       R.when(R.always(propFor('actions')), mergeEventHandlersForViews(propFor('actions'))),
-      R.when(R.always(propFor('props')), mergePropsForViews(propFor('props'))),
+      R.when(R.always(propFor('props')), mergePropsForViews({}, propFor('props'))),
       R.when(R.always(propFor('styles')), mergeStylesIntoViews(propFor('styles')))
     )(props);
   }

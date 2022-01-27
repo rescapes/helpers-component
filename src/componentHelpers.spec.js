@@ -10,7 +10,6 @@
  */
 import * as R from 'ramda';
 //import * as chakra from "@chakra-ui/react";
-
 import {
   applyIfFunction,
   applyToIfFunction,
@@ -20,6 +19,7 @@ import {
   e,
   itemizeProps,
   keysMatchingStatus,
+  keyViewProps,
   keyWith,
   liftAndExtract,
   mergeEventHandlersForViews,
@@ -30,7 +30,7 @@ import {
   propsForItem,
   propsForSansClass
 } from './componentHelpers.js';
-import {defaultNode, mergeDeep, reqStrPathThrowing} from '@rescapes/ramda';
+import {mergeDeep, reqStrPathThrowing} from '@rescapes/ramda';
 import {joinComponents, keyWithDatum, mergePropsForViews, renderChoicepoint} from 'componentHelpers';
 import React from 'react';
 
@@ -106,12 +106,29 @@ describe('componentHelpers', () => {
         }
       }
     };
-    expect(mergePropsForViews(viewNamesToViewProps, props)).toEqual(mergeDeep({views: viewNamesToViewProps}, props));
+    expect(mergePropsForViews({}, viewNamesToViewProps, props)).toEqual(mergeDeep({views: viewNamesToViewProps}, props));
   });
+
+  test('keyViewProps', () => {
+    const viewProps = {
+      aComponent: {
+        a: 1,
+        b: () => {
+          return 'funny'
+        }
+      }
+    }
+    expect(keyViewProps(viewProps)).toEqual({views: R.over(
+      R.lensProp('aComponent'),
+      props => ({...props, key: "aComponent"}),
+      viewProps
+    )})
+  })
 
   test('mergePropsForViews', () => {
 
     const mergeProps = mergePropsForViews(
+      {},
       props => ({
         aComponent: {
           foo: 1,
@@ -494,9 +511,11 @@ describe('componentHelpers', () => {
       }
     );
     expect(propsFor(viewProps, 'bermudaProps')).toEqual(
-      {key: 'bermudaProps',
+      {
+        key: 'bermudaProps',
         "data-testid": "bermudaProps",
-        className: 'bermuda-props'}
+        className: 'bermuda-props'
+      }
     );
   });
 
@@ -547,7 +566,7 @@ describe('componentHelpers', () => {
     expect([component, props]).toEqual(
       [
         Button,
-        {className: 'foo-view',  "data-testid": "fooView", style: {'background-color': 'red'}, key: 'fooView', bar: 1}
+        {className: 'foo-view', "data-testid": "fooView", style: {'background-color': 'red'}, key: 'fooView', bar: 1}
       ]
     );
   });
