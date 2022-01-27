@@ -151,6 +151,7 @@ const logChoicepoint = ({
 export const renderChoicepoint = R.curry(({onError, onLoading, onData, componentName}, propConfig, props) => {
   let keys;
   if (R.isEmpty(propConfig)) {
+    logChoicepoint({componentName}, `Choicepoint: ${componentName} DATA state due no keys passed`)
     return onData(props);
   }
   // Is there an authentication result that instructs bypassing to onData or onError
