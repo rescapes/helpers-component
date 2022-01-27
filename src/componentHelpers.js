@@ -1017,9 +1017,9 @@ export const composeViews = R.curry((viewNameToViewActions, viewNameToViewProps,
  * @param viewNameToViewProps
  * @param props
  */
-export const keyViewProps = (viewNameToViewProps, props) => {
+export const keyViewProps = R.curry((viewNameToViewProps, props) => {
   return mergePropsForViews({ignoreTopLevelFunctions: true}, viewNameToViewProps, props)
-}
+})
 
 /**
  * Like composeViews but takes a viewStruct as input for smaller component
