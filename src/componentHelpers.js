@@ -1023,6 +1023,38 @@ export const keyViewProps = R.curry((viewNameToViewProps, props) => {
 })
 
 /**
+ * Like composeViews but doesn't pass props or datum to views or view props that are functions
+ * @param {Object} config
+ * @param {Object|Function} config.viewProps Argument to mergePropsForViews. See mergePropsForViews
+ * @param {Object|Function} [config.viewStyles] Default identity function. Argument to mergeStylesIntoViews. See mergeStylesIntoViews
+ * @param {Object} [config.viewActions] Default identity function Argument to mergeActionsForView. See mergeEventHandlersForViews
+ * @param {Object} props Props that are used for the composition. Each of the three functions
+ * is called with the props.
+ * Styles is computed first in case viewProps need to access a computed style value, namely with and height.
+ * Otherwise There should be no dependencies between the three functions--they
+ * each contribute to the returned props.views
+ * @return {Function} The modified props with view properties added by each of the three functions
+ */
+export const composeSimpleViews = R.curry((
+  {
+    viewNameToViewProps,
+    viewNameToViewStyles = R.identity,
+    viewNameToViewActions = R.identity
+  }, props) => {
+  return R.compose(
+    p => {
+      return mergeEventHandlersForViews(viewNameToViewActions, p)
+    },
+    p => {
+      return mergePropsForViews({ignoreTopLevelFunctions: true}, viewNameToViewProps, p)
+    },
+    p => {
+      return mergeStylesIntoViews(viewNameToViewStyles, p)
+    }
+  )(props)
+})
+
+/**
  * Like composeViews but takes a viewStruct as input for smaller component
  * @param {Object} viewStruct
  * @param {Object} viewStruct.actions Optional. Maps actions to views

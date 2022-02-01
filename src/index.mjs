@@ -23,7 +23,8 @@ export {
   filterForQueryContainers,
   filterForMutationContainers,
   filterForMutationContainersWithQueriesRunFirst,
-  keyViewProps
+  keyViewProps,
+  composeSimpleViews
 } from './componentHelpers.js';
 
 export {
