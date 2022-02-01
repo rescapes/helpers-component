@@ -1038,18 +1038,18 @@ export const keyViewProps = R.curry((viewNameToViewProps, props) => {
 export const composeSimpleViews = R.curry((
   {
     viewNameToViewProps,
-    viewNameToViewStyles = R.identity,
-    viewNameToViewActions = R.identity
+    viewNameToViewStyles,
+    viewNameToViewActions,
   }, props) => {
   return R.compose(
     p => {
-      return mergeEventHandlersForViews(viewNameToViewActions, p)
+      return viewNameToViewActions ?  mergeEventHandlersForViews(viewNameToViewActions, p) : p;
     },
     p => {
       return mergePropsForViews({ignoreTopLevelFunctions: true}, viewNameToViewProps, p)
     },
     p => {
-      return mergeStylesIntoViews(viewNameToViewStyles, p)
+      return viewNameToViewStyles ? mergeStylesIntoViews(viewNameToViewStyles, p) : p
     }
   )(props)
 })
